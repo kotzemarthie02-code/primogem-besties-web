@@ -5,296 +5,680 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Primogem Besties</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Inter,sans-serif}
-body{background:#f6f7fb;color:#111827;min-height:100vh;padding-bottom:100px}
-.top{position:sticky;top:0;z-index:20;background:#f6f7fb;padding:12px 16px}
-.top h1{font-size:20px;font-weight:800;text-align:center}
-.top small{display:block;text-align:center;color:#6b7280;font-size:12px}
-.card{background:#fff;border-radius:20px;margin:12px 16px;padding:14px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
-.tab2{background:#eef2ff;border-radius:16px;display:flex;padding:4px;margin:10px 0}
-.tab2 button{flex:1;border:none;background:transparent;padding:10px;border-radius:12px;font-weight:700;cursor:pointer}
-.tab2 button.active{background:#3b82f6;color:#fff}
-.weekBar{display:flex;gap:8px;align-items:center;padding:0 16px}
-.weekBar .dateChip{flex:1;background:#fff;padding:12px 14px;border-radius:14px;font-size:13px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 6px rgba(0,0,0,.05)}
-.weekBar .shareBtn{background:#22c55e;color:#fff;border:none;padding:12px 16px;border-radius:14px;font-weight:700;cursor:pointer}
-.dayCard .dayHead{display:flex;justify-content:space-between;align-items:center}
-.dayTitle{font-weight:800;font-size:16px}
-.daySub{color:#6b7280;font-size:12px}
-.searchRow{display:flex;gap:8px;margin-top:10px}
-.searchRow input{flex:1;background:#f3f4f6;border:none;padding:12px 14px;border-radius:12px;font-size:14px}
-.searchRow button{background:#3b82f6;color:#fff;border:none;width:42px;height:42px;border-radius:12px;font-size:20px;cursor:pointer}
-.emojiGrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;background:#f9fafb;padding:8px;border-radius:12px}
-.emojiGrid span{font-size:20px;cursor:pointer;padding:4px;border-radius:8px}
-.emojiGrid span:hover{background:#e5e7eb}
-.planItem{display:flex;justify-content:space-between;align-items:center;background:#f0fdf4;border:1px solid #dcfce7;padding:10px 12px;border-radius:12px;margin-top:8px}
-.planItem.group{background:#eff6ff;border-color:#dbeafe}
-.planLeft{flex:1}
-.planMeta{font-size:11px;color:#6b7280}
-.planActions{display:flex;gap:6px;align-items:center}
-.iconBtn{border:none;background:#fff;border-radius:8px;padding:6px 8px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08);font-size:12px}
-.joinedBtn{background:#22c55e;color:#fff;border:none;padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer}
-.joinedBtn.joined{background:#111827}
-.bottomNav{position:fixed;left:12px;right:12px;bottom:12px;background:#fff;border-radius:22px;display:flex;justify-content:space-around;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.12);z-index:30}
-.bottomNav button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;color:#9ca3af;font-size:11px;cursor:pointer;padding:6px 12px;border-radius:12px}
-.bottomNav button.active{color:#3b82f6;background:#eff6ff;font-weight:700}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+:root{--bg:#f6f7fd;--ink:#141b34;--gray:#6b7390;--blue:#5078f5;--chip:#eceef7;--green:#05d85b;--mint:#a8e6cf}
+body{background:var(--bg);color:var(--ink);min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:0 14px 120px;position:relative}
+button{font-family:inherit;cursor:pointer}
 .hidden{display:none!important}
-.loginAvatars{display:flex;justify-content:center;margin:10px 0}
-.loginAvatars div{width:44px;height:44px;border-radius:50%;border:3px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;margin:6px 0}
-.primary{width:100%;background:#3b82f6;color:#fff;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;margin-top:8px}
-.calendarGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;margin-top:10px}
-.calendarGrid div{padding:10px 4px;border-radius:10px;font-size:13px;cursor:pointer}
-.calendarGrid div.hasEvent{border:1px solid #3b82f6}
-.calendarGrid div.today{background:#bbf7d0;font-weight:800}
-.calendarGrid div.selected{background:#3b82f6;color:#fff}
-.eventListItem{background:#f9fafb;padding:10px 12px;border-radius:12px;margin-top:8px;display:flex;justify-content:space-between}
-.notif{padding:12px;border-radius:14px;display:flex;gap:10px;margin-top:8px}
-.notif.blue{background:#dbeafe}
-.notif.green{background:#dcfce7}
-.notif.gray{background:#f3f4f6}
-.profileAvatar{width:84px;height:84px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:40px;border:3px solid #e5e7eb;cursor:pointer}
+/* header */
+.top{position:sticky;top:0;z-index:20;background:var(--bg);height:60px;display:flex;align-items:center;justify-content:center;margin:0 -14px}
+.top h1{font-size:18px;font-weight:800}
+.gear{position:absolute;right:14px;top:8px;width:44px;height:44px;border-radius:50%;background:#a5a8b1;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.gear svg{width:24px;height:24px;fill:#fff}
+.groupRow{display:flex;align-items:center;gap:12px;margin-top:6px}
+.groupLogo{width:44px;height:44px;border-radius:14px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
+.groupName{font-size:18px;font-weight:800}
+.groupName i{color:var(--blue);font-style:normal;margin:0 2px}
+.groupSub{font-size:12px;color:var(--gray);font-weight:600}
+.lbl{font-size:14px;font-weight:700;color:var(--gray);margin:18px 0 8px}
+.avRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.av{border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.invite{background:#dfe7ff;color:#6b8cff;border:none;border-radius:24px;padding:0 20px;height:48px;font-size:15px;font-weight:700}
+/* color pickers */
+.colorRow{display:flex;gap:10px;margin-top:16px}
+.cpick{flex:1;min-width:0;background:#fff;border-radius:20px;padding:12px;box-shadow:0 2px 10px rgba(30,40,90,.08)}
+.cTop b{display:block;font-size:14px;font-weight:800}
+.cTop span{display:block;font-size:11px;font-weight:600;color:var(--gray);margin-top:1px}
+.cMain{display:flex;align-items:center;gap:10px;margin-top:10px}
+.swatch{position:relative;width:52px;height:52px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 0 0 2px #d4d8e8,0 2px 8px rgba(0,0,0,.12);overflow:hidden;cursor:pointer}
+.swatch input{position:absolute;inset:-10px;width:80px;height:80px;opacity:0;cursor:pointer;border:none;padding:0}
+.hexBox{flex:1;min-width:0;width:100%;background:#f3f4fb;border:2px solid transparent;border-radius:14px;height:44px;padding:0 10px;font-size:15px;font-weight:800;color:var(--ink);text-transform:uppercase;outline:none;text-align:center}
+.hexBox:focus{border-color:var(--blue);background:#fff}
+.hexBox.bad{border-color:#ff3347}
+/* planner */
+.seg{background:#e9ecf9;border-radius:20px;display:flex;padding:5px;margin-top:16px}
+.seg button{flex:1;border:none;background:transparent;padding:13px;border-radius:16px;font-weight:800;font-size:15px;color:var(--ink)}
+.seg button.active{background:var(--blue);color:#fff}
+.weekBar{display:flex;gap:10px;align-items:center;margin-top:14px}
+.chip{flex:1;background:var(--chip);border-radius:16px;height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;position:relative;overflow:hidden}
+.chip select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px}
+.chip em{font-style:normal;color:#8a90a8;font-size:16px}
+.shareBtn{background:var(--green);color:#fff;border:none;height:52px;padding:0 18px;border-radius:18px;font-weight:800;font-size:15px}
+h2.sec{font-size:24px;font-weight:800;margin-top:22px}
+.secSub{font-size:14px;color:var(--gray);margin-top:2px;font-weight:500}
+.dayCard{background:#fff;border-radius:24px;padding:18px 18px;margin-top:16px;box-shadow:0 4px 16px rgba(30,40,90,.08)}
+.dayCard.today{box-shadow:0 0 0 2px #bff0d6,0 4px 16px rgba(30,40,90,.08)}
+.dayTitle{font-size:22px;font-weight:800}
+.daySub{font-size:16px;color:var(--gray);font-weight:600;margin-top:2px}
+.none{font-size:14px;color:var(--gray);font-weight:600;margin-top:14px}
+.addRow{display:flex;align-items:center;gap:10px;margin-top:12px}
+.addRow input{flex:1;min-width:0;background:#f3f4fb;border:none;border-radius:16px;height:48px;padding:0 14px;font-size:14px;color:var(--ink);outline:none}
+.addRow input::placeholder{color:#9aa0b8}
+.plusBtn{width:50px;height:50px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:28px;line-height:1;flex:none}
+.quick{display:flex;gap:14px;margin:12px 0 0 62px;flex-wrap:wrap}
+.quick span{font-size:24px;cursor:pointer}
+.plan{margin-top:14px}
+.planTop{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gray);font-weight:700;margin-bottom:6px}
+.planLine{display:flex;align-items:center;gap:10px}
+.bubble{flex:1;min-width:0;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700;border-left:5px solid var(--pc);background:var(--pcbg);word-break:break-word}
+.bubble .pe{font-size:24px}
+.editBtn{background:none;border:none;color:var(--blue);width:36px;height:36px;flex:none;display:flex;align-items:center;justify-content:center}
+.editBtn svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.joinBtn{background:var(--blue);color:#fff;border:none;border-radius:20px;height:40px;padding:0 18px;font-weight:800;font-size:14px;flex:none}
+.joinBtn.joined{background:#1e2a4a}
+.pmeta{font-size:13px;color:var(--gray);font-weight:600;margin-top:6px}
+.pmeta.has{color:#17a35a}
+/* month */
+.calHead{background:#ebedf6;border-radius:20px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;margin-top:20px}
+.calHead h3{font-size:20px;font-weight:800}
+.calHead button{background:none;border:none;font-size:30px;color:var(--ink);width:40px;line-height:1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);row-gap:8px;margin-top:16px;text-align:center}
+.cal .wd{font-size:14px;color:var(--gray);font-weight:700;padding:8px 0 10px}
+.cal .d{height:46px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;font-weight:800;cursor:pointer;margin:0 3px}
+.cal .d.today{background:#bff0d6}
+.dots{display:flex;gap:3px;height:7px;margin-top:3px}
+.dots i{width:7px;height:7px;border-radius:50%;display:block}
+.evCard{background:#e8edfd;border:1px solid #dae3fb;border-radius:24px;padding:16px;margin-top:14px}
+.evDate{color:var(--blue);font-weight:800;font-size:16px}
+.evItem{margin-top:10px}
+.evWho{display:flex;gap:10px;align-items:flex-start}
+.evWho .col{flex:1;min-width:0}
+.evWho small{display:block;font-size:13px;color:var(--gray);font-weight:600;margin-bottom:4px}
+.evCard .bubble{background:var(--pcbg);}
+/* activity */
+.notif{border-radius:24px;padding:16px;display:flex;align-items:center;gap:14px;margin-top:14px;box-shadow:0 4px 14px rgba(30,40,90,.07);cursor:pointer}
+.notif.blue{background:#dfeaff}
+.notif.green{background:#d8f5e3}
+.notif.red{background:#fff}
+.nIcon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;font-size:26px}
+.notif.blue .nIcon{background:#c6d9ff;color:#5078f5}
+.notif.green .nIcon{background:#bdebd0;color:#16a35a}
+.notif.red .nIcon{background:#ff3347;color:#fff;font-size:30px;font-weight:800}
+.nIcon svg{width:28px;height:28px;fill:currentColor}
+.nBody{flex:1;min-width:0}
+.nBody b{display:block;font-size:17px;font-weight:800}
+.nBody span{display:block;font-size:14px;color:var(--gray);font-weight:600;margin-top:2px;word-break:break-word}
+.badge{width:46px;height:46px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800}
+.badge.unread{background:#ff3347}
+.badge.read{background:#10b866}
+.badge.sm{width:34px;height:34px;font-size:16px}
+.empty{color:var(--gray);font-size:14px;font-weight:600;margin-top:14px}
+/* profile */
+.pCard{background:#fff;border-radius:28px;padding:26px 22px 22px;margin-top:20px;box-shadow:0 4px 16px rgba(30,40,90,.08)}
+.bigAv{width:142px;height:142px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:72px}
+.nameRow{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px}
+.nameRow input{width:62%;background:#f3f4fb;border:none;border-radius:22px;height:56px;text-align:center;font-size:18px;font-weight:700;color:var(--ink);outline:none}
+.rbtn{width:44px;height:44px;border-radius:50%;border:none;color:#fff;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.rbtn.ok{background:#10b866}.rbtn.no{background:#a5a8b8}
+.pTitle{font-size:16px;font-weight:800;margin:26px 0 12px}
+.emojiG7{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.emojiG7 button,.emojiG6 button{aspect-ratio:1;background:#f3f4fb;border:2px solid transparent;border-radius:16px;font-size:28px;display:flex;align-items:center;justify-content:center}
+.emojiG7 button.sel,.emojiG6 button.sel{border-color:var(--blue);background:#eaf0ff}
+.colorG{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.colorG button{aspect-ratio:1;border-radius:50%;border:3px solid #e7eaf4}
+.colorG button.sel{border-color:var(--blue)}
+.hexIn{width:100%;background:#f3f4fb;border:none;border-radius:16px;height:56px;padding:0 18px;font-size:16px;font-weight:700;color:var(--ink);outline:none}
+.saveAv{width:100%;margin-top:20px;background:var(--blue);color:#fff;border:none;border-radius:18px;height:56px;font-size:16px;font-weight:800}
+.waBig{width:100%;margin-top:18px;background:var(--green);color:#fff;border:none;border-radius:20px;height:64px;font-size:16px;font-weight:800}
+.logout{width:100%;margin-top:14px;background:#fff;color:#e11d2e;border:none;border-radius:20px;height:64px;font-size:16px;font-weight:800;box-shadow:0 2px 10px rgba(30,40,90,.05)}
+/* bottom nav */
+.bottomNav{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:calc(100% - 24px);max-width:456px;background:#fff;border-radius:30px;display:flex;justify-content:space-around;padding:10px 8px;box-shadow:0 8px 28px rgba(30,40,90,.16);z-index:30}
+.bottomNav button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:#8a90a8;font-size:12px;font-weight:600;padding:4px 12px;flex:1}
+.bottomNav svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bottomNav button.active{color:var(--blue);font-weight:800}
+.bottomNav button.active svg{fill:currentColor}
+.bottomNav button.active svg .w{stroke:#fff}
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(20,27,52,.55);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:30px;padding:22px;width:100%;max-width:440px}
+.modal h3{font-size:22px;font-weight:800}
+.edTop{display:flex;align-items:center;gap:14px;margin-top:14px}
+.edEmoji{font-size:44px;width:56px;text-align:center}
+.edTop input{flex:1;min-width:0;background:#f3f4fb;border:none;border-radius:16px;height:56px;padding:0 16px;font-size:16px;font-weight:600;color:var(--ink);outline:none}
+.emojiG6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;max-height:300px;overflow-y:auto;padding-right:8px}
+.edBtns{display:flex;gap:10px;margin-top:16px}
+.edBtns button{height:56px;border:none;border-radius:18px;font-size:16px;font-weight:800}
+.bSave{flex:2.2;background:var(--blue);color:#fff}
+.bCancel{flex:1;background:#ececf0;color:#555b70}
+.bDel{width:76px;background:#ffd6d9;font-size:22px!important}
+.pkHead{background:#ebedf6;border-radius:20px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;margin-top:14px}
+.pkHead h4{font-size:18px;font-weight:800;flex:1;text-align:center}
+.pkHead button{background:none;border:none;width:40px;height:40px;color:var(--ink);display:flex;align-items:center;justify-content:center}
+.pkHead svg{width:24px;height:24px;fill:currentColor}
+.pkGrid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:6px;margin-top:14px;text-align:center}
+.pkGrid .wd{font-size:14px;color:var(--gray);font-weight:600;padding:6px 0 8px}
+.pkGrid .pd{width:44px;height:44px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;border:2px solid transparent}
+.pkGrid .pd.wk{background:#dfe8ff;font-weight:800}
+.pkGrid .pd.tdy{border-color:var(--blue)}
+/* login */
+.loginAvatars{display:flex;justify-content:center;margin:14px 0}
+.loginAvatars div{width:48px;height:48px;border-radius:50%;border:3px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.lcard{background:#fff;border-radius:24px;padding:16px;margin-top:16px;box-shadow:0 4px 16px rgba(30,40,90,.08)}
+.tab2{background:#e9ecf9;border-radius:16px;display:flex;padding:4px;margin-bottom:10px}
+.tab2 button{flex:1;border:none;background:transparent;padding:11px;border-radius:12px;font-weight:800;color:var(--ink)}
+.tab2 button.active{background:var(--blue);color:#fff}
+.input{width:100%;padding:14px;border:none;background:#f3f4fb;border-radius:14px;margin:6px 0;font-size:15px;outline:none}
+.primary{width:100%;background:var(--blue);color:#fff;border:none;padding:14px;border-radius:14px;font-weight:800;font-size:15px;margin-top:8px}
 </style>
 </head>
 <body>
 
-<div id="loginScreen">
-<div class="top"><small>App name</small><h1>Primogem Besties 💎</h1></div>
-<div class="loginAvatars"><div style="background:#93c5fd">😊</div><div style="background:#fdba74">🥰</div><div style="background:#c4b5fd">😎</div><div style="background:#86efac">🤩</div><div style="background:#fde68a">🙂</div></div>
-<p style="text-align:center;color:#6b7280;font-size:13px;padding:0 20px">Welcome! Login or create an account to plan your weekly activities</p>
-<div class="card">
-<div class="tab2"><button class="active">Login</button><button onclick="alert('Register same as Login for demo - just login')">Register</button></div>
-<input id="loginEmail" class="input" placeholder="Email" value="bluely@gmail.com">
-<input id="loginPass" class="input" type="password" placeholder="Password" value="123456">
-<button class="primary" onclick="doLogin()">Login</button>
-<p style="text-align:center;margin-top:10px;font-size:12px;color:#6b7280">Profile will stay saved after closing app</p>
-</div>
-</div>
-
-<div id="appScreen" class="hidden">
-<div class="top" style="display:flex;justify-content:space-between;align-items:center">
-<div style="display:flex;align-items:center;gap:8px"><div style="width:38px;height:38px;background:#3b82f6;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff">✦</div><div><div style="font-weight:800;font-size:14px">Trinity • Genshin</div><small id="memberCount">Team Trinity • 1 members</small></div></div>
-<div style="display:flex;gap:8px"><span onclick="nav('profile')" style="cursor:pointer">⚙️</span></div>
+<!-- LOGIN -->
+<div id="loginScreen" class="wrap">
+  <div class="top"><h1>Primogem Besties 💎</h1></div>
+  <div class="loginAvatars"><div style="background:#93c5fd">😊</div><div style="background:#fdba74">🥰</div><div style="background:#c4b5fd">😎</div><div style="background:#86efac">🤩</div><div style="background:#fde68a">🙂</div></div>
+  <p style="text-align:center;color:var(--gray);font-size:13px;padding:0 20px;font-weight:600">Welcome! Login or create an account to plan your weekly activities</p>
+  <div class="lcard">
+    <div class="tab2"><button id="tabLogin" class="active" onclick="setLoginTab('login')">Login</button><button id="tabReg" onclick="setLoginTab('reg')">Register</button></div>
+    <input id="loginEmail" class="input" placeholder="Email" value="bluely@gmail.com" autocomplete="email">
+    <input id="loginPass" class="input" type="password" placeholder="Password" value="123456" autocomplete="current-password">
+    <button class="primary" id="loginBtn" onclick="doLogin()">Login</button>
+    <p style="text-align:center;margin-top:10px;font-size:12px;color:var(--gray);font-weight:600">Profile will stay saved after closing app</p>
+  </div>
 </div>
 
-<div id="tab-planner">
-<div class="card" style="padding:6px"><div class="tab2" style="margin:0"><button id="btnMyWeek" class="active" onclick="setMode('my')">My Week</button><button id="btnGroupWeek" onclick="setMode('group')">Group Week</button></div></div>
-<div class="weekBar">
-<div class="dateChip"><span id="weekLabel">📅 Oct 13 - Oct 19, 2026</span><input id="datePicker" type="date" style="border:none;background:transparent" onchange="jumpToDate(this.value)"></div>
-<button class="shareBtn" onclick="shareWhatsApp()">💬 Share</button>
-</div>
-<div style="padding:0 16px"><input id="globalSearch" class="input" placeholder="Search old plans... like Active tab" oninput="renderDays()" style="background:#fff"></div>
-<div id="daysContainer"></div>
-</div>
-<div id="tab-month" class="hidden">
-<div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center"><button class="iconBtn" onclick="changeMonth(-1)">‹</button><h3 id="monthTitle" style="text-align:center">October 2026</h3><button class="iconBtn" onclick="changeMonth(1)">›</button></div>
-<div class="calendarGrid" id="calendar"></div>
-<div style="margin-top:16px"><b>Weekly Planner Events</b><p style="font-size:12px;color:#6b7280">List of all group plans this month - you asked for this!</p><div id="monthEvents"></div></div>
-</div>
+<!-- APP -->
+<div id="appScreen" class="wrap hidden">
+  <div class="top">
+    <h1 id="pageTitle">Group Weekly Planner</h1>
+    <button class="gear" onclick="nav('profile')" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
+  </div>
+
+  <div class="groupRow">
+    <div class="groupLogo">✦</div>
+    <div><div class="groupName">Trinity <i>•</i> Genshin</div><div class="groupSub" id="memberCount">Team Trinity • 1 members</div></div>
+  </div>
+  <div class="lbl">Group</div>
+  <div class="avRow" id="groupAvatars"></div>
+
+  <!-- PLANNER -->
+  <div id="tab-planner">
+    <div class="colorRow">
+      <div class="cpick">
+        <div class="cTop"><b>My Week</b><span>tap circle or type hex</span></div>
+        <div class="cMain">
+          <label class="swatch" id="swMy"><input type="color" id="colMy" oninput="setColor('my',this.value)"></label>
+          <input class="hexBox" id="colMyHex" maxlength="7" placeholder="#A8E6CF" oninput="hexColor('my',this.value)">
+        </div>
+      </div>
+      <div class="cpick">
+        <div class="cTop"><b>Group Week</b><span>tap circle or type hex</span></div>
+        <div class="cMain">
+          <label class="swatch" id="swGroup"><input type="color" id="colGroup" oninput="setColor('group',this.value)"></label>
+          <input class="hexBox" id="colGroupHex" maxlength="7" placeholder="#93C5FD" oninput="hexColor('group',this.value)">
+        </div>
+      </div>
+    </div>
+    <div class="seg"><button id="btnMy" class="active" onclick="setMode('my')">My Week</button><button id="btnGroup" onclick="setMode('group')">Group Week</button></div>
+    <div class="weekBar">
+      <div class="chip" onclick="openPicker()"><span id="weekLabel">📅 </span><em>⌄</em></div>
+      <button class="shareBtn" onclick="shareWhatsApp()">💬 Share</button>
+    </div>
+    <h2 class="sec">Weekly Planner</h2>
+    <div class="secSub">Select or view each day's planned activity</div>
+    <div id="daysContainer"></div>
+  </div>
+
+  <!-- MONTH -->
+  <div id="tab-month" class="hidden">
+    <div class="calHead"><button onclick="changeMonth(-1)">‹</button><h3 id="monthTitle"></h3><button onclick="changeMonth(1)">›</button></div>
+    <div class="cal" id="calendar"></div>
+    <h2 class="sec" style="margin-top:28px">Weekly Planner Events</h2>
+    <div class="secSub" id="monthSub"></div>
+    <div id="monthEvents"></div>
+  </div>
+
+  <!-- ACTIVITY -->
+  <div id="tab-activity" class="hidden">
+    <h2 class="sec">Notifications</h2>
+    <div class="secSub">Latest activity &amp; reminders</div>
+    <div id="notifList"></div>
+    <h2 class="sec" style="margin-top:28px">Updates</h2>
+    <div class="secSub">Recent changes &amp; alerts</div>
+    <div id="updateList"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="tab-profile" class="hidden">
+    <div class="pCard">
+      <div id="bigAvatar" class="bigAv">🧪</div>
+      <div class="nameRow">
+        <input id="profileName" maxlength="24" onkeydown="if(event.key==='Enter')saveName()">
+        <button class="rbtn ok" onclick="saveName()" aria-label="Save name">✓</button>
+        <button class="rbtn no" onclick="cancelName()" aria-label="Cancel">✕</button>
+      </div>
+      <div class="pTitle">Emoji</div>
+      <div class="emojiG7" id="profileEmojiGrid"></div>
+      <div class="pTitle">Color</div>
+      <div class="colorG" id="profileColorGrid"></div>
+      <div class="pTitle">Custom color (hex, e.g. #FF00FF)</div>
+      <input id="hexInput" class="hexIn" value="#A8E6CF" maxlength="7" oninput="hexTyped(this.value)">
+      <button class="saveAv" onclick="saveAvatar()">Save avatar</button>
+    </div>
+    <button class="waBig" onclick="shareWhatsApp()">💬 Share my week to WhatsApp</button>
+    <button class="logout" onclick="doLogout()">Log out</button>
+  </div>
+
+  <div class="bottomNav">
+    <button id="nav-planner" class="active" onclick="nav('planner')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><line class="w" x1="12" y1="3.5" x2="12" y2="20.5"/></svg>Planner</button>
+    <button id="nav-month" onclick="nav('month')"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><line class="w" x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>Month</button>
+    <button id="nav-activity" onclick="nav('activity')"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17z"/><path d="M10 21.5h4"/></svg>Activity</button>
+    <button id="nav-profile" onclick="nav('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Profile</button>
+  </div>
 </div>
 
-<div id="tab-activity" class="hidden">
-<div class="card"><b>Notifications</b><p style="font-size:12px;color:#6b7280">Latest activity & reminders - auto updates when someone Joined/Edited</p><div id="activityList"></div></div>
+<!-- DATE PICKER POPUP -->
+<div id="dateOverlay" class="overlay hidden" onclick="if(event.target===this)closePicker()">
+  <div class="modal">
+    <h3>Choose a date</h3>
+    <div class="pkHead">
+      <button onclick="pkMove(-12)" aria-label="Previous year"><svg viewBox="0 0 24 24"><polygon points="12,5 12,19 3,12"/><polygon points="21,5 21,19 12,12"/></svg></button>
+      <button onclick="pkMove(-1)" aria-label="Previous month"><svg viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><polyline points="15,5 8,12 15,19"/></svg></button>
+      <h4 id="pkTitle"></h4>
+      <button onclick="pkMove(1)" aria-label="Next month"><svg viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><polyline points="9,5 16,12 9,19"/></svg></button>
+      <button onclick="pkMove(12)" aria-label="Next year"><svg viewBox="0 0 24 24"><polygon points="3,5 3,19 12,12"/><polygon points="12,5 12,19 21,12"/></svg></button>
+    </div>
+    <div class="pkGrid" id="pkGrid"></div>
+    <div class="edBtns"><button class="bSave" style="flex:1" onclick="pickThisWeek()">This week</button><button class="bCancel" style="flex:1" onclick="closePicker()">Cancel</button></div>
+  </div>
 </div>
 
-<div id="tab-profile" class="hidden">
-<div class="card" style="text-align:center">
-<div id="profileAvatar" class="profileAvatar" onclick="pickProfileEmoji()">🧪</div>
-<p style="font-size:12px;color:#6b7280;margin-top:6px">Tap avatar to change emoji</p>
-<div style="margin-top:12px;text-align:left">
-<label style="font-size:12px;font-weight:700">Display Name (you can change anytime)</label>
-<input id="profileName" class="input" value="SuperBluely" oninput="saveProfile()">
-<label style="font-size:12px;font-weight:700">Email</label>
-<input id="profileEmail" class="input" value="bluely@gmail.com" readonly>
-</div>
-<div style="margin-top:12px;text-align:left"><b>Choose your profile emoji</b>
-<div class="emojiGrid" id="profileEmojiGrid"></div>
-</div>
-<button class="primary" style="background:#ef4444;margin-top:16px" onclick="doLogout()">Logout</button>
-<p style="font-size:11px;color:#6b7280;margin-top:8px">Profile stays saved even if you close app - as you requested!</p>
-</div>
+<!-- EDIT POPUP -->
+<div id="editOverlay" class="overlay hidden" onclick="if(event.target===this)closeEdit()">
+  <div class="modal">
+    <h3>Edit event</h3>
+    <div class="edTop"><div class="edEmoji" id="edEmoji">✨</div><input id="edText" placeholder="Plan" onkeydown="if(event.key==='Enter')saveEdit()"></div>
+    <div class="pTitle" style="margin:16px 0 10px">Emoji</div>
+    <div class="emojiG6" id="edGrid"></div>
+    <div class="edBtns"><button class="bSave" onclick="saveEdit()">Save</button><button class="bCancel" onclick="closeEdit()">Cancel</button><button class="bDel" onclick="deleteFromEdit()">🗑️</button></div>
+  </div>
 </div>
 
-<div class="bottomNav">
-<button id="nav-planner" class="active" onclick="nav('planner')"><span>📅</span>Planner</button>
-<button id="nav-month" onclick="nav('month')"><span>🗓️</span>Month</button>
-<button id="nav-activity" onclick="nav('activity')"><span>🔔</span>Activity</button>
-<button id="nav-profile" onclick="nav('profile')"><span>👤</span>Profile</button>
-</div>
-</div>
-
+<script type="module" src="firebase.js"></script>
 <script>
-const ALL_EMOJIS=["😀","😃","😄","😁","😆","😅","😂","🤣","🥲","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","🤩","🥳","😎","🤓","🧐","🤠","🥸","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😶‍🌫️","😱","😨","😰","😥","😓","🤗","🤔","🫣","🤭","🫢","🫡","🤫","🫠","🤥","😶","😐","😑","😬","🫨","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😮‍💨","😵","🤐","🥴","😵‍💫","🤠","🥳","🥸","😎","🤓","🧐","😕","🫤","😟","🙁","☹️","😮","😯","😲","😳","🥺","🥹","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺","👻","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾","🧪","⚗️","🔬","🔭","🧬","💎","💠","🔮","⭐","🌟","✨","⚡","🔥","💥","🌸","🌺","🌻","🌷","🍓","🍎","🍑","🎮","🏆","🎯","🗡️","🛡️","⚔️","🏹","🧙‍♀️","🧙","🦊","🐉","👑"];
-let currentDate=new Date(2026,9,13);
-let viewMode='my';
-let currentUser={name:'SuperBluely',email:'bluely@gmail.com',emoji:'🧪'};
-let plans=JSON.parse(localStorage.getItem('pb_plans')||'{}');
-let activity=JSON.parse(localStorage.getItem('pb_activity')||'[]');
-let monthOffset=0;
-function loadProfile(){
- const saved=JSON.parse(localStorage.getItem('pb_profile')||'null');
- if(saved) currentUser=saved;
- document.getElementById('profileName').value=currentUser.name;
- document.getElementById('profileEmail').value=currentUser.email;
- document.getElementById('profileAvatar').textContent=currentUser.emoji;
- document.getElementById('memberCount').textContent=`Team Trinity • ${currentUser.name}`;
+/* ---------- storage (profile stays in localStorage) ---------- */
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const EMOJIS=["🧪","🔥","🕊️","🌻","🏍️","😊","😍","⚔️","🌸","💙","⭐","🍀","🌿","✨","🍃","💖","🎮","📅","⏰","🎉","💪","😎","🥰","🌙","☀️","❤️","💜","💚","💛","🧡","💀","👑","🌈","🍓","⚡","💎","🚀","😄","😇","🤩","😴","🤔","🐱","😺","🐶","🐰","🦊","🐻","🐼","🐨","🐸","🐧","🦄","🐲","🦋","🐝","🦅","🦉","🐺","🐯","🦁","🐮","🐷","🐵","🦖","🐬","🐳","🍉","🍒","🍩","🍪","🍫","☕","🧋","🎧","🎨","🎬","📚","🧸","🪄","🌊","🌋","🏆","🏅","🎯","🧩","🛡️","🌟","💫","🌺","🌹","🍁","🍄","🪐","🛸","🎸","🎹","⚽","🏀","🚲","🚗","✈️","🧿","💌","🔔","🕯️"];
+const QUICK=["😊","💎","🍓","🎮","🌸","✨"];
+const PALETTE=["#FFA8D0","#FFC1DD","#FFCFE0","#FFBF94","#FFD3B0","#FFDD90","#FFF0A0","#DDF59A",
+"#BCF5A0","#B2EFD0","#A8E6CF","#8EE8E0","#A0E8F8","#9ED2F8","#A9CCFF","#BCC8FF",
+"#C8A8FF","#D8B8F4","#EBC4F6","#FBB9FF","#FFB9E4","#FFA8BC","#F0B49C","#D8C0A0",
+"#BCCFA8","#8ADCC0","#80C4EC","#A8A0E8","#C0A0D8","#FFFFFF"];
+
+/* ---------- state ---------- */
+let allPlans=[];        // flat list (from Firestore)
+let plans={};           // { 'YYYY-MM-DD': [plan,...] }  built from allPlans
+let activity=[];        // activity docs (Firestore, only mine in FB mode)
+let remoteUsers={};     // avatars of everyone who owns a plan
+let users=store.get('pb_users',{});
+let profile=store.get('pb_profile',null);
+let colors=Object.assign({my:'#A8E6CF',group:'#93C5FD',groupCustom:false},store.get('pb_colors',{}));
+let mode='my';
+let weekStart=mondayOf(new Date());
+let monthDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let draft={emoji:'🧪',color:'#A8E6CF'};
+let editing=null;
+let useFB=false,syncStarted=false;
+
+const saveUsers=()=>store.set('pb_users',users);
+const saveProf=()=>{store.set('pb_profile',profile);if(profile){users[profile.email]={name:profile.name,emoji:profile.emoji,color:profile.color};saveUsers();}};
+
+/* ---------- helpers ---------- */
+function pad(n){return String(n).padStart(2,'0')}
+function keyOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parseKey(k){const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());const day=x.getDay();x.setDate(x.getDate()-(day===0?6:day-1));return x}
+const fmtNice=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const dayLabel=k=>parseKey(k).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+function normHex(v){v=String(v||'').trim();if(v[0]!=='#')v='#'+v;if(/^#[0-9a-f]{3}$/i.test(v))v='#'+v.slice(1).split('').map(c=>c+c).join('');return /^#[0-9a-f]{6}$/i.test(v)?v.toUpperCase():null}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`}
+function ago(ts){const s=(Date.now()-ts)/1000;if(s<60)return 'Just now';const m=Math.floor(s/60);if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' hour'+(h>1?'s':'')+' ago';const d=Math.floor(h/24);if(d===1)return 'Yesterday';return d+' days ago'}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const me=()=>profile.email;
+const isMine=p=>p.owner===me();
+const iJoined=p=>(p.joinedIds||[]).includes(me());
+function planColor(p){
+  if(isMine(p))return normHex(colors.my)||'#A8E6CF';
+  if(colors.groupCustom)return normHex(colors.group)||'#93C5FD';
+  return normHex(p.color)||normHex(colors.group)||'#93C5FD';
 }
-function saveProfile(){
- currentUser.name=document.getElementById('profileName').value||'SuperBluely';
- currentUser.email=document.getElementById('profileEmail').value;
- localStorage.setItem('pb_profile',JSON.stringify(currentUser));
- document.getElementById('memberCount').textContent=`Team Trinity • ${currentUser.name}`;
+function userOf(id){
+  if(profile&&id===profile.email)return{name:profile.name,emoji:profile.emoji,color:profile.color};
+  return remoteUsers[id]||users[id]||{name:String(id).split('@')[0],emoji:'🙂',color:'#A8E6CF'};
 }
-function pickProfileEmoji(){document.getElementById('profileEmojiGrid').scrollIntoView();}
-function doLogin(){
- const email=document.getElementById('loginEmail').value||'bluely@gmail.com';
- currentUser.email=email;
- currentUser.name=document.getElementById('profileName')?.value||email.split('@')[0];
- localStorage.setItem('pb_logged','1');
- localStorage.setItem('pb_profile',JSON.stringify(currentUser));
- loadProfile();
- showApp();
+function avatar(u,size){return `<div class="av" style="width:${size}px;height:${size}px;background:${esc(u.color)};font-size:${Math.round(size*.5)}px">${esc(u.emoji)}</div>`}
+const EMO_RE=/(\p{Extended_Pictographic}\uFE0F?(?:\u200D\p{Extended_Pictographic}\uFE0F?)*)/gu;
+function splitEmoji(t){const m=t.match(EMO_RE)||[];return{emoji:m[0]||'',text:t.replace(EMO_RE,'').replace(/\uFE0F/g,'').replace(/\s+/g,' ').trim()}}
+function findPlan(key,id){const l=plans[key]||[];const i=l.findIndex(p=>p.id===id);return i<0?null:{p:l[i],i}}
+
+/* ---------- data layer: Firestore (live) or local fallback ---------- */
+function persistLocal(){store.set('pb_plans',allPlans);store.set('pb_activity',activity)}
+const DB={
+  addPlan(p){if(useFB)FB.addPlan(p);else{allPlans.push(p);persistLocal();onPlans(allPlans)}},
+  updatePlan(id,f){if(useFB)FB.updatePlan(id,f);else{const p=allPlans.find(x=>x.id===id);if(p){Object.assign(p,f);persistLocal();onPlans(allPlans)}}},
+  deletePlan(id){if(useFB)FB.deletePlan(id);else{allPlans=allPlans.filter(x=>x.id!==id);persistLocal();onPlans(allPlans)}},
+  join(id,name,email){if(useFB)FB.join(id,name,email);else{const p=allPlans.find(x=>x.id===id);if(p){p.joined=[...new Set([...(p.joined||[]),name])];p.joinedIds=[...new Set([...(p.joinedIds||[]),email])];persistLocal();onPlans(allPlans)}}},
+  leave(id,name,email){if(useFB)FB.leave(id,name,email);else{const p=allPlans.find(x=>x.id===id);if(p){p.joined=(p.joined||[]).filter(n=>n!==name);p.joinedIds=(p.joinedIds||[]).filter(n=>n!==email);persistLocal();onPlans(allPlans)}}},
+  meta(ids,f){if(useFB)FB.batchUpdate(ids,f);else{allPlans.forEach(p=>{if(ids.includes(p.id))Object.assign(p,f)});persistLocal();onPlans(allPlans)}},
+  addActivity(a){if(useFB)FB.addActivity(a);else{activity.unshift(a);persistLocal();onActs(activity)}},
+  updateActivity(id,f){if(useFB)FB.updateActivity(id,f);else{const a=activity.find(x=>x.id===id);if(a){Object.assign(a,f);persistLocal();onActs(activity)}}}
+};
+function loadLocalPlans(){
+  const v=store.get('pb_plans',[]);if(Array.isArray(v))return v;
+  const arr=[];Object.keys(v||{}).forEach(k=>(v[k]||[]).forEach(p=>arr.push(Object.assign({},p,{id:String(p.id),date:k,day:parseKey(k).toLocaleDateString('en-US',{weekday:'short'}),joined:p.joined||[],joinedIds:[]}))));
+  return arr;
 }
-function checkLogin(){
- if(localStorage.getItem('pb_logged')==='1'){loadProfile();showApp();}
-}
-function doLogout(){localStorage.removeItem('pb_logged');location.reload();}
-function showApp(){
- document.getElementById('loginScreen').classList.add('hidden');
- document.getElementById('appScreen').classList.remove('hidden');
- renderAll();
-}
-function getWeekDates(base){
- let d=new Date(base);
- let day=d.getDay();
- let diff=d.getDate()-day+1;
- if(day===0) diff-=6;
- let monday=new Date(d.setDate(diff));
- let dates=[];
- for(let i=0;i<7;i++){let dt=new Date(monday);dt.setDate(monday.getDate()+i);dates.push(dt);}
- return dates;
-}
-function fmt(d){return d.toISOString().slice(0,10);}
-function fmtNice(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
-function renderAll(){renderDays();renderCalendar();renderActivity();renderEmojiGrids();}
-function setMode(m){viewMode=m;document.getElementById('btnMyWeek').classList.toggle('active',m==='my');document.getElementById('btnGroupWeek').classList.toggle('active',m==='group');renderDays();}
-function renderDays(){
- const week=getWeekDates(currentDate);
- document.getElementById('weekLabel').textContent=`📅 ${fmtNice(week[0])} - ${fmtNice(week[6])}, ${week[0].getFullYear()}`;
- const container=document.getElementById('daysContainer');
- const search=(document.getElementById('globalSearch').value||'').toLowerCase();
- container.innerHTML='';
- week.forEach(dt=>{
-  const key=fmt(dt);
-  const list=plans[key]||[];
-  let filtered=list;
-  if(search){filtered=list.filter(p=>p.text.toLowerCase().includes(search)); if(filtered.length===0 &&!pTextMatch(key,search)) return; }
-  const dayName=dt.toLocaleDateString('en-US',{weekday:'short'});
-  let html=`<div class="card dayCard"><div class="dayHead"><div><div class="dayTitle">${dayName}</div><div class="daySub">${fmtNice(dt)} • ${key}</div></div><span style="font-size:12px;color:#6b7280">${list.length} plans</span></div>`;
-  if(filtered.length===0) html+=`<p style="color:#9ca3af;font-size:13px;margin-top:8px">No plans yet - type below + emoji then +</p>`;
-  else filtered.forEach((p,idx)=>{
-    const isMy=p.owner===currentUser.name;
-    const show=viewMode==='my'?isMy:true;
-    if(!show) return;
-    const joined=p.joined?.includes(currentUser.name);
-    html+=`<div class="planItem ${viewMode==='group'?'group':''}"><div class="planLeft"><div>${p.emoji||''} ${p.text}</div><div class="planMeta">${p.owner} • ${p.joined?.length||0} joined ${p.joined?.join(', ')||''}</div></div><div class="planActions"><button class="joinedBtn ${joined?'joined':''}" onclick="toggleJoin('${key}',${idx})">${joined?'✓ Joined':'Join'}</button><button class="iconBtn" onclick="editPlan('${key}',${idx})">✏️</button><button class="iconBtn" onclick="deletePlan('${key}',${idx})">🗑️</button></div></div>`;
+/* called on EVERY Firestore snapshot -> instant live update on all phones */
+function onPlans(list){
+  allPlans=list;plans={};remoteUsers={};
+  list.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(p=>{
+    p.joined=p.joined||[];p.joinedIds=p.joinedIds||[];
+    (plans[p.date]=plans[p.date]||[]).push(p);
+    if(p.owner)remoteUsers[p.owner]={name:p.ownerName||String(p.owner).split('@')[0],emoji:p.ownerEmoji||'🙂',color:p.ownerColor||'#A8E6CF'};
   });
-  html+=`<div class="searchRow"><input id="in-${key}" placeholder="E.g. Monday 19 Oct Weekly Boss The Knave + emoji"><button onclick="addPlan('${key}')">+</button></div><div class="emojiGrid" id="eg-${key}">${ALL_EMOJIS.slice(0,24).map(e=>`<span onclick="addEmojiToInput('${key}','${e}')">${e}</span>`).join('')} <span style="color:#3b82f6;font-size:12px;cursor:pointer" onclick="expandEmojis('${key}')">+ More</span></div></div>`;
-  container.innerHTML+=html;
- });
+  if(profile&&!$('appScreen').classList.contains('hidden')){renderGroup();renderPlanner();renderMonth()}
 }
-function pTextMatch(k,s){return (plans[k]||[]).some(p=>p.text.toLowerCase().includes(s));}
-function expandEmojis(k){document.getElementById('eg-'+k).innerHTML=ALL_EMOJIS.map(e=>`<span onclick="addEmojiToInput('${k}','${e}')">${e}</span>`).join('');}
-function addEmojiToInput(k,e){const el=document.getElementById('in-'+k);el.value=(el.value+' '+e).trim();el.focus();}
-function addPlan(key){
- const el=document.getElementById('in-'+key);const txt=el.value.trim();if(!txt) return;
- if(!plans[key]) plans[key]=[];
- plans[key].push({id:Date.now(),text:txt,emoji:'',owner:currentUser.name,joined:[]});
- localStorage.setItem('pb_plans',JSON.stringify(plans));
- activity.unshift({type:'created',text:`${currentUser.name} added "${txt}" on ${key}`,time:new Date().toLocaleString()});
- localStorage.setItem('pb_activity',JSON.stringify(activity));
- el.value='';renderAll();
+function onActs(list){
+  activity=list.slice().sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+  if(profile&&!$('appScreen').classList.contains('hidden'))renderActivity();
 }
-function toggleJoin(key,idx){
- const p=plans[key][idx];if(!p.joined) p.joined=[];
- const i=p.joined.indexOf(currentUser.name);
- if(i>=0) p.joined.splice(i,1); else p.joined.push(currentUser.name);
- localStorage.setItem('pb_plans',JSON.stringify(plans));
- activity.unshift({type:'joined',text:`${currentUser.name} ${i>=0?'left':'joined'} "${p.text}" on ${key}`,time:new Date().toLocaleString()});
- localStorage.setItem('pb_activity',JSON.stringify(activity));
- renderAll();
-}
-function editPlan(key,idx){
- const p=plans[key][idx];const nt=prompt('Edit plan text + emoji:',p.text);if(nt===null) return;
- p.text=nt;localStorage.setItem('pb_plans',JSON.stringify(plans));
- activity.unshift({type:'edited',text:`${currentUser.name} edited to "${nt}"`,time:new Date().toLocaleString()});
- localStorage.setItem('pb_activity',JSON.stringify(activity));renderAll();
-}
-function deletePlan(key,idx){if(!confirm('Delete?')) return;plans[key].splice(idx,1);localStorage.setItem('pb_plans',JSON.stringify(plans));renderAll();}
-function jumpToDate(v){if(!v) return;currentDate=new Date(v);renderAll();}
-function changeMonth(dir){monthOffset+=dir;renderCalendar();}
-function renderCalendar(){
- const base=new Date(2026,9+monthOffset,1);
- document.getElementById('monthTitle').textContent=base.toLocaleDateString('en-US',{month:'long',year:'numeric'});
- const first=new Date(base.getFullYear(),base.getMonth(),1);
- const last=new Date(base.getFullYear(),base.getMonth()+1,0);
- const startDay=first.getDay();
- const grid=document.getElementById('calendar');
- let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div style="color:#9ca3af;font-size:11px">${d}</div>`).join('');
- for(let i=0;i<startDay;i++) html+=`<div></div>`;
- for(let d=1;d<=last.getDate();d++){
-  const dt=new Date(base.getFullYear(),base.getMonth(),d);
-  const k=fmt(dt);
-  const has=plans[k] && plans[k].length>0;
-  const isToday=fmt(new Date())===k;
-  const isSel=fmt(currentDate)===k;
-  html+=`<div class="${has?'hasEvent':''} ${isToday?'today':''} ${isSel?'selected':''}" onclick="selectDate('${k}')">${d}${has?`<div style="font-size:9px;color:#3b82f6">${plans[k].length}•</div>`:''}</div>`;
- }
- grid.innerHTML=html;
- const monthEvents=document.getElementById('monthEvents');
- let ev=[];
- Object.keys(plans).forEach(k=>{
-  const dt=new Date(k);
-  if(dt.getMonth()===base.getMonth() && dt.getFullYear()===base.getFullYear()){
-   plans[k].forEach(p=>ev.push({k,...p}));
+function beginSync(m){
+  if(syncStarted)return;syncStarted=true;useFB=(m==='fb');
+  if(useFB){FB.listenPlans(onPlans);FB.listenActivity(me(),onActs)}
+  else{
+    console.warn('[Primogem] Local mode (no Firebase keys) – plans are NOT shared between phones.');
+    allPlans=loadLocalPlans();const a=store.get('pb_activity',[]);activity=Array.isArray(a)?a:[];
+    onPlans(allPlans);onActs(activity);
   }
- });
- if(ev.length===0) monthEvents.innerHTML=`<p style="color:#9ca3af;font-size:13px;margin-top:8px">No events this month yet - add some in Planner tab.</p>`;
- else monthEvents.innerHTML=ev.map(e=>`<div class="eventListItem"><div><b>${e.k}</b> ${e.emoji} ${e.text}<div style="font-size:11px;color:#6b7280">${e.owner} • ${e.joined?.length||0} joined</div></div><button class="iconBtn" onclick="selectDate('${e.k}')">View</button></div>`).join('');
 }
-function selectDate(k){currentDate=new Date(k);nav('planner');renderAll();}
-function renderActivity(){
- const list=document.getElementById('activityList');
- if(activity.length===0) list.innerHTML=`<p style="color:#9ca3af;font-size:13px;margin-top:8px">No activity yet - add or join a plan!</p>`;
- else list.innerHTML=activity.slice(0,30).map(a=>`<div class="notif ${a.type==='joined'?'green':a.type==='created'?'blue':'gray'}"><span>${a.type==='joined'?'🤝':a.type==='created'?'✨':'✏️'}</span><div><b>${a.text}</b><div style="font-size:11px;color:#6b7280">${a.time}</div></div></div>`).join('');
+function startSync(){
+  if(syncStarted)return;
+  const go=()=>beginSync(window.FB&&window.FB.ready?'fb':'local');
+  if(window.FB)go();
+  else{window.addEventListener('fb-ready',go,{once:true});setTimeout(()=>{if(!syncStarted)beginSync('local')},4000)}
 }
-function renderEmojiGrids(){
- const grid=document.getElementById('profileEmojiGrid');
- grid.innerHTML=ALL_EMOJIS.map(e=>`<span onclick="setProfileEmoji('${e}')">${e}</span>`).join('');
+function pushAct(to,type,message,detail){
+  DB.addActivity({id:uid(),to,type,message,detail:detail||'',timestamp:Date.now(),read:false});
 }
-function setProfileEmoji(e){currentUser.emoji=e;document.getElementById('profileAvatar').textContent=e;saveProfile();}
+
+/* ---------- login ---------- */
+function setLoginTab(t){$('tabLogin').classList.toggle('active',t==='login');$('tabReg').classList.toggle('active',t==='reg');$('loginBtn').textContent=t==='login'?'Login':'Create account'}
+function doLogin(){
+  const email=($('loginEmail').value.trim()||'bluely@gmail.com').toLowerCase();
+  const known=users[email];
+  profile=Object.assign({email,name:email.split('@')[0],emoji:'🧪',color:'#A8E6CF'},known||{},{email});
+  store.set('pb_logged',email);
+  saveProf();showApp();
+}
+function doLogout(){try{localStorage.removeItem('pb_logged')}catch(e){}location.reload()}
+function showApp(){$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');draft={emoji:profile.emoji,color:profile.color};$('profileName').value=profile.name;nav('planner');startSync();}
+function checkLogin(){
+  const logged=store.get('pb_logged',null);
+  if(logged){
+    if(!profile||profile.email!==logged){profile=Object.assign({email:logged,name:logged.split('@')[0],emoji:'🧪',color:'#A8E6CF'},users[logged]||{},{email:logged})}
+    if(!profile.color)profile.color='#A8E6CF';
+    if(!profile.email)profile.email=logged;
+    saveProf();showApp();
+  }
+}
+
+/* ---------- navigation ---------- */
+const TITLES={planner:'Group Weekly Planner',month:'Calendar',activity:'News & Reminders',profile:'Profile'};
 function nav(t){
- ['planner','month','activity','profile'].forEach(x=>{
-  document.getElementById('tab-'+x).classList.add('hidden');
-  document.getElementById('nav-'+x).classList.remove('active');
- });
- document.getElementById('tab-'+t).classList.remove('hidden');
- document.getElementById('nav-'+t).classList.add('active');
- if(t!=='planner') renderAll();
+  ['planner','month','activity','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
+  $('pageTitle').textContent=TITLES[t];
+  renderAll();window.scrollTo(0,0);
 }
+function renderAll(){renderGroup();renderPlanner();renderMonth();renderActivity();renderProfile()}
+function renderGroup(){
+  const ids=Object.keys(remoteUsers);if(profile&&!ids.includes(profile.email))ids.unshift(profile.email);
+  $('memberCount').textContent=`Team Trinity • ${ids.length} members`;
+  $('groupAvatars').innerHTML=ids.map(id=>avatar(userOf(id),60)).join('')+`<button class="invite" onclick="invite()">+ Invite</button>`;
+}
+function invite(){
+  const text=`Join my Primogem Besties group 💎 ${location.href.split('#')[0]}`;
+  if(navigator.share){navigator.share({title:'Primogem Besties',text}).catch(()=>{})}
+  else window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+/* ---------- colors ---------- */
+let colTimer=null;
+function syncMyColor(){
+  clearTimeout(colTimer);
+  colTimer=setTimeout(()=>{const ids=allPlans.filter(isMine).map(p=>p.id);if(ids.length)DB.meta(ids,{color:normHex(colors.my)})},350);
+}
+function syncOwnerMeta(){
+  const ids=allPlans.filter(isMine).map(p=>p.id);
+  if(ids.length)DB.meta(ids,{ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color});
+}
+function applyColor(which,h){
+  colors[which]=h;if(which==='group')colors.groupCustom=true;
+  store.set('pb_colors',colors);
+  $(which==='my'?'swMy':'swGroup').style.background=h;
+  if(which==='my')syncMyColor();
+  renderPlanner();renderMonth();
+}
+function setColor(which,v){
+  const h=normHex(v);if(!h)return;
+  $(which==='my'?'colMyHex':'colGroupHex').value=h;$(which==='my'?'colMyHex':'colGroupHex').classList.remove('bad');
+  applyColor(which,h);
+}
+function hexColor(which,v){
+  const el=$(which==='my'?'colMyHex':'colGroupHex');const h=normHex(v);
+  el.classList.toggle('bad',!h&&v.length>=4);
+  if(!h)return;
+  $(which==='my'?'colMy':'colGroup').value=h.toLowerCase();
+  applyColor(which,h);
+}
+function syncColorUI(){
+  [['my','colMy','colMyHex','swMy'],['group','colGroup','colGroupHex','swGroup']].forEach(([k,c,hx,sw])=>{
+    const h=normHex(colors[k])||'#A8E6CF';
+    $(c).value=h.toLowerCase();$(sw).style.background=h;
+    if(document.activeElement!==$(hx))$(hx).value=h;
+  });
+}
+
+/* ---------- planner ---------- */
+function setMode(m){mode=m;renderPlanner()}
+let pkMonth=null;
+const weekText=m=>`${fmtNice(m)} — ${fmtNice(addDays(m,6))}, ${addDays(m,6).getFullYear()}${keyOf(m)===keyOf(mondayOf(new Date()))?' • This':''}`;
+function renderWeekSelect(){$('weekLabel').textContent='📅  '+weekText(weekStart)}
+function openPicker(){pkMonth=new Date(addDays(weekStart,3).getFullYear(),addDays(weekStart,3).getMonth(),1);renderPicker();$('dateOverlay').classList.remove('hidden')}
+function closePicker(){$('dateOverlay').classList.add('hidden')}
+function pkMove(n){pkMonth=new Date(pkMonth.getFullYear(),pkMonth.getMonth()+n,1);renderPicker()}
+function renderPicker(){
+  const y=pkMonth.getFullYear(),m=pkMonth.getMonth();
+  $('pkTitle').textContent=pkMonth.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const last=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7,todayK=keyOf(new Date());
+  const wkKeys=new Set([...Array(7)].map((_,i)=>keyOf(addDays(weekStart,i))));
+  let h=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="wd">${d}</div>`).join('');
+  for(let i=0;i<off;i++)h+='<div></div>';
+  for(let d=1;d<=last;d++){
+    const k=y+'-'+pad(m+1)+'-'+pad(d);
+    h+=`<div><div class="pd ${wkKeys.has(k)?'wk':''} ${k===todayK?'tdy':''}" onclick="pickDay('${k}')">${d}</div></div>`;
+  }
+  $('pkGrid').innerHTML=h;
+}
+function pickDay(k){weekStart=mondayOf(parseKey(k));renderPicker();setTimeout(()=>{closePicker();renderPlanner()},220)}
+function pickThisWeek(){weekStart=mondayOf(new Date());closePicker();renderPlanner()}
+function joinedLine(p){
+  const j=p.joined||[];
+  if(!j.length)return `<div class="pmeta">No one joined yet</div>`;
+  return `<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`;
+}
+const PENCIL=`<svg viewBox="0 0 24 24"><path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+function bubble(p){const c=planColor(p);return `<div class="bubble" style="--pc:${c};--pcbg:${hexA(c,.22)}">${p.emoji?`<span class="pe">${esc(p.emoji)}</span>`:''}<span>${esc(p.text)}</span></div>`}
+function renderPlanner(){
+  syncColorUI();
+  $('btnMy').classList.toggle('active',mode==='my');$('btnGroup').classList.toggle('active',mode==='group');
+  renderWeekSelect();
+  // keep typed text + focus when a live update arrives from another phone
+  const keep={};document.querySelectorAll('[id^="in-"]').forEach(i=>{if(i.value)keep[i.id]=i.value});
+  const ae=document.activeElement;const focusId=ae&&ae.id&&ae.id.startsWith('in-')?ae.id:null;
+  const selS=focusId?ae.selectionStart:null,selE=focusId?ae.selectionEnd:null;
+  const todayK=keyOf(new Date());
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=addDays(weekStart,i),key=keyOf(d);
+    const list=(plans[key]||[]).filter(p=>mode==='group'||isMine(p));
+    html+=`<div class="dayCard ${key===todayK?'today':''}"><div class="dayTitle">${d.toLocaleDateString('en-US',{weekday:'short'})}</div><div class="daySub">${fmtNice(d)}</div>`;
+    if(!list.length)html+=`<div class="none">No plans yet</div>`;
+    list.forEach(p=>{
+      if(mode==='my'){
+        html+=`<div class="plan"><div class="planLine">${bubble(p)}<button class="editBtn" onclick="openEdit('${key}','${p.id}')" aria-label="Edit">${PENCIL}</button></div>${joinedLine(p)}</div>`;
+      }else{
+        const u=userOf(p.owner),joined=iJoined(p);
+        html+=`<div class="plan"><div class="planTop">${avatar(u,24)}${esc(u.name)}${isMine(p)?' (you)':''}</div><div class="planLine">${bubble(p)}<button class="joinBtn ${joined?'joined':''}" onclick="joinPlan('${key}','${p.id}')">${joined?'✓ Joined':'Join'}</button></div>${joinedLine(p)}</div>`;
+      }
+    });
+    if(mode==='my'){
+      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
+      html+=`<div class="quick">${QUICK.map(e=>`<span onclick="addEmoji('${key}','${e}')">${e}</span>`).join('')}</div>`;
+    }
+    html+=`</div>`;
+  }
+  $('daysContainer').innerHTML=html;
+  Object.keys(keep).forEach(id=>{const el=$(id);if(el)el.value=keep[id]});
+  if(focusId&&$(focusId)){const el=$(focusId);el.focus();try{el.setSelectionRange(selS,selE)}catch(e){}}
+}
+function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();el.focus()}
+function addPlan(key){
+  const el=$('in-'+key);const raw=el.value.trim();if(!raw)return;
+  const {emoji,text}=splitEmoji(raw);
+  const d=parseKey(key);
+  el.value='';
+  DB.addPlan({
+    id:uid(),owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
+    text:text,emoji:emoji,color:normHex(colors.my)||'#A8E6CF',
+    day:d.toLocaleDateString('en-US',{weekday:'short'}),date:key,
+    joined:[],joinedIds:[],createdAt:Date.now()
+  });
+}
+function joinPlan(key,id){
+  const f=findPlan(key,id);if(!f)return;const p=f.p;
+  if(iJoined(p)){
+    DB.leave(id,profile.name,me());
+  }else{
+    DB.join(id,profile.name,me());   // arrayUnion(name) on "joined"
+    pushAct(p.owner,'green',`${profile.name} joined your plan ${dayLabel(key).replace(',','')}`,`${p.emoji||''} ${p.text}`.trim());
+  }
+}
+
+/* ---------- edit popup ---------- */
+function openEdit(key,id){
+  const f=findPlan(key,id);if(!f||!isMine(f.p))return;
+  editing={key,id,emoji:f.p.emoji||''};
+  $('edText').value=f.p.text;$('edEmoji').textContent=editing.emoji||'✨';
+  renderEdGrid();$('editOverlay').classList.remove('hidden');
+}
+function renderEdGrid(){
+  $('edGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===editing.emoji?'sel':''}" onclick="pickEdEmoji('${e}')">${e}</button>`).join('');
+}
+function pickEdEmoji(e){editing.emoji=e;$('edEmoji').textContent=e;renderEdGrid()}
+function closeEdit(){editing=null;$('editOverlay').classList.add('hidden')}
+function saveEdit(){
+  if(!editing)return;const f=findPlan(editing.key,editing.id);if(!f){closeEdit();return}
+  const {emoji:e2,text}=splitEmoji($('edText').value.trim());
+  const newEmoji=e2||editing.emoji,newText=text;
+  if(!newText&&!newEmoji)return;
+  const p=f.p,key=editing.key,id=editing.id;
+  const changed=p.text!==newText||(p.emoji||'')!==newEmoji;
+  if(changed){
+    const lbl=dayLabel(key).replace(',','');
+    DB.updatePlan(id,{text:newText,emoji:newEmoji});
+    pushAct(me(),'blue','You edited plan',`Plan for ${lbl} was updated`);
+    (p.joinedIds||[]).filter(j=>j!==me()).forEach(j=>pushAct(j,'blue',`${profile.name} edited plan you joined`,`${lbl} • ${newEmoji} ${newText}`.trim()));
+  }
+  closeEdit();
+}
+function deleteFromEdit(){
+  if(!editing)return;if(!confirm('Delete this plan?'))return;
+  const f=findPlan(editing.key,editing.id);
+  if(f){
+    const p=f.p,key=editing.key;
+    (p.joinedIds||[]).filter(j=>j!==me()).forEach(j=>pushAct(j,'red',`${profile.name} deleted a plan you joined`,`${dayLabel(key).replace(',','')} • ${p.emoji||''} ${p.text}`.trim()));
+    DB.deletePlan(p.id);
+  }
+  closeEdit();
+}
+
+/* ---------- month ---------- */
+function changeMonth(n){monthDate=new Date(monthDate.getFullYear(),monthDate.getMonth()+n,1);renderMonth()}
+function renderMonth(){
+  const y=monthDate.getFullYear(),m=monthDate.getMonth();
+  $('monthTitle').textContent=monthDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const last=new Date(y,m+1,0).getDate(),start=new Date(y,m,1).getDay(),todayK=keyOf(new Date());
+  let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="wd">${d}</div>`).join('');
+  for(let i=0;i<start;i++)html+='<div></div>';
+  for(let d=1;d<=last;d++){
+    const k=y+'-'+pad(m+1)+'-'+pad(d);
+    const cols=[...new Set((plans[k]||[]).map(planColor))].slice(0,3);
+    html+=`<div class="d ${k===todayK?'today':''}" onclick="selectDate('${k}')">${d}<div class="dots">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div></div>`;
+  }
+  $('calendar').innerHTML=html;
+  const keys=Object.keys(plans).filter(k=>{const dt=parseKey(k);return dt.getFullYear()===y&&dt.getMonth()===m&&(plans[k]||[]).length}).sort();
+  const count=keys.reduce((a,k)=>a+plans[k].length,0);
+  $('monthSub').textContent=`${monthDate.toLocaleDateString('en-US',{month:'long'})} • ${count} event${count===1?'':'s'} from the group`;
+  if(!keys.length){$('monthEvents').innerHTML=`<div class="empty">No events this month yet — add some in the Planner.</div>`;return}
+  $('monthEvents').innerHTML=keys.map(k=>{
+    return `<div class="evCard"><div class="evDate">${dayLabel(k)}</div>`+plans[k].map(p=>{
+      const u=userOf(p.owner),j=p.joined||[];
+      return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}</div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
+    }).join('')+`</div>`;
+  }).join('');
+}
+function selectDate(k){weekStart=mondayOf(parseKey(k));nav('planner')}
+
+/* ---------- activity ---------- */
+const ICON_BELL=`<svg viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 0 0 2.2-2.2h-4.4A2.2 2.2 0 0 0 12 22zm6-6.2V11a6 6 0 0 0-4.5-5.8V4.5a1.5 1.5 0 0 0-3 0v.7A6 6 0 0 0 6 11v4.8l-2 2v1h16v-1l-2-2z"/></svg>`;
+const ICON_PIN=`<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5"/><rect x="11" y="11" width="2" height="10" rx="1"/></svg>`;
+function toggleRead(id){const a=activity.find(x=>x.id===id);if(a)DB.updateActivity(id,{read:!a.read})}
+function renderActivity(){
+  if(!profile)return;
+  const mine=activity.filter(a=>a.to===me());
+  const notifs=mine.filter(a=>a.type!=='red'),ups=mine.filter(a=>a.type==='red');
+  $('notifList').innerHTML=notifs.length?notifs.slice(0,40).map(a=>`<div class="notif ${a.type==='green'?'green':'blue'}" onclick="toggleRead('${a.id}')"><div class="nIcon">${a.type==='green'?ICON_PIN:ICON_BELL}</div><div class="nBody"><b>${esc(a.message)}</b><span>${ago(a.timestamp)} • ${esc(a.detail)}</span></div><div class="badge ${a.read?'read':'unread'}">${a.read?'✓':'!'}</div></div>`).join(''):`<div class="empty">No activity yet — add, edit or join a plan!</div>`;
+  $('updateList').innerHTML=ups.length?ups.slice(0,40).map(a=>`<div class="notif red" onclick="toggleRead('${a.id}')"><div class="nIcon">!</div><div class="nBody"><b>${esc(a.message)}</b><span>${ago(a.timestamp)} • ${esc(a.detail)}</span></div><div class="badge sm ${a.read?'read':'unread'}">${a.read?'✓':'!'}</div></div>`).join(''):`<div class="empty">Nothing important right now.</div>`;
+}
+
+/* ---------- profile (localStorage pb_profile) ---------- */
+function renderProfile(){
+  const big=$('bigAvatar');big.textContent=draft.emoji;big.style.background=draft.color;
+  $('profileEmojiGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===draft.emoji?'sel':''}" onclick="setDraftEmoji('${e}')">${e}</button>`).join('');
+  $('profileColorGrid').innerHTML=PALETTE.map(c=>`<button class="${c.toUpperCase()===draft.color.toUpperCase()?'sel':''}" style="background:${c}" onclick="setDraftColor('${c}')" aria-label="${c}"></button>`).join('');
+  if(document.activeElement!==$('hexInput'))$('hexInput').value=draft.color.toUpperCase();
+}
+function setDraftEmoji(e){draft.emoji=e;renderProfile()}
+function setDraftColor(c){draft.color=c;renderProfile()}
+function hexTyped(v){const h=normHex(v);if(h){draft.color=h;renderProfile()}}
+function saveName(){const v=$('profileName').value.trim();if(!v)return;profile.name=v;saveProf();syncOwnerMeta();renderAll()}
+function cancelName(){$('profileName').value=profile.name}
+function saveAvatar(){
+  const v=$('profileName').value.trim();if(v)profile.name=v;
+  profile.emoji=draft.emoji;profile.color=draft.color;saveProf();syncOwnerMeta();renderAll();
+  const b=document.querySelector('.saveAv');b.textContent='Saved ✓';setTimeout(()=>b.textContent='Save avatar',1200);
+}
+
+/* ---------- share ---------- */
 function shareWhatsApp(){
- const week=getWeekDates(currentDate);
- let text=`Primogem Besties 💎 Weekly Plan ${fmtNice(week[0])}-${fmtNice(week[6])}\n`;
- week.forEach(d=>{
-  const k=fmt(d);
-  if(plans[k]?.length){text+=`\n${d.toLocaleDateString('en-US',{weekday:'short'})} ${fmtNice(d)}:\n`;plans[k].forEach(p=>{text+=`- ${p.text} (${p.owner}) ${p.joined?.length?`[${p.joined.length} joined: ${p.joined.join(', ')}]`:''}\n`;});}
- });
- const url=`https://wa.me/?text=${encodeURIComponent(text)}`;
- window.open(url,'_blank');
- activity.unshift({type:'shared',text:`${currentUser.name} shared week via WhatsApp`,time:new Date().toLocaleString()});
- localStorage.setItem('pb_activity',JSON.stringify(activity));
+  let text=`Primogem Besties 💎 Weekly Plan ${fmtNice(weekStart)} - ${fmtNice(addDays(weekStart,6))}\n`;
+  for(let i=0;i<7;i++){
+    const d=addDays(weekStart,i),k=keyOf(d);
+    const list=(plans[k]||[]).filter(p=>isMine(p));
+    if(list.length){text+=`\n${d.toLocaleDateString('en-US',{weekday:'short'})} ${fmtNice(d)}:\n`;list.forEach(p=>{text+=`- ${p.emoji||''} ${p.text}${(p.joined||[]).length?` [${p.joined.length} joined]`:''}\n`})}
+  }
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
-checkLogin();loadProfile();renderAll();
+
+checkLogin();
 </script>
 </body>
 </html>
