@@ -2,106 +2,299 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trinity Genshin Group Weekly Planner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Primogem Besties</title>
 <style>
-*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0}
-body{background:#f5f7fb;color:#0f172a;min-height:100vh;padding-bottom:90px}
-.top{padding:14px 16px 6px;text-align:center;position:sticky;top:0;background:#f5f7fb;z-index:10}
-.top h1{font-size:22px;font-weight:800}
-.top small{color:#64748b;font-size:13px}
-.avatars{display:flex;justify-content:center;margin:10px 0}
-.avatars div{width:46px;height:46px;border-radius:50%;margin-left:-10px;border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:20px}
-.tab-switch{background:#e9eefb;border-radius:16px;display:flex;padding:4px;margin:12px 16px}
-.tab-switch button{flex:1;padding:12px;border:none;border-radius:12px;font-weight:700;background:transparent;cursor:pointer}
-.tab-switch button.active{background:#3b82f6;color:white}
-.card{background:white;border-radius:22px;margin:12px 16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
-.week-label{font-size:14px;color:#64748b;background:#f1f5f9;padding:12px 16px;border-radius:14px;display:flex;justify-content:space-between;align-items:center}
-.day-title{font-weight:800;font-size:18px}
-.day-sub{color:#64748b;font-size:13px}
-.input-row{display:flex;align-items:center;gap:10px;margin-top:12px}
-.input-row input{flex:1;background:#f1f5f9;border:none;padding:14px 16px;border-radius:14px;font-size:14px}
-.input-row button{width:44px;height:44px;border-radius:50%;background:#3b82f6;color:white;border:none;font-size:22px;cursor:pointer}
-.emoji-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.emoji-row span{cursor:pointer;font-size:18px}
-.plan-item{background:#f0fdf4;border-radius:12px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
-.bottom-nav{position:fixed;bottom:16px;left:16px;right:16px;background:white;border-radius:24px;display:flex;justify-content:space-around;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12)}
-.bottom-nav button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;font-size:12px;color:#94a3b8;cursor:pointer}
-.bottom-nav button.active{color:#3b82f6;font-weight:700}
-.hidden{display:none}
-.login-card input{width:100%;padding:14px;border:1px solid #e2e8f0;border-radius:14px;margin:8px 0}
-.login-card.primary{width:100%;background:#3b82f6;color:white;border:none;padding:14px;border-radius:14px;font-weight:700;margin-top:12px;cursor:pointer}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center;margin-top:12px}
-.calendar-grid div{padding:10px;border-radius:10px}
-.calendar-grid div.today{background:#bbf7d0;font-weight:700}
-.notif{padding:12px;border-radius:16px;display:flex;align-items:center;gap:10px;margin:8px 0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Inter,sans-serif}
+body{background:#f6f7fb;color:#111827;min-height:100vh;padding-bottom:100px}
+.top{position:sticky;top:0;z-index:20;background:#f6f7fb;padding:12px 16px}
+.top h1{font-size:20px;font-weight:800;text-align:center}
+.top small{display:block;text-align:center;color:#6b7280;font-size:12px}
+.card{background:#fff;border-radius:20px;margin:12px 16px;padding:14px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+.tab2{background:#eef2ff;border-radius:16px;display:flex;padding:4px;margin:10px 0}
+.tab2 button{flex:1;border:none;background:transparent;padding:10px;border-radius:12px;font-weight:700;cursor:pointer}
+.tab2 button.active{background:#3b82f6;color:#fff}
+.weekBar{display:flex;gap:8px;align-items:center;padding:0 16px}
+.weekBar .dateChip{flex:1;background:#fff;padding:12px 14px;border-radius:14px;font-size:13px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+.weekBar .shareBtn{background:#22c55e;color:#fff;border:none;padding:12px 16px;border-radius:14px;font-weight:700;cursor:pointer}
+.dayCard .dayHead{display:flex;justify-content:space-between;align-items:center}
+.dayTitle{font-weight:800;font-size:16px}
+.daySub{color:#6b7280;font-size:12px}
+.searchRow{display:flex;gap:8px;margin-top:10px}
+.searchRow input{flex:1;background:#f3f4f6;border:none;padding:12px 14px;border-radius:12px;font-size:14px}
+.searchRow button{background:#3b82f6;color:#fff;border:none;width:42px;height:42px;border-radius:12px;font-size:20px;cursor:pointer}
+.emojiGrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;background:#f9fafb;padding:8px;border-radius:12px}
+.emojiGrid span{font-size:20px;cursor:pointer;padding:4px;border-radius:8px}
+.emojiGrid span:hover{background:#e5e7eb}
+.planItem{display:flex;justify-content:space-between;align-items:center;background:#f0fdf4;border:1px solid #dcfce7;padding:10px 12px;border-radius:12px;margin-top:8px}
+.planItem.group{background:#eff6ff;border-color:#dbeafe}
+.planLeft{flex:1}
+.planMeta{font-size:11px;color:#6b7280}
+.planActions{display:flex;gap:6px;align-items:center}
+.iconBtn{border:none;background:#fff;border-radius:8px;padding:6px 8px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08);font-size:12px}
+.joinedBtn{background:#22c55e;color:#fff;border:none;padding:6px 10px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer}
+.joinedBtn.joined{background:#111827}
+.bottomNav{position:fixed;left:12px;right:12px;bottom:12px;background:#fff;border-radius:22px;display:flex;justify-content:space-around;padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.12);z-index:30}
+.bottomNav button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;color:#9ca3af;font-size:11px;cursor:pointer;padding:6px 12px;border-radius:12px}
+.bottomNav button.active{color:#3b82f6;background:#eff6ff;font-weight:700}
+.hidden{display:none!important}
+.loginAvatars{display:flex;justify-content:center;margin:10px 0}
+.loginAvatars div{width:44px;height:44px;border-radius:50%;border:3px solid #fff;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:12px;margin:6px 0}
+.primary{width:100%;background:#3b82f6;color:#fff;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;margin-top:8px}
+.calendarGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;margin-top:10px}
+.calendarGrid div{padding:10px 4px;border-radius:10px;font-size:13px;cursor:pointer}
+.calendarGrid div.hasEvent{border:1px solid #3b82f6}
+.calendarGrid div.today{background:#bbf7d0;font-weight:800}
+.calendarGrid div.selected{background:#3b82f6;color:#fff}
+.eventListItem{background:#f9fafb;padding:10px 12px;border-radius:12px;margin-top:8px;display:flex;justify-content:space-between}
+.notif{padding:12px;border-radius:14px;display:flex;gap:10px;margin-top:8px}
 .notif.blue{background:#dbeafe}
 .notif.green{background:#dcfce7}
-.notif.white{background:white;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.notif.gray{background:#f3f4f6}
+.profileAvatar{width:84px;height:84px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:40px;border:3px solid #e5e7eb;cursor:pointer}
 </style>
 </head>
 <body>
 
 <div id="loginScreen">
-<div class="top"><small>Trinity Genshin</small><h1>Trinity Genshin Group Weekly Planner</h1></div>
-<div class="avatars"><div style="background:#60a5fa">🙂</div><div style="background:#fdba74">🙂</div><div style="background:#c4b5fd">🙂</div><div style="background:#86efac">🙂</div><div style="background:#22c55e">🙂</div></div>
-<p style="text-align:center;color:#64748b;font-size:13px;padding:0 20px">Welcome! Login or create an account to plan your weekly activities</p>
-<div class="tab-switch"><button class="active">Login</button><button>Register</button></div>
-<div class="card login-card">
-<input id="email" value="bluely@gmail.com" placeholder="email">
-<input id="pass" type="password" placeholder="Enter your password">
-<button class="primary" onclick="showApp()">Login</button>
-<p style="text-align:center;margin-top:12px;font-size:13px">Don't have an account? <span style="color:#3b82f6;font-weight:700">Register now</span></p>
+<div class="top"><small>App name</small><h1>Primogem Besties 💎</h1></div>
+<div class="loginAvatars"><div style="background:#93c5fd">😊</div><div style="background:#fdba74">🥰</div><div style="background:#c4b5fd">😎</div><div style="background:#86efac">🤩</div><div style="background:#fde68a">🙂</div></div>
+<p style="text-align:center;color:#6b7280;font-size:13px;padding:0 20px">Welcome! Login or create an account to plan your weekly activities</p>
+<div class="card">
+<div class="tab2"><button class="active">Login</button><button onclick="alert('Register same as Login for demo - just login')">Register</button></div>
+<input id="loginEmail" class="input" placeholder="Email" value="bluely@gmail.com">
+<input id="loginPass" class="input" type="password" placeholder="Password" value="123456">
+<button class="primary" onclick="doLogin()">Login</button>
+<p style="text-align:center;margin-top:10px;font-size:12px;color:#6b7280">Profile will stay saved after closing app</p>
 </div>
 </div>
 
 <div id="appScreen" class="hidden">
-<div class="top" style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;background:#3b82f6;border-radius:12px;display:flex;align-items:center;justify-content:center;color:white">✦</div><div style="text-align:left"><div style="font-weight:800">Trinity • Genshin</div><small>Team Trinity • 1 members</small></div></div><div>⚙️</div></div>
-
-<div id="plannerTab">
-<div class="card" style="padding:8px"><div class="tab-switch" style="margin:0"><button id="myWeekBtn" class="active" onclick="setWeek('my')">My Week</button><button id="groupWeekBtn" onclick="setWeek('group')">Group Week</button></div></div>
-<div style="display:flex;gap:10px;padding:0 16px"><div class="week-label" style="flex:1">📅 Oct 12 — Oct 18, 2026 • This Week</div><button style="background:#22c55e;color:white;border:none;padding:10px 16px;border-radius:14px;font-weight:700">💬 Share</button></div>
-<div id="days"></div>
+<div class="top" style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;align-items:center;gap:8px"><div style="width:38px;height:38px;background:#3b82f6;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff">✦</div><div><div style="font-weight:800;font-size:14px">Trinity • Genshin</div><small id="memberCount">Team Trinity • 1 members</small></div></div>
+<div style="display:flex;gap:8px"><span onclick="nav('profile')" style="cursor:pointer">⚙️</span></div>
 </div>
 
-<div id="monthTab" class="hidden">
-<div class="card"><h3 style="text-align:center">October 2026</h3><div class="calendar-grid" id="cal"></div><div style="margin-top:16px"><b>Weekly Planner Events</b><p style="color:#64748b;font-size:13px">No events this month yet — add some in the Planner.</p></div></div>
+<div id="tab-planner">
+<div class="card" style="padding:6px"><div class="tab2" style="margin:0"><button id="btnMyWeek" class="active" onclick="setMode('my')">My Week</button><button id="btnGroupWeek" onclick="setMode('group')">Group Week</button></div></div>
+<div class="weekBar">
+<div class="dateChip"><span id="weekLabel">📅 Oct 13 - Oct 19, 2026</span><input id="datePicker" type="date" style="border:none;background:transparent" onchange="jumpToDate(this.value)"></div>
+<button class="shareBtn" onclick="shareWhatsApp()">💬 Share</button>
+</div>
+<div style="padding:0 16px"><input id="globalSearch" class="input" placeholder="Search old plans... like Active tab" oninput="renderDays()" style="background:#fff"></div>
+<div id="daysContainer"></div>
+</div>
+<div id="tab-month" class="hidden">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center"><button class="iconBtn" onclick="changeMonth(-1)">‹</button><h3 id="monthTitle" style="text-align:center">October 2026</h3><button class="iconBtn" onclick="changeMonth(1)">›</button></div>
+<div class="calendarGrid" id="calendar"></div>
+<div style="margin-top:16px"><b>Weekly Planner Events</b><p style="font-size:12px;color:#6b7280">List of all group plans this month - you asked for this!</p><div id="monthEvents"></div></div>
+</div>
 </div>
 
-<div id="activityTab" class="hidden">
-<div class="card"><b>Notifications</b><p style="color:#64748b;font-size:12px">Latest activity & reminders</p>
-<div class="notif blue">🔔 <div><b>Computer App edited plan</b><br><small>2 min ago • Plan for Wed Oct 9 was updated</small></div></div>
-<div class="notif green">📍 <div><b>Sunday reminder pinned</b><br><small>Today 08:30 • Rest day</small></div></div>
+<div id="tab-activity" class="hidden">
+<div class="card"><b>Notifications</b><p style="font-size:12px;color:#6b7280">Latest activity & reminders - auto updates when someone Joined/Edited</p><div id="activityList"></div></div>
 </div>
-<div class="card"><b>Updates</b>
-<div class="notif white">❗ <div><b>New member joined</b><br><small>1 hour ago</small></div></div>
-<div class="notif white">❗ <div><b>Task deadline changed</b><br><small>3 hours ago</small></div></div>
+
+<div id="tab-profile" class="hidden">
+<div class="card" style="text-align:center">
+<div id="profileAvatar" class="profileAvatar" onclick="pickProfileEmoji()">🧪</div>
+<p style="font-size:12px;color:#6b7280;margin-top:6px">Tap avatar to change emoji</p>
+<div style="margin-top:12px;text-align:left">
+<label style="font-size:12px;font-weight:700">Display Name (you can change anytime)</label>
+<input id="profileName" class="input" value="SuperBluely" oninput="saveProfile()">
+<label style="font-size:12px;font-weight:700">Email</label>
+<input id="profileEmail" class="input" value="bluely@gmail.com" readonly>
+</div>
+<div style="margin-top:12px;text-align:left"><b>Choose your profile emoji</b>
+<div class="emojiGrid" id="profileEmojiGrid"></div>
+</div>
+<button class="primary" style="background:#ef4444;margin-top:16px" onclick="doLogout()">Logout</button>
+<p style="font-size:11px;color:#6b7280;margin-top:8px">Profile stays saved even if you close app - as you requested!</p>
 </div>
 </div>
 
-<div id="profileTab" class="hidden">
-<div class="card" style="text-align:center"><div style="width:80px;height:80px;background:#a7f3d0;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div><div style="margin-top:10px;background:#f1f5f9;padding:8px 16px;border-radius:12px;display:inline-block"><b>SuperBluely</b></div><p style="color:#64748b;font-size:12px">bluely@gmail</p></div>
-</div>
-
-<div class="bottom-nav">
-<button class="active" id="navPlanner" onclick="nav('planner')"><span>🗂️</span>Planner</button>
-<button id="navMonth" onclick="nav('month')"><span>📅</span>Month</button>
-<button id="navActivity" onclick="nav('activity')"><span>🔔</span>Activity</button>
-<button id="navProfile" onclick="nav('profile')"><span>👤</span>Profile</button>
+<div class="bottomNav">
+<button id="nav-planner" class="active" onclick="nav('planner')"><span>📅</span>Planner</button>
+<button id="nav-month" onclick="nav('month')"><span>🗓️</span>Month</button>
+<button id="nav-activity" onclick="nav('activity')"><span>🔔</span>Activity</button>
+<button id="nav-profile" onclick="nav('profile')"><span>👤</span>Profile</button>
 </div>
 </div>
 
 <script>
-const daysData=[{key:'Mon',date:'Oct 12',full:'2026-10-12'},{key:'Tue',date:'Oct 13',full:'2026-10-13'},{key:'Wed',date:'Oct 14',full:'2026-10-14'},{key:'Thu',date:'Oct 15',full:'2026-10-15'},{key:'Fri',date:'Oct 16',full:'2026-10-16'},{key:'Sat',date:'Oct 17',full:'2026-10-17'},{key:'Sun',date:'Oct 18',full:'2026-10-18'}];
-let plans=JSON.parse(localStorage.getItem('trinityPlans')||'{}');
-function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appScreen').classList.remove('hidden');renderDays();renderCal();}
-function renderDays(){const c=document.getElementById('days');c.innerHTML='';daysData.forEach(d=>{const list=plans[d.full]||[];const items=list.map((t,i)=>`<div class="plan-item"><span>${t}</span><span onclick="delPlan('${d.full}',${i})" style="cursor:pointer">✕</span></div>`).join('');c.innerHTML+=`<div class="card"><div class="day-title">${d.key}</div><div class="day-sub">${d.date}</div>${list.length?items:`<p style="color:#64748b;font-size:13px;margin-top:6px">No plans yet</p>`}<div class="input-row"><input id="in-${d.full}" placeholder="Ek soek... type anything + emoji"><button onclick="addPlan('${d.full}')">+</button></div><div class="emoji-row"><span onclick="addEmoji('${d.full}','🙂')">🙂</span><span onclick="addEmoji('${d.full}','💎')">💎</span><span onclick="addEmoji('${d.full}','🍓')">🍓</span><span onclick="addEmoji('${d.full}','🎮')">🎮</span><span onclick="addEmoji('${d.full}','🌸')">🌸</span><span onclick="addEmoji('${d.full}','✨')">✨</span></div></div>`;});}
-function addPlan(date){const el=document.getElementById('in-'+date);if(!el.value.trim())return;if(!plans[date])plans[date]=[];plans[date].push(el.value);localStorage.setItem('trinityPlans',JSON.stringify(plans));el.value='';renderDays();}
-function delPlan(date,i){plans[date].splice(i,1);localStorage.setItem('trinityPlans',JSON.stringify(plans));renderDays();}
-function addEmoji(date,e){const el=document.getElementById('in-'+date);el.value+=e;el.focus();}
-function nav(t){['planner','month','activity','profile'].forEach(x=>{document.getElementById(x+'Tab').classList.add('hidden');document.getElementById('nav'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('active');});document.getElementById(t+'Tab').classList.remove('hidden');document.getElementById('nav'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');}
-function renderCal(){const cal=document.getElementById('cal');const headers=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(h=>`<div style="color:#94a3b8;font-size:12px">${h}</div>`).join('');let days='';for(let i=1;i<=31;i++){days+=`<div class="${i==16?'today':''}">${i}</div>`}cal.innerHTML=headers+days;}
-function setWeek(type){document.getElementById('myWeekBtn').classList.toggle('active',type=='my');document.getElementById('groupWeekBtn').classList.toggle('active',type=='group');}
+const ALL_EMOJIS=["😀","😃","😄","😁","😆","😅","😂","🤣","🥲","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","🤩","🥳","😎","🤓","🧐","🤠","🥸","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😶‍🌫️","😱","😨","😰","😥","😓","🤗","🤔","🫣","🤭","🫢","🫡","🤫","🫠","🤥","😶","😐","😑","😬","🫨","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😮‍💨","😵","🤐","🥴","😵‍💫","🤠","🥳","🥸","😎","🤓","🧐","😕","🫤","😟","🙁","☹️","😮","😯","😲","😳","🥺","🥹","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺","👻","👽","👾","🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾","🧪","⚗️","🔬","🔭","🧬","💎","💠","🔮","⭐","🌟","✨","⚡","🔥","💥","🌸","🌺","🌻","🌷","🍓","🍎","🍑","🎮","🏆","🎯","🗡️","🛡️","⚔️","🏹","🧙‍♀️","🧙","🦊","🐉","👑"];
+let currentDate=new Date(2026,9,13);
+let viewMode='my';
+let currentUser={name:'SuperBluely',email:'bluely@gmail.com',emoji:'🧪'};
+let plans=JSON.parse(localStorage.getItem('pb_plans')||'{}');
+let activity=JSON.parse(localStorage.getItem('pb_activity')||'[]');
+let monthOffset=0;
+function loadProfile(){
+ const saved=JSON.parse(localStorage.getItem('pb_profile')||'null');
+ if(saved) currentUser=saved;
+ document.getElementById('profileName').value=currentUser.name;
+ document.getElementById('profileEmail').value=currentUser.email;
+ document.getElementById('profileAvatar').textContent=currentUser.emoji;
+ document.getElementById('memberCount').textContent=`Team Trinity • ${currentUser.name}`;
+}
+function saveProfile(){
+ currentUser.name=document.getElementById('profileName').value||'SuperBluely';
+ currentUser.email=document.getElementById('profileEmail').value;
+ localStorage.setItem('pb_profile',JSON.stringify(currentUser));
+ document.getElementById('memberCount').textContent=`Team Trinity • ${currentUser.name}`;
+}
+function pickProfileEmoji(){document.getElementById('profileEmojiGrid').scrollIntoView();}
+function doLogin(){
+ const email=document.getElementById('loginEmail').value||'bluely@gmail.com';
+ currentUser.email=email;
+ currentUser.name=document.getElementById('profileName')?.value||email.split('@')[0];
+ localStorage.setItem('pb_logged','1');
+ localStorage.setItem('pb_profile',JSON.stringify(currentUser));
+ loadProfile();
+ showApp();
+}
+function checkLogin(){
+ if(localStorage.getItem('pb_logged')==='1'){loadProfile();showApp();}
+}
+function doLogout(){localStorage.removeItem('pb_logged');location.reload();}
+function showApp(){
+ document.getElementById('loginScreen').classList.add('hidden');
+ document.getElementById('appScreen').classList.remove('hidden');
+ renderAll();
+}
+function getWeekDates(base){
+ let d=new Date(base);
+ let day=d.getDay();
+ let diff=d.getDate()-day+1;
+ if(day===0) diff-=6;
+ let monday=new Date(d.setDate(diff));
+ let dates=[];
+ for(let i=0;i<7;i++){let dt=new Date(monday);dt.setDate(monday.getDate()+i);dates.push(dt);}
+ return dates;
+}
+function fmt(d){return d.toISOString().slice(0,10);}
+function fmtNice(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function renderAll(){renderDays();renderCalendar();renderActivity();renderEmojiGrids();}
+function setMode(m){viewMode=m;document.getElementById('btnMyWeek').classList.toggle('active',m==='my');document.getElementById('btnGroupWeek').classList.toggle('active',m==='group');renderDays();}
+function renderDays(){
+ const week=getWeekDates(currentDate);
+ document.getElementById('weekLabel').textContent=`📅 ${fmtNice(week[0])} - ${fmtNice(week[6])}, ${week[0].getFullYear()}`;
+ const container=document.getElementById('daysContainer');
+ const search=(document.getElementById('globalSearch').value||'').toLowerCase();
+ container.innerHTML='';
+ week.forEach(dt=>{
+  const key=fmt(dt);
+  const list=plans[key]||[];
+  let filtered=list;
+  if(search){filtered=list.filter(p=>p.text.toLowerCase().includes(search)); if(filtered.length===0 &&!pTextMatch(key,search)) return; }
+  const dayName=dt.toLocaleDateString('en-US',{weekday:'short'});
+  let html=`<div class="card dayCard"><div class="dayHead"><div><div class="dayTitle">${dayName}</div><div class="daySub">${fmtNice(dt)} • ${key}</div></div><span style="font-size:12px;color:#6b7280">${list.length} plans</span></div>`;
+  if(filtered.length===0) html+=`<p style="color:#9ca3af;font-size:13px;margin-top:8px">No plans yet - type below + emoji then +</p>`;
+  else filtered.forEach((p,idx)=>{
+    const isMy=p.owner===currentUser.name;
+    const show=viewMode==='my'?isMy:true;
+    if(!show) return;
+    const joined=p.joined?.includes(currentUser.name);
+    html+=`<div class="planItem ${viewMode==='group'?'group':''}"><div class="planLeft"><div>${p.emoji||''} ${p.text}</div><div class="planMeta">${p.owner} • ${p.joined?.length||0} joined ${p.joined?.join(', ')||''}</div></div><div class="planActions"><button class="joinedBtn ${joined?'joined':''}" onclick="toggleJoin('${key}',${idx})">${joined?'✓ Joined':'Join'}</button><button class="iconBtn" onclick="editPlan('${key}',${idx})">✏️</button><button class="iconBtn" onclick="deletePlan('${key}',${idx})">🗑️</button></div></div>`;
+  });
+  html+=`<div class="searchRow"><input id="in-${key}" placeholder="E.g. Monday 19 Oct Weekly Boss The Knave + emoji"><button onclick="addPlan('${key}')">+</button></div><div class="emojiGrid" id="eg-${key}">${ALL_EMOJIS.slice(0,24).map(e=>`<span onclick="addEmojiToInput('${key}','${e}')">${e}</span>`).join('')} <span style="color:#3b82f6;font-size:12px;cursor:pointer" onclick="expandEmojis('${key}')">+ More</span></div></div>`;
+  container.innerHTML+=html;
+ });
+}
+function pTextMatch(k,s){return (plans[k]||[]).some(p=>p.text.toLowerCase().includes(s));}
+function expandEmojis(k){document.getElementById('eg-'+k).innerHTML=ALL_EMOJIS.map(e=>`<span onclick="addEmojiToInput('${k}','${e}')">${e}</span>`).join('');}
+function addEmojiToInput(k,e){const el=document.getElementById('in-'+k);el.value=(el.value+' '+e).trim();el.focus();}
+function addPlan(key){
+ const el=document.getElementById('in-'+key);const txt=el.value.trim();if(!txt) return;
+ if(!plans[key]) plans[key]=[];
+ plans[key].push({id:Date.now(),text:txt,emoji:'',owner:currentUser.name,joined:[]});
+ localStorage.setItem('pb_plans',JSON.stringify(plans));
+ activity.unshift({type:'created',text:`${currentUser.name} added "${txt}" on ${key}`,time:new Date().toLocaleString()});
+ localStorage.setItem('pb_activity',JSON.stringify(activity));
+ el.value='';renderAll();
+}
+function toggleJoin(key,idx){
+ const p=plans[key][idx];if(!p.joined) p.joined=[];
+ const i=p.joined.indexOf(currentUser.name);
+ if(i>=0) p.joined.splice(i,1); else p.joined.push(currentUser.name);
+ localStorage.setItem('pb_plans',JSON.stringify(plans));
+ activity.unshift({type:'joined',text:`${currentUser.name} ${i>=0?'left':'joined'} "${p.text}" on ${key}`,time:new Date().toLocaleString()});
+ localStorage.setItem('pb_activity',JSON.stringify(activity));
+ renderAll();
+}
+function editPlan(key,idx){
+ const p=plans[key][idx];const nt=prompt('Edit plan text + emoji:',p.text);if(nt===null) return;
+ p.text=nt;localStorage.setItem('pb_plans',JSON.stringify(plans));
+ activity.unshift({type:'edited',text:`${currentUser.name} edited to "${nt}"`,time:new Date().toLocaleString()});
+ localStorage.setItem('pb_activity',JSON.stringify(activity));renderAll();
+}
+function deletePlan(key,idx){if(!confirm('Delete?')) return;plans[key].splice(idx,1);localStorage.setItem('pb_plans',JSON.stringify(plans));renderAll();}
+function jumpToDate(v){if(!v) return;currentDate=new Date(v);renderAll();}
+function changeMonth(dir){monthOffset+=dir;renderCalendar();}
+function renderCalendar(){
+ const base=new Date(2026,9+monthOffset,1);
+ document.getElementById('monthTitle').textContent=base.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+ const first=new Date(base.getFullYear(),base.getMonth(),1);
+ const last=new Date(base.getFullYear(),base.getMonth()+1,0);
+ const startDay=first.getDay();
+ const grid=document.getElementById('calendar');
+ let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div style="color:#9ca3af;font-size:11px">${d}</div>`).join('');
+ for(let i=0;i<startDay;i++) html+=`<div></div>`;
+ for(let d=1;d<=last.getDate();d++){
+  const dt=new Date(base.getFullYear(),base.getMonth(),d);
+  const k=fmt(dt);
+  const has=plans[k] && plans[k].length>0;
+  const isToday=fmt(new Date())===k;
+  const isSel=fmt(currentDate)===k;
+  html+=`<div class="${has?'hasEvent':''} ${isToday?'today':''} ${isSel?'selected':''}" onclick="selectDate('${k}')">${d}${has?`<div style="font-size:9px;color:#3b82f6">${plans[k].length}•</div>`:''}</div>`;
+ }
+ grid.innerHTML=html;
+ const monthEvents=document.getElementById('monthEvents');
+ let ev=[];
+ Object.keys(plans).forEach(k=>{
+  const dt=new Date(k);
+  if(dt.getMonth()===base.getMonth() && dt.getFullYear()===base.getFullYear()){
+   plans[k].forEach(p=>ev.push({k,...p}));
+  }
+ });
+ if(ev.length===0) monthEvents.innerHTML=`<p style="color:#9ca3af;font-size:13px;margin-top:8px">No events this month yet - add some in Planner tab.</p>`;
+ else monthEvents.innerHTML=ev.map(e=>`<div class="eventListItem"><div><b>${e.k}</b> ${e.emoji} ${e.text}<div style="font-size:11px;color:#6b7280">${e.owner} • ${e.joined?.length||0} joined</div></div><button class="iconBtn" onclick="selectDate('${e.k}')">View</button></div>`).join('');
+}
+function selectDate(k){currentDate=new Date(k);nav('planner');renderAll();}
+function renderActivity(){
+ const list=document.getElementById('activityList');
+ if(activity.length===0) list.innerHTML=`<p style="color:#9ca3af;font-size:13px;margin-top:8px">No activity yet - add or join a plan!</p>`;
+ else list.innerHTML=activity.slice(0,30).map(a=>`<div class="notif ${a.type==='joined'?'green':a.type==='created'?'blue':'gray'}"><span>${a.type==='joined'?'🤝':a.type==='created'?'✨':'✏️'}</span><div><b>${a.text}</b><div style="font-size:11px;color:#6b7280">${a.time}</div></div></div>`).join('');
+}
+function renderEmojiGrids(){
+ const grid=document.getElementById('profileEmojiGrid');
+ grid.innerHTML=ALL_EMOJIS.map(e=>`<span onclick="setProfileEmoji('${e}')">${e}</span>`).join('');
+}
+function setProfileEmoji(e){currentUser.emoji=e;document.getElementById('profileAvatar').textContent=e;saveProfile();}
+function nav(t){
+ ['planner','month','activity','profile'].forEach(x=>{
+  document.getElementById('tab-'+x).classList.add('hidden');
+  document.getElementById('nav-'+x).classList.remove('active');
+ });
+ document.getElementById('tab-'+t).classList.remove('hidden');
+ document.getElementById('nav-'+t).classList.add('active');
+ if(t!=='planner') renderAll();
+}
+function shareWhatsApp(){
+ const week=getWeekDates(currentDate);
+ let text=`Primogem Besties 💎 Weekly Plan ${fmtNice(week[0])}-${fmtNice(week[6])}\n`;
+ week.forEach(d=>{
+  const k=fmt(d);
+  if(plans[k]?.length){text+=`\n${d.toLocaleDateString('en-US',{weekday:'short'})} ${fmtNice(d)}:\n`;plans[k].forEach(p=>{text+=`- ${p.text} (${p.owner}) ${p.joined?.length?`[${p.joined.length} joined: ${p.joined.join(', ')}]`:''}\n`;});}
+ });
+ const url=`https://wa.me/?text=${encodeURIComponent(text)}`;
+ window.open(url,'_blank');
+ activity.unshift({type:'shared',text:`${currentUser.name} shared week via WhatsApp`,time:new Date().toLocaleString()});
+ localStorage.setItem('pb_activity',JSON.stringify(activity));
+}
+checkLogin();loadProfile();renderAll();
 </script>
 </body>
 </html>
