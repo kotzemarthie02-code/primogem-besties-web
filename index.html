@@ -1,24 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width">
-<title>Primogem Besties</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trinity Genshin Group Weekly Planner</title>
 <style>
-body{background:#0f172a;color:white;font-family:sans-serif;text-align:center;padding:20px}
-.card{background:#1e293b;padding:20px;border-radius:15px;margin:15px auto;max-width:400px}
-.btn{background:#38bdf8;color:black;padding:12px 20px;border-radius:25px;display:inline-block;text-decoration:none;font-weight:bold}
+*{box-sizing:border-box;font-family:system-ui;margin:0;padding:0}
+body{background:#f5f7fb;color:#0f172a;min-height:100vh;padding-bottom:90px}
+.top{padding:14px 16px 6px;text-align:center;position:sticky;top:0;background:#f5f7fb;z-index:10}
+.top h1{font-size:22px;font-weight:800}
+.top small{color:#64748b;font-size:13px}
+.avatars{display:flex;justify-content:center;margin:10px 0}
+.avatars div{width:46px;height:46px;border-radius:50%;margin-left:-10px;border:3px solid white;display:flex;align-items:center;justify-content:center;font-size:20px}
+.tab-switch{background:#e9eefb;border-radius:16px;display:flex;padding:4px;margin:12px 16px}
+.tab-switch button{flex:1;padding:12px;border:none;border-radius:12px;font-weight:700;background:transparent;cursor:pointer}
+.tab-switch button.active{background:#3b82f6;color:white}
+.card{background:white;border-radius:22px;margin:12px 16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.week-label{font-size:14px;color:#64748b;background:#f1f5f9;padding:12px 16px;border-radius:14px;display:flex;justify-content:space-between;align-items:center}
+.day-title{font-weight:800;font-size:18px}
+.day-sub{color:#64748b;font-size:13px}
+.input-row{display:flex;align-items:center;gap:10px;margin-top:12px}
+.input-row input{flex:1;background:#f1f5f9;border:none;padding:14px 16px;border-radius:14px;font-size:14px}
+.input-row button{width:44px;height:44px;border-radius:50%;background:#3b82f6;color:white;border:none;font-size:22px;cursor:pointer}
+.emoji-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.emoji-row span{cursor:pointer;font-size:18px}
+.plan-item{background:#f0fdf4;border-radius:12px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.bottom-nav{position:fixed;bottom:16px;left:16px;right:16px;background:white;border-radius:24px;display:flex;justify-content:space-around;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12)}
+.bottom-nav button{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;font-size:12px;color:#94a3b8;cursor:pointer}
+.bottom-nav button.active{color:#3b82f6;font-weight:700}
+.hidden{display:none}
+.login-card input{width:100%;padding:14px;border:1px solid #e2e8f0;border-radius:14px;margin:8px 0}
+.login-card.primary{width:100%;background:#3b82f6;color:white;border:none;padding:14px;border-radius:14px;font-weight:700;margin-top:12px;cursor:pointer}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center;margin-top:12px}
+.calendar-grid div{padding:10px;border-radius:10px}
+.calendar-grid div.today{background:#bbf7d0;font-weight:700}
+.notif{padding:12px;border-radius:16px;display:flex;align-items:center;gap:10px;margin:8px 0}
+.notif.blue{background:#dbeafe}
+.notif.green{background:#dcfce7}
+.notif.white{background:white;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
 </style>
 </head>
 <body>
-<h1>✨ Primogem Besties ✨</h1>
-<p>Genshin Impact utility app</p>
-<div class="card">
-<h2>Trinity App - Web</h2>
-<p>Welkom! Jou web weergawe werk nou!</p>
-<a class="btn" href="https://github.com/kotzemarthie02-code/Trinity-App">Gaan na Trinity App</a>
+
+<div id="loginScreen">
+<div class="top"><small>Trinity Genshin</small><h1>Trinity Genshin Group Weekly Planner</h1></div>
+<div class="avatars"><div style="background:#60a5fa">🙂</div><div style="background:#fdba74">🙂</div><div style="background:#c4b5fd">🙂</div><div style="background:#86efac">🙂</div><div style="background:#22c55e">🙂</div></div>
+<p style="text-align:center;color:#64748b;font-size:13px;padding:0 20px">Welcome! Login or create an account to plan your weekly activities</p>
+<div class="tab-switch"><button class="active">Login</button><button>Register</button></div>
+<div class="card login-card">
+<input id="email" value="bluely@gmail.com" placeholder="email">
+<input id="pass" type="password" placeholder="Enter your password">
+<button class="primary" onclick="showApp()">Login</button>
+<p style="text-align:center;margin-top:12px;font-size:13px">Don't have an account? <span style="color:#3b82f6;font-weight:700">Register now</span></p>
 </div>
-<div class="card">
-<p>Om te installeer: Share > Add to Home Screen</p>
 </div>
+
+<div id="appScreen" class="hidden">
+<div class="top" style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px"><div style="width:40px;height:40px;background:#3b82f6;border-radius:12px;display:flex;align-items:center;justify-content:center;color:white">✦</div><div style="text-align:left"><div style="font-weight:800">Trinity • Genshin</div><small>Team Trinity • 1 members</small></div></div><div>⚙️</div></div>
+
+<div id="plannerTab">
+<div class="card" style="padding:8px"><div class="tab-switch" style="margin:0"><button id="myWeekBtn" class="active" onclick="setWeek('my')">My Week</button><button id="groupWeekBtn" onclick="setWeek('group')">Group Week</button></div></div>
+<div style="display:flex;gap:10px;padding:0 16px"><div class="week-label" style="flex:1">📅 Oct 12 — Oct 18, 2026 • This Week</div><button style="background:#22c55e;color:white;border:none;padding:10px 16px;border-radius:14px;font-weight:700">💬 Share</button></div>
+<div id="days"></div>
+</div>
+
+<div id="monthTab" class="hidden">
+<div class="card"><h3 style="text-align:center">October 2026</h3><div class="calendar-grid" id="cal"></div><div style="margin-top:16px"><b>Weekly Planner Events</b><p style="color:#64748b;font-size:13px">No events this month yet — add some in the Planner.</p></div></div>
+</div>
+
+<div id="activityTab" class="hidden">
+<div class="card"><b>Notifications</b><p style="color:#64748b;font-size:12px">Latest activity & reminders</p>
+<div class="notif blue">🔔 <div><b>Computer App edited plan</b><br><small>2 min ago • Plan for Wed Oct 9 was updated</small></div></div>
+<div class="notif green">📍 <div><b>Sunday reminder pinned</b><br><small>Today 08:30 • Rest day</small></div></div>
+</div>
+<div class="card"><b>Updates</b>
+<div class="notif white">❗ <div><b>New member joined</b><br><small>1 hour ago</small></div></div>
+<div class="notif white">❗ <div><b>Task deadline changed</b><br><small>3 hours ago</small></div></div>
+</div>
+</div>
+
+<div id="profileTab" class="hidden">
+<div class="card" style="text-align:center"><div style="width:80px;height:80px;background:#a7f3d0;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px">🧪</div><div style="margin-top:10px;background:#f1f5f9;padding:8px 16px;border-radius:12px;display:inline-block"><b>SuperBluely</b></div><p style="color:#64748b;font-size:12px">bluely@gmail</p></div>
+</div>
+
+<div class="bottom-nav">
+<button class="active" id="navPlanner" onclick="nav('planner')"><span>🗂️</span>Planner</button>
+<button id="navMonth" onclick="nav('month')"><span>📅</span>Month</button>
+<button id="navActivity" onclick="nav('activity')"><span>🔔</span>Activity</button>
+<button id="navProfile" onclick="nav('profile')"><span>👤</span>Profile</button>
+</div>
+</div>
+
+<script>
+const daysData=[{key:'Mon',date:'Oct 12',full:'2026-10-12'},{key:'Tue',date:'Oct 13',full:'2026-10-13'},{key:'Wed',date:'Oct 14',full:'2026-10-14'},{key:'Thu',date:'Oct 15',full:'2026-10-15'},{key:'Fri',date:'Oct 16',full:'2026-10-16'},{key:'Sat',date:'Oct 17',full:'2026-10-17'},{key:'Sun',date:'Oct 18',full:'2026-10-18'}];
+let plans=JSON.parse(localStorage.getItem('trinityPlans')||'{}');
+function showApp(){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appScreen').classList.remove('hidden');renderDays();renderCal();}
+function renderDays(){const c=document.getElementById('days');c.innerHTML='';daysData.forEach(d=>{const list=plans[d.full]||[];const items=list.map((t,i)=>`<div class="plan-item"><span>${t}</span><span onclick="delPlan('${d.full}',${i})" style="cursor:pointer">✕</span></div>`).join('');c.innerHTML+=`<div class="card"><div class="day-title">${d.key}</div><div class="day-sub">${d.date}</div>${list.length?items:`<p style="color:#64748b;font-size:13px;margin-top:6px">No plans yet</p>`}<div class="input-row"><input id="in-${d.full}" placeholder="Ek soek... type anything + emoji"><button onclick="addPlan('${d.full}')">+</button></div><div class="emoji-row"><span onclick="addEmoji('${d.full}','🙂')">🙂</span><span onclick="addEmoji('${d.full}','💎')">💎</span><span onclick="addEmoji('${d.full}','🍓')">🍓</span><span onclick="addEmoji('${d.full}','🎮')">🎮</span><span onclick="addEmoji('${d.full}','🌸')">🌸</span><span onclick="addEmoji('${d.full}','✨')">✨</span></div></div>`;});}
+function addPlan(date){const el=document.getElementById('in-'+date);if(!el.value.trim())return;if(!plans[date])plans[date]=[];plans[date].push(el.value);localStorage.setItem('trinityPlans',JSON.stringify(plans));el.value='';renderDays();}
+function delPlan(date,i){plans[date].splice(i,1);localStorage.setItem('trinityPlans',JSON.stringify(plans));renderDays();}
+function addEmoji(date,e){const el=document.getElementById('in-'+date);el.value+=e;el.focus();}
+function nav(t){['planner','month','activity','profile'].forEach(x=>{document.getElementById(x+'Tab').classList.add('hidden');document.getElementById('nav'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('active');});document.getElementById(t+'Tab').classList.remove('hidden');document.getElementById('nav'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('active');}
+function renderCal(){const cal=document.getElementById('cal');const headers=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(h=>`<div style="color:#94a3b8;font-size:12px">${h}</div>`).join('');let days='';for(let i=1;i<=31;i++){days+=`<div class="${i==16?'today':''}">${i}</div>`}cal.innerHTML=headers+days;}
+function setWeek(type){document.getElementById('myWeekBtn').classList.toggle('active',type=='my');document.getElementById('groupWeekBtn').classList.toggle('active',type=='group');}
+</script>
 </body>
 </html>
