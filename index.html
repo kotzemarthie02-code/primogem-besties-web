@@ -16,6 +16,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 :root{--bg:#f6f7fd;--ink:#141b34;--gray:#6b7390;--blue:#5078f5;--chip:#eceef7;--green:#05d85b;--mint:#a8e6cf}
+html,body{overscroll-behavior-y:none}
 body{background:var(--bg);color:var(--ink);min-height:100vh}
 .wrap{max-width:480px;margin:0 auto;padding:0 14px 120px;position:relative}
 button{font-family:inherit;cursor:pointer}
@@ -67,8 +68,9 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .addRow input{flex:1;min-width:0;background:#f3f4fb;border:none;border-radius:16px;height:48px;padding:0 14px;font-size:14px;color:var(--ink);outline:none}
 .addRow input::placeholder{color:#9aa0b8}
 .plusBtn{width:50px;height:50px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:28px;line-height:1;flex:none}
-.quick{display:flex;gap:14px;margin:12px 0 0 62px;flex-wrap:wrap}
-.quick span{font-size:24px;cursor:pointer}
+.quick{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:12px 0 0;max-height:160px;overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 2px 0}
+.quick span{font-size:26px;cursor:pointer;text-align:center;padding:5px 0;border-radius:12px;line-height:1.2}
+.quick span:active{background:#eaf0ff}
 .plan{margin-top:14px}
 .planTop{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gray);font-weight:700;margin-bottom:6px}
 .planLine{display:flex;align-items:center;gap:10px}
@@ -299,7 +301,7 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 <div id="editOverlay" class="overlay hidden" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
     <h3>Edit event</h3>
-    <div class="edTop"><div class="edEmoji" id="edEmoji">✨</div><input id="edText" placeholder="Plan" onkeydown="if(event.key==='Enter')saveEdit()"></div>
+    <div class="edTop"><div class="edEmoji" id="edEmoji">✨</div><input id="edText" placeholder="Plan" oninput="saveEditDraft()" onkeydown="if(event.key==='Enter')saveEdit()"></div>
     <div class="pTitle" style="margin:16px 0 10px">Emoji</div>
     <div class="emojiG6" id="edGrid"></div>
     <div class="edBtns"><button class="bSave" onclick="saveEdit()">Save</button><button class="bCancel" onclick="closeEdit()">Cancel</button><button class="bDel" onclick="deleteFromEdit()">🗑️</button></div>
@@ -325,7 +327,15 @@ function dbg(m){
   el.textContent=dbgLines.slice(-14).join('\n');
 }
 const EMOJIS=["🧪","🔥","🕊️","🌻","🏍️","😊","😍","⚔️","🌸","💙","⭐","🍀","🌿","✨","🍃","💖","🎮","📅","⏰","🎉","💪","😎","🥰","🌙","☀️","❤️","💜","💚","💛","🧡","💀","👑","🌈","🍓","⚡","💎","🚀","😄","😇","🤩","😴","🤔","🐱","😺","🐶","🐰","🦊","🐻","🐼","🐨","🐸","🐧","🦄","🐲","🦋","🐝","🦅","🦉","🐺","🐯","🦁","🐮","🐷","🐵","🦖","🐬","🐳","🍉","🍒","🍩","🍪","🍫","☕","🧋","🎧","🎨","🎬","📚","🧸","🪄","🌊","🌋","🏆","🏅","🎯","🧩","🛡️","🌟","💫","🌺","🌹","🍁","🍄","🪐","🛸","🎸","🎹","⚽","🏀","🚲","🚗","✈️","🧿","💌","🔔","🕯️"];
+const MORE=["😂","🤣","😭","😅","😉","😘","🥳","😤","😡","🙄","🤗","🤭","😬","🥺","😢","😱","🤪","🤤","🤢","🤒","😏","😌","😋","😜","🥹","😈","👻","🤖","👽","💩",
+"👍","👎","👏","🙌","🙏","👋","✌️","🤞","🤝","👀","🧠","💤","💥","💢","💦","🫶","🤍","🖤","🤎","💔","💕","💞","💘","💝","🫂",
+"🎂","🍕","🍔","🍟","🌭","🌮","🍿","🍦","🍰","🧁","🍷","🍺","🥂","🍹","🍎","🍌","🍇","🍑","🥑","🥐","🍜","🍣","🍝","🥗","🍳","🥞",
+"🐔","🐥","🐢","🐍","🐙","🦀","🐠","🐋","🦈","🐴","🦓","🦒","🐘","🦔","🐿️","🦜","🦢","🦩",
+"🏠","🏫","🏥","🏖️","⛰️","🏕️","🎡","🎢","🎤","🎲","♟️","🎳","🏊","🏃","🚴","🧘","🏋️","⛺","🌍","🗺️","🧳","🚌","🚂","🚢","🚁",
+"💼","💻","📱","📷","📞","🔑","🎁","💰","🛒","💊","🩺","📖","✏️","📝","📌","📍","⌛","🕒","🛏️","🧹","🧺","🛁","🪥","🎓","🏁","✅","❌","❗","❓","💯","🔝","🆕","🔜"];
+MORE.forEach(e=>{if(!EMOJIS.includes(e))EMOJIS.push(e)});
 const QUICK=["😊","💎","🍓","🎮","🌸","✨"];
+const QUICK_ALL=[...new Set([...QUICK,...EMOJIS])];
 const PALETTE=["#FFA8D0","#FFC1DD","#FFCFE0","#FFBF94","#FFD3B0","#FFDD90","#FFF0A0","#DDF59A",
 "#BCF5A0","#B2EFD0","#A8E6CF","#8EE8E0","#A0E8F8","#9ED2F8","#A9CCFF","#BCC8FF",
 "#C8A8FF","#D8B8F4","#EBC4F6","#FBB9FF","#FFB9E4","#FFA8BC","#F0B49C","#D8C0A0",
@@ -345,6 +355,8 @@ let monthDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let draft={emoji:'🧪',color:'#A8E6CF'};
 let editing=null;
 let useFB=false,syncStarted=false;
+let drafts=store.get('pb_drafts',{});
+let editDraftRestored=false;
 let friendFilter=null;   // tap a friend's avatar -> see only their plans in Group Week
 let migTried=false,migPending=null;
 
@@ -412,6 +424,7 @@ function onPlans(list,meta){
     if(p.owner)remoteUsers[p.owner]={name:p.ownerName||String(p.owner).split('@')[0],emoji:p.ownerEmoji||'🙂',color:p.ownerColor||'#A8E6CF'};
   });
   if(profile&&!$('appScreen').classList.contains('hidden')){renderGroup();renderPlanner();renderMonth()}
+  if(profile&&!$('appScreen').classList.contains('hidden'))restoreEditDraft(meta);
   if(useFB&&profile&&meta&&!meta.fromCache)migrateStep(list,meta);
 }
 /* one-time: copy plans that were saved only on THIS phone (old local mode) into Firestore */
@@ -609,8 +622,8 @@ function renderPlanner(){
       }
     });
     if(mode==='my'){
-      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
-      html+=`<div class="quick">${QUICK.map(e=>`<span onclick="addEmoji('${key}','${e}')">${e}</span>`).join('')}</div>`;
+      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
+      html+=`<div class="quick">${QUICK_ALL.map(e=>`<span onclick="addEmoji('${key}','${e}')">${e}</span>`).join('')}</div>`;
     }
     html+=`</div>`;
   }
@@ -618,13 +631,15 @@ function renderPlanner(){
   Object.keys(keep).forEach(id=>{const el=$(id);if(el)el.value=keep[id]});
   if(focusId&&$(focusId)){const el=$(focusId);el.focus();try{el.setSelectionRange(selS,selE)}catch(e){}}
 }
-function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();el.focus()}
+const draftKey=k=>(profile?profile.email:'')+'|'+k;
+function saveDraft(key,v){const k=draftKey(key);if(v)drafts[k]=v;else delete drafts[k];store.set('pb_drafts',drafts)}
+function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();saveDraft(key,el.value);el.focus()}
 function addPlan(key){
   if(!syncReady())return;
   const el=$('in-'+key);const raw=el.value.trim();if(!raw)return;
   const {emoji,text}=splitEmoji(raw);
   const d=parseKey(key);
-  el.value='';
+  el.value='';saveDraft(key,'');
   DB.addPlan({
     id:uid(),owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
     text:text,emoji:emoji,color:normHex(colors.my)||'#A8E6CF',
@@ -654,8 +669,18 @@ function renderEdGrid(){
   $('edGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===editing.emoji?'sel':''}" onclick="pickEdEmoji('${e}')">${e}</button>`).join('');
 }
 function edPreview(){const el=$('edEmoji');el.textContent=editing.emoji||'✨';el.style.opacity=editing.emoji?1:.3}
-function pickEdEmoji(e){editing.emoji=(editing.emoji===e)?'':e;edPreview();renderEdGrid()}
-function closeEdit(){editing=null;$('editOverlay').classList.add('hidden')}
+function pickEdEmoji(e){editing.emoji=(editing.emoji===e)?'':e;edPreview();renderEdGrid();saveEditDraft()}
+function saveEditDraft(){if(!editing)return;store.set('pb_editdraft',{email:me(),key:editing.key,id:editing.id,emoji:editing.emoji,text:$('edText').value})}
+function restoreEditDraft(meta){
+  if(editDraftRestored||editing||!profile)return;
+  const d=store.get('pb_editdraft',null);
+  if(!d||d.email!==me()){editDraftRestored=true;return}
+  const f=findPlan(d.key,d.id);
+  if(!f){if(meta&&!meta.fromCache){store.set('pb_editdraft',null);editDraftRestored=true}return}
+  editDraftRestored=true;openEdit(d.key,d.id);
+  if(editing){editing.emoji=d.emoji||'';$('edText').value=d.text||'';edPreview();renderEdGrid()}
+}
+function closeEdit(){editing=null;store.set('pb_editdraft',null);$('editOverlay').classList.add('hidden')}
 function saveEdit(){
   if(!editing||!syncReady())return;const f=findPlan(editing.key,editing.id);if(!f){closeEdit();return}
   const {emoji:e2,text}=splitEmoji($('edText').value.trim());
