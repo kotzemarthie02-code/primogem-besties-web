@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Primogem Besties</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#5078f5">
+<meta name="application-name" content="Primogem Besties">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Primogem Besties">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 :root{--bg:#f6f7fd;--ink:#141b34;--gray:#6b7390;--blue:#5078f5;--chip:#eceef7;--green:#05d85b;--mint:#a8e6cf}
@@ -359,8 +368,13 @@ function userOf(id){
   return remoteUsers[id]||users[id]||{name:String(id).split('@')[0],emoji:'🙂',color:'#A8E6CF'};
 }
 function avatar(u,size){return `<div class="av" style="width:${size}px;height:${size}px;background:${esc(u.color)};font-size:${Math.round(size*.5)}px">${esc(u.emoji)}</div>`}
-const EMO_RE=/(\p{Extended_Pictographic}\uFE0F?(?:\u200D\p{Extended_Pictographic}\uFE0F?)*)/gu;
-function splitEmoji(t){const m=t.match(EMO_RE)||[];return{emoji:m[0]||'',text:t.replace(EMO_RE,'').replace(/\uFE0F/g,'').replace(/\s+/g,' ').trim()}}
+const EMO_LEAD=/^(\p{Extended_Pictographic}\uFE0F?(?:\u200D\p{Extended_Pictographic}\uFE0F?)*)\s*/u;
+function splitEmoji(t){
+  t=String(t||'').replace(/\s+/g,' ').trim();
+  const m=t.match(EMO_LEAD);
+  if(m)return{emoji:m[1],text:t.slice(m[0].length)};
+  return{emoji:'',text:t};
+}
 function findPlan(key,id){const l=plans[key]||[];const i=l.findIndex(p=>p.id===id);return i<0?null:{p:l[i],i}}
 
 /* ---------- data layer: Firestore (live) or local fallback ---------- */
@@ -621,13 +635,14 @@ function joinPlan(key,id){
 function openEdit(key,id){
   const f=findPlan(key,id);if(!f||!isMine(f.p))return;
   editing={key,id,emoji:f.p.emoji||''};
-  $('edText').value=f.p.text;$('edEmoji').textContent=editing.emoji||'✨';
+  $('edText').value=f.p.text;edPreview();
   renderEdGrid();$('editOverlay').classList.remove('hidden');
 }
 function renderEdGrid(){
   $('edGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===editing.emoji?'sel':''}" onclick="pickEdEmoji('${e}')">${e}</button>`).join('');
 }
-function pickEdEmoji(e){editing.emoji=e;$('edEmoji').textContent=e;renderEdGrid()}
+function edPreview(){const el=$('edEmoji');el.textContent=editing.emoji||'✨';el.style.opacity=editing.emoji?1:.3}
+function pickEdEmoji(e){editing.emoji=(editing.emoji===e)?'':e;edPreview();renderEdGrid()}
 function closeEdit(){editing=null;$('editOverlay').classList.add('hidden')}
 function saveEdit(){
   if(!editing||!syncReady())return;const f=findPlan(editing.key,editing.id);if(!f){closeEdit();return}
@@ -724,6 +739,7 @@ function shareWhatsApp(){
 }
 
 checkLogin();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 </script>
 </body>
 </html>
