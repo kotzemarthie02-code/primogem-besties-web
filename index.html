@@ -527,7 +527,7 @@ function renderGroup(){
 }
 function pickFriend(id){friendFilter=(friendFilter===id)?null:id;mode='group';nav('planner')}
 function invite(){
-  const text=`Join my Primogem Besties group 💎 ${location.href.split('#')[0]}`;
+  const text=`Join my Primogem Besties group 💎 ${location.origin+location.pathname}`;
   if(navigator.share){navigator.share({title:'Primogem Besties',text}).catch(()=>{})}
   else window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
