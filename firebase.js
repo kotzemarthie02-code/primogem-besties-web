@@ -67,7 +67,7 @@ if (!configured) {
         let got = false;
         const t = setTimeout(() => { if (!got) fbError("plans listener",
           { code: "unavailable", message: "Cannot reach Firestore after 12s. Is the Firestore Database created (Build > Firestore Database > Create database)? Rules published? Internet ok?" }); }, 12000);
-        return onSnapshot(collection(db, "plans"),
+        return onSnapshot(collection(db, "plans"), { includeMetadataChanges: true },
           snap => { if (!snap.metadata.fromCache) { got = true; clearTimeout(t); }
                     cb(snap.docs.map(d => ({ ...d.data(), id: d.id })), snap.metadata); },
           e => { got = true; clearTimeout(t); fbError("plans listener", e); });
