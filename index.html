@@ -316,6 +316,14 @@ const store={
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+/* optional on-screen status: open the app with ?debug=1 on the end of the link */
+const DEBUG=/[?&]debug/.test(location.search);const dbgLines=[];
+function dbg(m){
+  if(!DEBUG)return;dbgLines.push(new Date().toLocaleTimeString()+'  '+m);
+  let el=document.getElementById('dbgBox');
+  if(!el){el=document.createElement('div');el.id='dbgBox';el.style.cssText='position:fixed;left:8px;right:8px;top:8px;z-index:999;background:rgba(0,0,0,.88);color:#8f8;font:12px/1.45 monospace;padding:10px;border-radius:12px;max-height:45vh;overflow:auto;white-space:pre-wrap';document.body.appendChild(el)}
+  el.textContent=dbgLines.slice(-14).join('\n');
+}
 const EMOJIS=["🧪","🔥","🕊️","🌻","🏍️","😊","😍","⚔️","🌸","💙","⭐","🍀","🌿","✨","🍃","💖","🎮","📅","⏰","🎉","💪","😎","🥰","🌙","☀️","❤️","💜","💚","💛","🧡","💀","👑","🌈","🍓","⚡","💎","🚀","😄","😇","🤩","😴","🤔","🐱","😺","🐶","🐰","🦊","🐻","🐼","🐨","🐸","🐧","🦄","🐲","🦋","🐝","🦅","🦉","🐺","🐯","🦁","🐮","🐷","🐵","🦖","🐬","🐳","🍉","🍒","🍩","🍪","🍫","☕","🧋","🎧","🎨","🎬","📚","🧸","🪄","🌊","🌋","🏆","🏅","🎯","🧩","🛡️","🌟","💫","🌺","🌹","🍁","🍄","🪐","🛸","🎸","🎹","⚽","🏀","🚲","🚗","✈️","🧿","💌","🔔","🕯️"];
 const QUICK=["😊","💎","🍓","🎮","🌸","✨"];
 const PALETTE=["#FFA8D0","#FFC1DD","#FFCFE0","#FFBF94","#FFD3B0","#FFDD90","#FFF0A0","#DDF59A",
@@ -396,6 +404,7 @@ function loadLocalPlans(){
 }
 /* called on EVERY Firestore snapshot -> instant live update on all phones */
 function onPlans(list,meta){
+  dbg('plans in group: '+list.length+(meta&&meta.fromCache?' (from cache)':''));
   allPlans=list;plans={};remoteUsers={};
   list.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(p=>{
     p.joined=p.joined||[];p.joinedIds=p.joinedIds||[];
@@ -438,6 +447,7 @@ function beginSync(m){
   // allow upgrading local -> Firebase if Firebase finishes loading late
   if(syncStarted&&!(m==='fb'&&!useFB))return;
   syncStarted=true;useFB=(m==='fb');
+  dbg(useFB?'SYNC = LIVE (Firebase connected)':'SYNC = LOCAL ONLY (not shared!)');
   if(useFB){allPlans=[];plans={};activity=[];FB.listenPlans(onPlans);FB.listenActivity(me(),onActs);console.log('[Primogem] Live sync ON')}
   else{
     console.warn('[Primogem] Local mode (no Firebase) – plans are NOT shared between phones.');
@@ -447,12 +457,14 @@ function beginSync(m){
 }
 function startSync(){
   if(syncStarted)return;
+  dbg('start: firebase.js '+(window.FB?'loaded, ready='+window.FB.ready:'still loading…'));
   const go=()=>beginSync(window.FB&&window.FB.ready?'fb':'local');
   if(window.FB)go();
   else{window.addEventListener('fb-ready',go);setTimeout(()=>{if(!syncStarted)beginSync('local')},20000)}
 }
 let fbErrShown=false;
 window.addEventListener('fb-error',e=>{
+  dbg('ERROR: '+((e.detail&&e.detail.what)||'')+' '+((e.detail&&e.detail.code)||'')+' '+((e.detail&&e.detail.message)||''));
   if(fbErrShown)return;fbErrShown=true;
   const d=e.detail||{};
   alert('Firebase problem ('+(d.what||'')+'): '+(d.code||'')+' '+(d.message||'')+'\n\nCheck: 1) Firestore Database is created (not only Realtime Database)  2) Rules are published');
