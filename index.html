@@ -24,6 +24,8 @@ button{font-family:inherit;cursor:pointer}
 .lbl{font-size:14px;font-weight:700;color:var(--gray);margin:18px 0 8px}
 .avRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .av{border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.avBtn{border:3px solid transparent;border-radius:50%;margin:-3px;cursor:pointer;flex:none}
+.avBtn.sel{border-color:var(--blue)}
 .invite{background:#dfe7ff;color:#6b8cff;border:none;border-radius:24px;padding:0 20px;height:48px;font-size:15px;font-weight:700}
 /* color pickers */
 .colorRow{display:flex;gap:10px;margin-top:16px}
@@ -326,6 +328,8 @@ let monthDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let draft={emoji:'🧪',color:'#A8E6CF'};
 let editing=null;
 let useFB=false,syncStarted=false;
+let friendFilter=null;   // tap a friend's avatar -> see only their plans in Group Week
+let migTried=false,migPending=null;
 
 const saveUsers=()=>store.set('pb_users',users);
 const saveProf=()=>{store.set('pb_profile',profile);if(profile){users[profile.email]={name:profile.name,emoji:profile.emoji,color:profile.color};saveUsers();}};
@@ -377,7 +381,7 @@ function loadLocalPlans(){
   return arr;
 }
 /* called on EVERY Firestore snapshot -> instant live update on all phones */
-function onPlans(list){
+function onPlans(list,meta){
   allPlans=list;plans={};remoteUsers={};
   list.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(p=>{
     p.joined=p.joined||[];p.joinedIds=p.joinedIds||[];
@@ -385,16 +389,44 @@ function onPlans(list){
     if(p.owner)remoteUsers[p.owner]={name:p.ownerName||String(p.owner).split('@')[0],emoji:p.ownerEmoji||'🙂',color:p.ownerColor||'#A8E6CF'};
   });
   if(profile&&!$('appScreen').classList.contains('hidden')){renderGroup();renderPlanner();renderMonth()}
+  if(useFB&&profile&&meta&&!meta.fromCache)migrateStep(list,meta);
+}
+/* one-time: copy plans that were saved only on THIS phone (old local mode) into Firestore */
+function buildMigration(){
+  if(store.get('pb_migrated_'+me(),false))return [];
+  let list=[];try{list=loadLocalPlans()}catch(e){}
+  const tag=me().replace(/[^A-Za-z0-9]/g,'');
+  return list.filter(p=>p&&p.date&&(p.owner===me()||!String(p.owner||'').includes('@')||p.owner===profile.name)).map(p=>{
+    const jn=(p.joined||[]).filter(x=>typeof x==='string');
+    const names=jn.map(j=>j.includes('@')?((users[j]&&users[j].name)||j.split('@')[0]):j);
+    const ids=(p.joinedIds&&p.joinedIds.length?p.joinedIds:jn.filter(j=>j.includes('@')));
+    return {id:'mig_'+String(p.id).replace(/[^A-Za-z0-9]/g,'')+'_'+tag,owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
+      text:p.text||'',emoji:p.emoji||'',color:normHex(colors.my)||'#A8E6CF',
+      day:parseKey(p.date).toLocaleDateString('en-US',{weekday:'short'}),date:p.date,joined:names,joinedIds:ids,createdAt:p.createdAt||Date.now()};
+  });
+}
+function migrateStep(list,meta){
+  const have=new Set(list.map(p=>p.id));
+  if(!migTried){
+    migTried=true;migPending=buildMigration();
+    const todo=migPending.filter(d=>!have.has(d.id));
+    todo.forEach(d=>DB.addPlan(d));
+    if(!todo.length){store.set('pb_migrated_'+me(),true);migPending=null}
+  }else if(migPending&&!meta.hasPendingWrites&&migPending.every(d=>have.has(d.id))){
+    store.set('pb_migrated_'+me(),true);migPending=null;   // confirmed on the server
+  }
 }
 function onActs(list){
   activity=list.slice().sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
   if(profile&&!$('appScreen').classList.contains('hidden'))renderActivity();
 }
 function beginSync(m){
-  if(syncStarted)return;syncStarted=true;useFB=(m==='fb');
-  if(useFB){FB.listenPlans(onPlans);FB.listenActivity(me(),onActs)}
+  // allow upgrading local -> Firebase if Firebase finishes loading late
+  if(syncStarted&&!(m==='fb'&&!useFB))return;
+  syncStarted=true;useFB=(m==='fb');
+  if(useFB){allPlans=[];plans={};activity=[];FB.listenPlans(onPlans);FB.listenActivity(me(),onActs);console.log('[Primogem] Live sync ON')}
   else{
-    console.warn('[Primogem] Local mode (no Firebase keys) – plans are NOT shared between phones.');
+    console.warn('[Primogem] Local mode (no Firebase) – plans are NOT shared between phones.');
     allPlans=loadLocalPlans();const a=store.get('pb_activity',[]);activity=Array.isArray(a)?a:[];
     onPlans(allPlans);onActs(activity);
   }
@@ -403,7 +435,17 @@ function startSync(){
   if(syncStarted)return;
   const go=()=>beginSync(window.FB&&window.FB.ready?'fb':'local');
   if(window.FB)go();
-  else{window.addEventListener('fb-ready',go,{once:true});setTimeout(()=>{if(!syncStarted)beginSync('local')},4000)}
+  else{window.addEventListener('fb-ready',go);setTimeout(()=>{if(!syncStarted)beginSync('local')},20000)}
+}
+let fbErrShown=false;
+window.addEventListener('fb-error',e=>{
+  if(fbErrShown)return;fbErrShown=true;
+  const d=e.detail||{};
+  alert('Firebase problem ('+(d.what||'')+'): '+(d.code||'')+' '+(d.message||'')+'\n\nCheck: 1) Firestore Database is created (not only Realtime Database)  2) Rules are published');
+});
+function syncReady(){
+  if(syncStarted)return true;
+  alert('Still connecting to the group… try again in a few seconds');return false;
 }
 function pushAct(to,type,message,detail){
   DB.addActivity({id:uid(),to,type,message,detail:detail||'',timestamp:Date.now(),read:false});
@@ -441,8 +483,9 @@ function renderAll(){renderGroup();renderPlanner();renderMonth();renderActivity(
 function renderGroup(){
   const ids=Object.keys(remoteUsers);if(profile&&!ids.includes(profile.email))ids.unshift(profile.email);
   $('memberCount').textContent=`Team Trinity • ${ids.length} members`;
-  $('groupAvatars').innerHTML=ids.map(id=>avatar(userOf(id),60)).join('')+`<button class="invite" onclick="invite()">+ Invite</button>`;
+  $('groupAvatars').innerHTML=ids.map(id=>`<div class="avBtn ${friendFilter===id?'sel':''}" onclick="pickFriend('${esc(id)}')">${avatar(userOf(id),60)}</div>`).join('')+`<button class="invite" onclick="invite()">+ Invite</button>`;
 }
+function pickFriend(id){friendFilter=(friendFilter===id)?null:id;mode='group';nav('planner')}
 function invite(){
   const text=`Join my Primogem Besties group 💎 ${location.href.split('#')[0]}`;
   if(navigator.share){navigator.share({title:'Primogem Besties',text}).catch(()=>{})}
@@ -528,11 +571,11 @@ function renderPlanner(){
   let html='';
   for(let i=0;i<7;i++){
     const d=addDays(weekStart,i),key=keyOf(d);
-    const list=(plans[key]||[]).filter(p=>mode==='group'||isMine(p));
+    const list=(plans[key]||[]).filter(p=>mode==='group'?(!friendFilter||p.owner===friendFilter):(isMine(p)||iJoined(p)));
     html+=`<div class="dayCard ${key===todayK?'today':''}"><div class="dayTitle">${d.toLocaleDateString('en-US',{weekday:'short'})}</div><div class="daySub">${fmtNice(d)}</div>`;
     if(!list.length)html+=`<div class="none">No plans yet</div>`;
     list.forEach(p=>{
-      if(mode==='my'){
+      if(mode==='my'&&isMine(p)){
         html+=`<div class="plan"><div class="planLine">${bubble(p)}<button class="editBtn" onclick="openEdit('${key}','${p.id}')" aria-label="Edit">${PENCIL}</button></div>${joinedLine(p)}</div>`;
       }else{
         const u=userOf(p.owner),joined=iJoined(p);
@@ -551,6 +594,7 @@ function renderPlanner(){
 }
 function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();el.focus()}
 function addPlan(key){
+  if(!syncReady())return;
   const el=$('in-'+key);const raw=el.value.trim();if(!raw)return;
   const {emoji,text}=splitEmoji(raw);
   const d=parseKey(key);
@@ -563,6 +607,7 @@ function addPlan(key){
   });
 }
 function joinPlan(key,id){
+  if(!syncReady())return;
   const f=findPlan(key,id);if(!f)return;const p=f.p;
   if(iJoined(p)){
     DB.leave(id,profile.name,me());
@@ -585,7 +630,7 @@ function renderEdGrid(){
 function pickEdEmoji(e){editing.emoji=e;$('edEmoji').textContent=e;renderEdGrid()}
 function closeEdit(){editing=null;$('editOverlay').classList.add('hidden')}
 function saveEdit(){
-  if(!editing)return;const f=findPlan(editing.key,editing.id);if(!f){closeEdit();return}
+  if(!editing||!syncReady())return;const f=findPlan(editing.key,editing.id);if(!f){closeEdit();return}
   const {emoji:e2,text}=splitEmoji($('edText').value.trim());
   const newEmoji=e2||editing.emoji,newText=text;
   if(!newText&&!newEmoji)return;
@@ -631,7 +676,7 @@ function renderMonth(){
   $('monthEvents').innerHTML=keys.map(k=>{
     return `<div class="evCard"><div class="evDate">${dayLabel(k)}</div>`+plans[k].map(p=>{
       const u=userOf(p.owner),j=p.joined||[];
-      return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}</div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
+      return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
     }).join('')+`</div>`;
   }).join('');
 }
