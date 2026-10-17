@@ -475,10 +475,11 @@ function startSync(){
   if(window.FB)go();
   else{window.addEventListener('fb-ready',go);setTimeout(()=>{if(!syncStarted)beginSync('local')},20000)}
 }
-let fbErrShown=false;
+let fbErrCount=0;
+window.addEventListener('fb-saved',e=>dbg('saved on server OK: '+e.detail));
 window.addEventListener('fb-error',e=>{
   dbg('ERROR: '+((e.detail&&e.detail.what)||'')+' '+((e.detail&&e.detail.code)||'')+' '+((e.detail&&e.detail.message)||''));
-  if(fbErrShown)return;fbErrShown=true;
+  if(fbErrCount>=3)return;fbErrCount++;
   const d=e.detail||{};
   alert('Firebase problem ('+(d.what||'')+'): '+(d.code||'')+' '+(d.message||'')+'\n\nCheck: 1) Firestore Database is created (not only Realtime Database)  2) Rules are published');
 });
@@ -496,11 +497,11 @@ function doLogin(){
   const email=($('loginEmail').value.trim()||'bluely@gmail.com').toLowerCase();
   const known=users[email];
   profile=Object.assign({email,name:email.split('@')[0],emoji:'🧪',color:'#A8E6CF'},known||{},{email});
-  store.set('pb_logged',email);
+  store.set('pb_logged',email);store.set('pb_last_email',email);
   saveProf();showApp();
 }
 function doLogout(){try{localStorage.removeItem('pb_logged')}catch(e){}location.reload()}
-function showApp(){$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');draft={emoji:profile.emoji,color:profile.color};$('profileName').value=profile.name;nav('planner');startSync();}
+function showApp(){dbg('logged in as: '+profile.email);$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');draft={emoji:profile.emoji,color:profile.color};$('profileName').value=profile.name;nav('planner');startSync();}
 function checkLogin(){
   const logged=store.get('pb_logged',null);
   if(logged){
@@ -775,6 +776,7 @@ function shareWhatsApp(){
   window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 
+{const le=store.get('pb_last_email',null);if(le&&$('loginEmail'))$('loginEmail').value=le}
 checkLogin();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 </script>
