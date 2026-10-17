@@ -41,7 +41,7 @@ if (!configured) {
     try {
       db = initializeFirestore(app, {
         localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
-        experimentalAutoDetectLongPolling: true
+        experimentalForceLongPolling: true
       });
     } catch (e) {
       console.warn("[Primogem] persistent cache not available, using default:", e);
