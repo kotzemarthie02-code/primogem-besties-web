@@ -113,6 +113,14 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .pop .goWeek{position:relative;color:#9db4ff;margin-top:6px}
 #colorOverlay,#emojiOverlay{z-index:60}
 .colBtn{width:48px;height:48px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 0 0 2px #d4d8e8;padding:0}
+.wkBox{margin-top:14px}
+.wkHead{width:100%;display:flex;align-items:center;gap:8px;background:#fff;border:none;border-radius:20px;padding:14px 16px;box-shadow:0 4px 14px rgba(30,40,90,.07);font-size:16px;font-weight:800;color:var(--ink);text-align:left}
+.wkHead.open{background:#dfe7ff}
+.wkT{flex:1;min-width:0}
+.wkT em{font-style:normal;font-size:12px;font-weight:800;color:#17a35a;background:#d8f5e3;border-radius:10px;padding:2px 8px;margin-left:6px;white-space:nowrap}
+.wkN{font-size:13px;color:var(--gray);font-weight:700;background:#eceef7;border-radius:12px;padding:3px 10px;flex:none}
+.wkArrow{color:var(--blue);font-size:16px;flex:none;width:16px;text-align:center}
+.wkHead .dotsRow{margin-left:0;flex:none}
 .dotsRow{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle}
 .dotsRow i,.cdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
 .cdot{margin-right:5px}
@@ -673,7 +681,7 @@ function addPlan(key){
   const el=$('in-'+key);const raw=el.value.trim();if(!raw)return;
   const {emoji,text}=splitEmoji(raw);
   const d=parseKey(key);
-  el.value='';saveDraft(key,'');
+  el.value='';saveDraft(key,'');weekOpenState[keyOf(mondayOf(parseKey(key)))]=true;
   DB.addPlan({
     id:uid(),owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
     text:text,emoji:emoji,color:normHex(planColorDraft)||'#A8E6CF',
@@ -799,8 +807,21 @@ function renderMonth(){
   const count=keys.reduce((a,k)=>a+plans[k].length,0);
   $('monthSub').textContent=`${monthDate.toLocaleDateString('en-US',{month:'long'})} • ${count} event${count===1?'':'s'} from the group`;
   if(!keys.length){$('monthEvents').innerHTML=`<div class="empty">No events this month yet — add some in the Planner.</div>`;return}
-  $('monthEvents').innerHTML=keys.map(k=>`<div class="evCard"><div class="evDate">${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join('');
+  // group by week (Mon–Sun): tap the date range to open / close. Nothing is deleted – old weeks stay for memories.
+  const weeks={};keys.forEach(k=>{const w=keyOf(mondayOf(parseKey(k)));(weeks[w]=weeks[w]||[]).push(k)});
+  $('monthEvents').innerHTML=Object.keys(weeks).sort().map(w=>{
+    const ks=weeks[w],ws=parseKey(w),we=addDays(ws,6),open=weekOpen(w);
+    const n=ks.reduce((a,k)=>a+plans[k].length,0);
+    const cols=[...new Set(ks.flatMap(k=>plans[k].map(planColor)))].slice(0,6);
+    return `<div class="wkBox"><button class="wkHead ${open?'open':''}" onclick="toggleWeek('${w}')"><span class="wkT">${fmtDM(ws)} – ${fmtDM(we)}${w===keyOf(mondayOf(new Date()))?'<em>This week</em>':''}</span><span class="dotsRow">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="wkN">${n}</span><span class="wkArrow">${open?'▴':'▾'}</span></button>`
+      +(open?ks.map(k=>`<div class="evCard"><div class="evDate">${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
+      +`</div>`;
+  }).join('');
 }
+const fmtDM=d=>d.getDate()+' '+d.toLocaleDateString('en-US',{month:'short'});
+let weekOpenState={};   // which weeks are open in the Month list (this week is open by default)
+const weekOpen=w=>(w in weekOpenState)?weekOpenState[w]:(w===keyOf(mondayOf(new Date())));
+function toggleWeek(w){weekOpenState[w]=!weekOpen(w);renderMonth()}
 function selectDate(k){
   monthSel=k;renderMonth();
   showDayPop(k,document.querySelector('#calendar .d[data-k="'+k+'"]'));
