@@ -94,8 +94,34 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .dots i{width:7px;height:7px;border-radius:50%;display:block}
 .cal .d.sel{box-shadow:inset 0 0 0 3px var(--blue)}
 .goWeek{background:none;border:none;color:var(--blue);font-weight:800;font-size:14px;margin-top:12px;padding:6px 0}
-.cpick .colorG{margin-top:14px}
-button.swatch{padding:0}
+.hexIn.bad{box-shadow:0 0 0 2px #ff3347}
+.pairRow{display:flex;gap:14px;margin-top:4px}
+.pairItem{flex:1;min-width:0;display:flex;align-items:center;gap:12px}
+.pairItem span{font-size:14px;font-weight:800;color:var(--ink);line-height:1.3}
+.pairItem small{display:block;font-size:12px;font-weight:600;color:var(--gray)}
+.pairCircle{width:76px;height:76px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 0 0 2px #d4d8e8,0 2px 8px rgba(0,0,0,.12);font-size:38px;display:flex;align-items:center;justify-content:center;padding:0;background:#f3f4fb}
+.popLayer{position:fixed;inset:0;z-index:45}
+.pop{position:fixed;background:#1b2036;color:#fff;border-radius:20px;padding:14px 16px;width:min(340px,calc(100vw - 24px));box-shadow:0 12px 36px rgba(10,14,35,.45)}
+.popArrow{position:absolute;width:16px;height:16px;background:#1b2036;transform:rotate(45deg);border-radius:3px}
+.popHead{position:relative;font-weight:800;font-size:15px;color:#aebcff;margin-bottom:6px}
+.popList{position:relative;max-height:min(45vh,320px);overflow-y:auto;overscroll-behavior:contain}
+.popRow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.12)}
+.popRow:first-child{border-top:none}
+.popRow .t{font-size:15px;font-weight:700;word-break:break-word}
+.popRow small{display:block;font-size:12px;color:#aab0d0;font-weight:600;margin-top:2px;word-break:break-word}
+.popEmpty{font-size:14px;color:#aab0d0;font-weight:600;padding:8px 0}
+.pop .goWeek{position:relative;color:#9db4ff;margin-top:6px}
+.colBtn{width:48px;height:48px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 0 0 2px #d4d8e8;padding:0}
+.dotsRow{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle}
+.dotsRow i,.cdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.cdot{margin-right:5px}
+@media (max-width:430px){
+  .addRow{gap:6px}
+  .addRow .av{width:36px!important;height:36px!important;font-size:18px!important}
+  .addRow input{padding:0 10px;font-size:13px}
+  .emoBtn,.colBtn{width:40px;height:40px;font-size:20px}
+  .plusBtn{width:44px;height:44px;font-size:26px}
+}
 .evCard{background:#e8edfd;border:1px solid #dae3fb;border-radius:24px;padding:16px;margin-top:14px}
 .evDate{color:var(--blue);font-weight:800;font-size:16px}
 .evItem{margin-top:10px}
@@ -213,16 +239,6 @@ button.swatch{padding:0}
 
   <!-- PLANNER -->
   <div id="tab-planner">
-    <div class="colorRow">
-      <div class="cpick">
-        <div class="cTop"><b>My Week</b><span>tap the circle for colors, or type a hex</span></div>
-        <div class="cMain">
-          <button class="swatch" id="swMy" onclick="toggleMyPalette()" aria-label="Pick my week color"></button>
-          <input class="hexBox" id="colMyHex" maxlength="7" placeholder="#A8E6CF" oninput="hexColor(this.value)">
-        </div>
-        <div class="colorG hidden" id="myPalette"></div>
-      </div>
-    </div>
     <div class="seg"><button id="btnMy" class="active" onclick="setMode('my')">My Week</button><button id="btnGroup" onclick="setMode('group')">Group Week</button></div>
     <div class="weekBar">
       <div class="chip" onclick="openPicker()"><span id="weekLabel">📅 </span><em>⌄</em></div>
@@ -237,20 +253,9 @@ button.swatch{padding:0}
   <div id="tab-month" class="hidden">
     <div class="calHead"><button onclick="changeMonth(-1)">‹</button><h3 id="monthTitle"></h3><button onclick="changeMonth(1)">›</button></div>
     <div class="cal" id="calendar"></div>
-    <div id="dayPanel"></div>
     <h2 class="sec" style="margin-top:28px">Weekly Planner Events</h2>
     <div class="secSub" id="monthSub"></div>
     <div id="monthEvents"></div>
-  </div>
-
-  <!-- ACTIVITY -->
-  <div id="tab-activity" class="hidden">
-    <h2 class="sec">Notifications</h2>
-    <div class="secSub">Latest activity &amp; reminders</div>
-    <div id="notifList"></div>
-    <h2 class="sec" style="margin-top:28px">Updates</h2>
-    <div class="secSub">Recent changes &amp; alerts</div>
-    <div id="updateList"></div>
   </div>
 
   <!-- PROFILE -->
@@ -262,12 +267,11 @@ button.swatch{padding:0}
         <button class="rbtn ok" onclick="saveName()" aria-label="Save name">✓</button>
         <button class="rbtn no" onclick="cancelName()" aria-label="Cancel">✕</button>
       </div>
-      <div class="pTitle">Emoji</div>
-      <div class="emojiG7" id="profileEmojiGrid"></div>
-      <div class="pTitle">Color</div>
-      <div class="colorG" id="profileColorGrid"></div>
-      <div class="pTitle">Custom color (hex, e.g. #FF00FF)</div>
-      <input id="hexInput" class="hexIn" value="#A8E6CF" maxlength="7" oninput="hexTyped(this.value)">
+      <div class="pTitle">Emoji &amp; Color</div>
+      <div class="pairRow">
+        <div class="pairItem"><button class="pairCircle" id="profEmoBtn" onclick="openEmojiPicker('@profile')" aria-label="Pick my emoji">🧪</button><span>My emoji<small>tap to choose</small></span></div>
+        <div class="pairItem"><button class="pairCircle" id="profColBtn" onclick="openColorPicker('@profile')" aria-label="Pick my color">🎨</button><span>My color<small>tap to choose</small></span></div>
+      </div>
       <button class="saveAv" onclick="saveAvatar()">Save avatar</button>
     </div>
     <button class="waBig" onclick="shareWhatsApp()">💬 Share my week to WhatsApp</button>
@@ -277,7 +281,6 @@ button.swatch{padding:0}
   <div class="bottomNav">
     <button id="nav-planner" class="active" onclick="nav('planner')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><line class="w" x1="12" y1="3.5" x2="12" y2="20.5"/></svg>Planner</button>
     <button id="nav-month" onclick="nav('month')"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><line class="w" x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>Month</button>
-    <button id="nav-activity" onclick="nav('activity')"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17z"/><path d="M10 21.5h4"/></svg>Activity</button>
     <button id="nav-profile" onclick="nav('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Profile</button>
   </div>
 </div>
@@ -298,7 +301,28 @@ button.swatch{padding:0}
   </div>
 </div>
 
-<!-- EMOJI PICKER POPUP (My Week) -->
+<!-- DAY POPUP (Month: tap a date) -->
+<div id="dayPop" class="popLayer hidden" onclick="if(event.target===this)closeDayPop()">
+  <div class="pop" id="popBox">
+    <div class="popArrow" id="popArrow"></div>
+    <div class="popHead" id="popHead"></div>
+    <div class="popList" id="popList"></div>
+    <button class="goWeek" id="popGo">Open this week in Planner →</button>
+  </div>
+</div>
+
+<!-- COLOR PICKER POPUP (Planner + Profile) -->
+<div id="colorOverlay" class="overlay hidden" onclick="if(event.target===this)closeColorPicker()">
+  <div class="modal">
+    <h3>Pick a color</h3>
+    <div class="colorG" id="colorAllGrid" style="margin-top:14px;max-height:min(50vh,380px);overflow-y:auto;overscroll-behavior:contain;padding:4px"></div>
+    <div class="pTitle" style="margin:14px 0 8px">Custom hex (e.g. #FF00FF)</div>
+    <input class="hexIn" id="colorHex" maxlength="7" placeholder="#A8E6CF" oninput="colorHexTyped(this.value)">
+    <div class="edBtns"><button class="bCancel" style="flex:1" onclick="closeColorPicker()">Close</button></div>
+  </div>
+</div>
+
+<!-- EMOJI PICKER POPUP (My Week + Profile) -->
 <div id="emojiOverlay" class="overlay hidden" onclick="if(event.target===this)closeEmojiPicker()">
   <div class="modal">
     <h3>Pick an emoji</h3>
@@ -364,7 +388,6 @@ let activity=[];        // activity docs (Firestore, only mine in FB mode)
 let remoteUsers={};     // avatars of everyone who owns a plan
 let users=store.get('pb_users',{});
 let profile=store.get('pb_profile',null);
-let colors=Object.assign({my:'#A8E6CF'},store.get('pb_colors',{}));
 let mode='my';
 let weekStart=mondayOf(new Date());
 let monthDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
@@ -395,8 +418,8 @@ const me=()=>profile.email;
 const isMine=p=>p.owner===me();
 const iJoined=p=>(p.joinedIds||[]).includes(me());
 function planColor(p){
-  if(isMine(p))return normHex(colors.my)||'#A8E6CF';
-  return normHex(p.color)||normHex(p.ownerColor)||'#93C5FD';   // friends keep their own My Week color
+  if(isMine(p))return normHex(profile.color)||'#A8E6CF';
+  return normHex(p.ownerColor)||normHex(p.color)||'#93C5FD';   // one color per person (same as their avatar)
 }
 function userOf(id){
   if(profile&&id===profile.email)return{name:profile.name,emoji:profile.emoji,color:profile.color};
@@ -452,7 +475,7 @@ function buildMigration(){
     const names=jn.map(j=>j.includes('@')?((users[j]&&users[j].name)||j.split('@')[0]):j);
     const ids=(p.joinedIds&&p.joinedIds.length?p.joinedIds:jn.filter(j=>j.includes('@')));
     return {id:'mig_'+String(p.id).replace(/[^A-Za-z0-9]/g,'')+'_'+tag,owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
-      text:p.text||'',emoji:p.emoji||'',color:normHex(colors.my)||'#A8E6CF',
+      text:p.text||'',emoji:p.emoji||'',color:normHex(profile.color)||'#A8E6CF',
       day:parseKey(p.date).toLocaleDateString('en-US',{weekday:'short'}),date:p.date,joined:names,joinedIds:ids,createdAt:p.createdAt||Date.now()};
   });
 }
@@ -467,16 +490,13 @@ function migrateStep(list,meta){
     store.set('pb_migrated_'+me(),true);migPending=null;   // confirmed on the server
   }
 }
-function onActs(list){
-  activity=list.slice().sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
-  if(profile&&!$('appScreen').classList.contains('hidden'))renderActivity();
-}
+function onActs(list){activity=list||[]}   // Activity tab removed
 function beginSync(m){
   // allow upgrading local -> Firebase if Firebase finishes loading late
   if(syncStarted&&!(m==='fb'&&!useFB))return;
   syncStarted=true;useFB=(m==='fb');
   dbg(useFB?'SYNC = LIVE (Firebase connected)':'SYNC = LOCAL ONLY (not shared!)');
-  if(useFB){allPlans=[];plans={};activity=[];FB.listenPlans(onPlans);FB.listenActivity(me(),onActs);console.log('[Primogem] Live sync ON')}
+  if(useFB){allPlans=[];plans={};activity=[];FB.listenPlans(onPlans);console.log('[Primogem] Live sync ON')}
   else{
     console.warn('[Primogem] Local mode (no Firebase) – plans are NOT shared between phones.');
     allPlans=loadLocalPlans();const a=store.get('pb_activity',[]);activity=Array.isArray(a)?a:[];
@@ -502,9 +522,7 @@ function syncReady(){
   if(syncStarted)return true;
   alert('Still connecting to the group… try again in a few seconds');return false;
 }
-function pushAct(to,type,message,detail){
-  DB.addActivity({id:uid(),to,type,message,detail:detail||'',timestamp:Date.now(),read:false});
-}
+function pushAct(){}   // Activity tab removed: nothing is written any more
 
 /* ---------- login ---------- */
 function setLoginTab(t){$('tabLogin').classList.toggle('active',t==='login');$('tabReg').classList.toggle('active',t==='reg');$('loginBtn').textContent=t==='login'?'Login':'Create account'}
@@ -528,13 +546,13 @@ function checkLogin(){
 }
 
 /* ---------- navigation ---------- */
-const TITLES={planner:'Group Weekly Planner',month:'Calendar',activity:'News & Reminders',profile:'Profile'};
+const TITLES={planner:'Group Weekly Planner',month:'Calendar',profile:'Profile'};
 function nav(t){
-  ['planner','month','activity','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
+  ['planner','month','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
   $('pageTitle').textContent=TITLES[t];
   renderAll();window.scrollTo(0,0);
 }
-function renderAll(){renderGroup();renderPlanner();renderMonth();renderActivity();renderProfile()}
+function renderAll(){renderGroup();renderPlanner();renderMonth();renderProfile()}
 function renderGroup(){
   const ids=Object.keys(remoteUsers);if(profile&&!ids.includes(profile.email))ids.unshift(profile.email);
   $('memberCount').textContent=`Team Trinity • ${ids.length} members`;
@@ -547,33 +565,35 @@ function invite(){
   else window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 
-/* ---------- colors ---------- */
+/* ---------- color (ONE color per person: avatar + plans + month dots) ---------- */
 let colTimer=null;
-function syncMyColor(){
-  clearTimeout(colTimer);
-  colTimer=setTimeout(()=>{const ids=allPlans.filter(isMine).map(p=>p.id);if(ids.length)DB.meta(ids,{color:normHex(colors.my)})},350);
-}
 function syncOwnerMeta(){
   const ids=allPlans.filter(isMine).map(p=>p.id);
-  if(ids.length)DB.meta(ids,{ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color});
+  if(ids.length)DB.meta(ids,{color:normHex(profile.color)||'#A8E6CF',ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color});
 }
-function applyMyColor(h){
-  colors.my=h;store.set('pb_colors',colors);
-  syncMyColor();renderPlanner();renderMonth();
+function applyMyColor(h){          // planner circle: saves instantly
+  profile.color=h;draft.color=h;saveProf();
+  clearTimeout(colTimer);colTimer=setTimeout(syncOwnerMeta,350);
+  renderAll();
 }
-function pickMyColor(h){$('colMyHex').classList.remove('bad');applyMyColor(h)}
-function hexColor(v){
-  const el=$('colMyHex');const h=normHex(v);
+let colorTarget=null;   // 'my' = planner circle (instant) | '@profile' = profile circle (saved with Save avatar)
+const curColor=()=>(colorTarget==='@profile'?draft.color:profile.color)||'#A8E6CF';
+function renderColorGrid(){
+  const cur=curColor().toUpperCase();
+  $('colorAllGrid').innerHTML=PALETTE.map(c=>`<button class="${c.toUpperCase()===cur?'sel':''}" style="background:${c}" onclick="chooseColor('${c}')" aria-label="${c}"></button>`).join('');
+}
+function openColorPicker(target){
+  colorTarget=target;renderColorGrid();
+  $('colorHex').value=curColor().toUpperCase();$('colorHex').classList.remove('bad');
+  $('colorAllGrid').scrollTop=0;$('colorOverlay').classList.remove('hidden');
+}
+function closeColorPicker(){$('colorOverlay').classList.add('hidden');colorTarget=null}
+function applyColorChoice(h){if(colorTarget==='@profile'){draft.color=h;renderProfile()}else applyMyColor(h)}
+function chooseColor(c){applyColorChoice(c);closeColorPicker()}
+function colorHexTyped(v){
+  const el=$('colorHex'),h=normHex(v);
   el.classList.toggle('bad',!h&&v.length>=4);
-  if(h)applyMyColor(h);
-}
-function toggleMyPalette(){$('myPalette').classList.toggle('hidden')}
-function syncColorUI(){
-  const h=normHex(colors.my)||'#A8E6CF';
-  $('swMy').style.background=h;
-  if(document.activeElement!==$('colMyHex'))$('colMyHex').value=h;
-  // same palette as the Profile color picker
-  $('myPalette').innerHTML=PALETTE.map(c=>`<button class="${c.toUpperCase()===h?'sel':''}" style="background:${c}" onclick="pickMyColor('${c}')" aria-label="${c}"></button>`).join('');
+  if(h){applyColorChoice(h);renderColorGrid()}
 }
 
 /* ---------- planner ---------- */
@@ -607,7 +627,6 @@ function joinedLine(p){
 const PENCIL=`<svg viewBox="0 0 24 24"><path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 function bubble(p){const c=planColor(p);return `<div class="bubble" style="--pc:${c};--pcbg:${hexA(c,.22)}">${p.emoji?`<span class="pe">${esc(p.emoji)}</span>`:''}<span>${esc(p.text)}</span></div>`}
 function renderPlanner(){
-  syncColorUI();
   $('btnMy').classList.toggle('active',mode==='my');$('btnGroup').classList.toggle('active',mode==='group');
   renderWeekSelect();
   // keep typed text + focus when a live update arrives from another phone
@@ -630,7 +649,7 @@ function renderPlanner(){
       }
     });
     if(mode==='my'){
-      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="emoBtn" onclick="openEmojiPicker('${key}')" aria-label="Pick emoji">😊</button><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
+      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="emoBtn" onclick="openEmojiPicker('${key}')" aria-label="Pick emoji">😊</button><button class="colBtn" style="background:${esc(profile.color)}" onclick="openColorPicker('my')" aria-label="Pick color"></button><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
     }
     html+=`</div>`;
   }
@@ -643,11 +662,12 @@ function saveDraft(key,v){const k=draftKey(key);if(v)drafts[k]=v;else delete dra
 let emojiTargetKey=null;
 function openEmojiPicker(key){
   emojiTargetKey=key;
-  $('emojiAllGrid').innerHTML=EMOJIS.map(e=>`<button onclick="chooseEmoji('${e}')">${e}</button>`).join('');
+  const cur=key==='@profile'?draft.emoji:null;
+  $('emojiAllGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===cur?'sel':''}" onclick="chooseEmoji('${e}')">${e}</button>`).join('');
   $('emojiAllGrid').scrollTop=0;$('emojiOverlay').classList.remove('hidden');
 }
 function closeEmojiPicker(){$('emojiOverlay').classList.add('hidden');emojiTargetKey=null}
-function chooseEmoji(e){const k=emojiTargetKey;closeEmojiPicker();if(k)addEmoji(k,e)}
+function chooseEmoji(e){const k=emojiTargetKey;closeEmojiPicker();if(k==='@profile')setDraftEmoji(e);else if(k)addEmoji(k,e)}
 function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();saveDraft(key,el.value);el.focus()}
 function addPlan(key){
   if(!syncReady())return;
@@ -657,7 +677,7 @@ function addPlan(key){
   el.value='';saveDraft(key,'');
   DB.addPlan({
     id:uid(),owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
-    text:text,emoji:emoji,color:normHex(colors.my)||'#A8E6CF',
+    text:text,emoji:emoji,color:normHex(profile.color)||'#A8E6CF',
     day:d.toLocaleDateString('en-US',{weekday:'short'}),date:key,
     joined:[],joinedIds:[],createdAt:Date.now()
   });
@@ -723,25 +743,44 @@ function deleteFromEdit(){
 }
 
 /* ---------- month ---------- */
-let monthSel=keyOf(new Date());   // date tapped in the calendar
+let monthSel=null,popKey=null;   // tapped date / date shown in the popup
 function changeMonth(n){
   monthDate=new Date(monthDate.getFullYear(),monthDate.getMonth()+n,1);
-  if(monthSel){const s0=parseKey(monthSel);if(s0.getFullYear()!==monthDate.getFullYear()||s0.getMonth()!==monthDate.getMonth())monthSel=null}
-  const t=new Date();
-  if(!monthSel&&t.getFullYear()===monthDate.getFullYear()&&t.getMonth()===monthDate.getMonth())monthSel=keyOf(t);
-  renderMonth();
+  closeDayPop(true);monthSel=null;renderMonth();
 }
 function planItem(k,p){
   const u=userOf(p.owner),j=p.joined||[];
   return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
 }
-function renderDayPanel(){
-  const el=$('dayPanel');
-  if(!monthSel){el.innerHTML=`<div class="empty">Tap a date to see everyone's plans for that day.</div>`;return}
-  const list=plans[monthSel]||[];   // everyone's plans + mine, no limit
-  el.innerHTML=`<div class="evCard"><div class="evDate">${dayLabel(monthSel)} • ${list.length} plan${list.length===1?'':'s'}</div>`
-    +(list.length?list.map(p=>planItem(monthSel,p)).join(''):`<div class="empty" style="margin-top:8px">No plans on this day yet.</div>`)
-    +`<button class="goWeek" onclick="goWeek('${monthSel}')">Open this week in Planner →</button></div>`;
+function popRow(p){
+  const u=userOf(p.owner),j=p.joined||[];
+  return `<div class="popRow">${avatar(u,34)}<div style="min-width:0"><div class="t">${p.emoji?esc(p.emoji)+' ':''}${esc(p.text)}</div><small><span class="cdot" style="background:${planColor(p)}"></span>${esc(u.name)}${isMine(p)?' (you)':''}${j.length?' • '+j.length+' joined: '+esc(j.join(', ')):''}</small></div></div>`;
+}
+function fillDayPop(){
+  const list=plans[popKey]||[];   // everyone's plans + mine, no limit
+  $('popHead').textContent=`${dayLabel(popKey)} • ${list.length} plan${list.length===1?'':'s'}`;
+  $('popList').innerHTML=list.length?list.map(popRow).join(''):`<div class="popEmpty">No plans on this day yet.</div>`;
+}
+function showDayPop(k,cell){
+  popKey=k;fillDayPop();
+  $('popGo').onclick=()=>{const k2=popKey;closeDayPop(true);monthSel=null;goWeek(k2)};
+  const layer=$('dayPop'),box=$('popBox'),arrow=$('popArrow');
+  layer.classList.remove('hidden');
+  box.style.visibility='hidden';box.style.left='0px';box.style.top='0px';
+  const vw=window.innerWidth,vh=window.innerHeight,bw=box.offsetWidth,bh=box.offsetHeight;
+  const r=cell?cell.getBoundingClientRect():{left:vw/2,width:0,top:vh/2,bottom:vh/2};
+  const cx=r.left+r.width/2;
+  const left=Math.max(12,Math.min(cx-bw/2,vw-12-bw));
+  const above=r.top-bh-16>=12;
+  const top=Math.max(12,above?r.top-bh-12:Math.min(r.bottom+12,vh-bh-12));
+  box.style.left=left+'px';box.style.top=top+'px';
+  arrow.style.left=Math.max(14,Math.min(cx-left-8,bw-30))+'px';
+  arrow.style.top=above?(bh-8)+'px':'-8px';
+  box.style.visibility='visible';
+}
+function closeDayPop(silent){
+  popKey=null;$('dayPop').classList.add('hidden');
+  if(!silent&&monthSel){monthSel=null;renderMonth()}
 }
 function renderMonth(){
   const y=monthDate.getFullYear(),m=monthDate.getMonth();
@@ -752,44 +791,29 @@ function renderMonth(){
   for(let d=1;d<=last;d++){
     const k=y+'-'+pad(m+1)+'-'+pad(d);
     const cols=[...new Set((plans[k]||[]).map(planColor))].slice(0,3);
-    html+=`<div class="d ${k===todayK?'today':''} ${k===monthSel?'sel':''}" onclick="selectDate('${k}')">${d}<div class="dots">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div></div>`;
+    html+=`<div class="d ${k===todayK?'today':''} ${k===monthSel?'sel':''}" data-k="${k}" onclick="selectDate('${k}')">${d}<div class="dots">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div></div>`;
   }
   $('calendar').innerHTML=html;
-  renderDayPanel();
+  if(popKey)fillDayPop();
   const keys=Object.keys(plans).filter(k=>{const dt=parseKey(k);return dt.getFullYear()===y&&dt.getMonth()===m&&(plans[k]||[]).length}).sort();
   const count=keys.reduce((a,k)=>a+plans[k].length,0);
   $('monthSub').textContent=`${monthDate.toLocaleDateString('en-US',{month:'long'})} • ${count} event${count===1?'':'s'} from the group`;
   if(!keys.length){$('monthEvents').innerHTML=`<div class="empty">No events this month yet — add some in the Planner.</div>`;return}
-  $('monthEvents').innerHTML=keys.map(k=>`<div class="evCard"><div class="evDate">${dayLabel(k)}</div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join('');
+  $('monthEvents').innerHTML=keys.map(k=>`<div class="evCard"><div class="evDate">${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join('');
 }
 function selectDate(k){
   monthSel=k;renderMonth();
-  setTimeout(()=>{const el=$('dayPanel');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'})},50);
+  showDayPop(k,document.querySelector('#calendar .d[data-k="'+k+'"]'));
 }
 function goWeek(k){weekStart=mondayOf(parseKey(k));nav('planner')}
-
-/* ---------- activity ---------- */
-const ICON_BELL=`<svg viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 0 0 2.2-2.2h-4.4A2.2 2.2 0 0 0 12 22zm6-6.2V11a6 6 0 0 0-4.5-5.8V4.5a1.5 1.5 0 0 0-3 0v.7A6 6 0 0 0 6 11v4.8l-2 2v1h16v-1l-2-2z"/></svg>`;
-const ICON_PIN=`<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5"/><rect x="11" y="11" width="2" height="10" rx="1"/></svg>`;
-function toggleRead(id){const a=activity.find(x=>x.id===id);if(a)DB.updateActivity(id,{read:!a.read})}
-function renderActivity(){
-  if(!profile)return;
-  const mine=activity.filter(a=>a.to===me());
-  const notifs=mine.filter(a=>a.type!=='red'),ups=mine.filter(a=>a.type==='red');
-  $('notifList').innerHTML=notifs.length?notifs.slice(0,40).map(a=>`<div class="notif ${a.type==='green'?'green':'blue'}" onclick="toggleRead('${a.id}')"><div class="nIcon">${a.type==='green'?ICON_PIN:ICON_BELL}</div><div class="nBody"><b>${esc(a.message)}</b><span>${ago(a.timestamp)} • ${esc(a.detail)}</span></div><div class="badge ${a.read?'read':'unread'}">${a.read?'✓':'!'}</div></div>`).join(''):`<div class="empty">No activity yet — add, edit or join a plan!</div>`;
-  $('updateList').innerHTML=ups.length?ups.slice(0,40).map(a=>`<div class="notif red" onclick="toggleRead('${a.id}')"><div class="nIcon">!</div><div class="nBody"><b>${esc(a.message)}</b><span>${ago(a.timestamp)} • ${esc(a.detail)}</span></div><div class="badge sm ${a.read?'read':'unread'}">${a.read?'✓':'!'}</div></div>`).join(''):`<div class="empty">Nothing important right now.</div>`;
-}
 
 /* ---------- profile (localStorage pb_profile) ---------- */
 function renderProfile(){
   const big=$('bigAvatar');big.textContent=draft.emoji;big.style.background=draft.color;
-  $('profileEmojiGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===draft.emoji?'sel':''}" onclick="setDraftEmoji('${e}')">${e}</button>`).join('');
-  $('profileColorGrid').innerHTML=PALETTE.map(c=>`<button class="${c.toUpperCase()===draft.color.toUpperCase()?'sel':''}" style="background:${c}" onclick="setDraftColor('${c}')" aria-label="${c}"></button>`).join('');
-  if(document.activeElement!==$('hexInput'))$('hexInput').value=draft.color.toUpperCase();
+  const eb=$('profEmoBtn');eb.textContent=draft.emoji;eb.style.background=draft.color;
+  $('profColBtn').style.background=draft.color;
 }
 function setDraftEmoji(e){draft.emoji=e;renderProfile()}
-function setDraftColor(c){draft.color=c;renderProfile()}
-function hexTyped(v){const h=normHex(v);if(h){draft.color=h;renderProfile()}}
 function saveName(){const v=$('profileName').value.trim();if(!v)return;profile.name=v;saveProf();syncOwnerMeta();renderAll()}
 function cancelName(){$('profileName').value=profile.name}
 function saveAvatar(){
