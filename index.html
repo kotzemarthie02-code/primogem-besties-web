@@ -92,6 +92,10 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .cal .d.today{background:#bff0d6}
 .dots{display:flex;gap:3px;height:7px;margin-top:3px}
 .dots i{width:7px;height:7px;border-radius:50%;display:block}
+.cal .d.sel{box-shadow:inset 0 0 0 3px var(--blue)}
+.goWeek{background:none;border:none;color:var(--blue);font-weight:800;font-size:14px;margin-top:12px;padding:6px 0}
+.cpick .colorG{margin-top:14px}
+button.swatch{padding:0}
 .evCard{background:#e8edfd;border:1px solid #dae3fb;border-radius:24px;padding:16px;margin-top:14px}
 .evDate{color:var(--blue);font-weight:800;font-size:16px}
 .evItem{margin-top:10px}
@@ -149,7 +153,9 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .edTop{display:flex;align-items:center;gap:14px;margin-top:14px}
 .edEmoji{font-size:44px;width:56px;text-align:center}
 .edTop input{flex:1;min-width:0;background:#f3f4fb;border:none;border-radius:16px;height:56px;padding:0 16px;font-size:16px;font-weight:600;color:var(--ink);outline:none}
-.emojiG6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;max-height:300px;overflow-y:auto;padding-right:8px}
+.emojiG6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;max-height:300px;overflow-y:auto;padding-right:8px;overscroll-behavior:contain}
+.emoBtn{width:48px;height:48px;border-radius:50%;background:#f3f4fb;border:2px solid #dfe4f5;font-size:24px;flex:none;display:flex;align-items:center;justify-content:center;padding:0}
+.emoBtn:active{background:#eaf0ff}
 .edBtns{display:flex;gap:10px;margin-top:16px}
 .edBtns button{height:56px;border:none;border-radius:18px;font-size:16px;font-weight:800}
 .bSave{flex:2.2;background:var(--blue);color:#fff}
@@ -209,18 +215,12 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
   <div id="tab-planner">
     <div class="colorRow">
       <div class="cpick">
-        <div class="cTop"><b>My Week</b><span>tap circle or type hex</span></div>
+        <div class="cTop"><b>My Week</b><span>tap the circle for colors, or type a hex</span></div>
         <div class="cMain">
-          <label class="swatch" id="swMy"><input type="color" id="colMy" oninput="setColor('my',this.value)"></label>
-          <input class="hexBox" id="colMyHex" maxlength="7" placeholder="#A8E6CF" oninput="hexColor('my',this.value)">
+          <button class="swatch" id="swMy" onclick="toggleMyPalette()" aria-label="Pick my week color"></button>
+          <input class="hexBox" id="colMyHex" maxlength="7" placeholder="#A8E6CF" oninput="hexColor(this.value)">
         </div>
-      </div>
-      <div class="cpick">
-        <div class="cTop"><b>Group Week</b><span>tap circle or type hex</span></div>
-        <div class="cMain">
-          <label class="swatch" id="swGroup"><input type="color" id="colGroup" oninput="setColor('group',this.value)"></label>
-          <input class="hexBox" id="colGroupHex" maxlength="7" placeholder="#93C5FD" oninput="hexColor('group',this.value)">
-        </div>
+        <div class="colorG hidden" id="myPalette"></div>
       </div>
     </div>
     <div class="seg"><button id="btnMy" class="active" onclick="setMode('my')">My Week</button><button id="btnGroup" onclick="setMode('group')">Group Week</button></div>
@@ -237,6 +237,7 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
   <div id="tab-month" class="hidden">
     <div class="calHead"><button onclick="changeMonth(-1)">‹</button><h3 id="monthTitle"></h3><button onclick="changeMonth(1)">›</button></div>
     <div class="cal" id="calendar"></div>
+    <div id="dayPanel"></div>
     <h2 class="sec" style="margin-top:28px">Weekly Planner Events</h2>
     <div class="secSub" id="monthSub"></div>
     <div id="monthEvents"></div>
@@ -297,6 +298,15 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
   </div>
 </div>
 
+<!-- EMOJI PICKER POPUP (My Week) -->
+<div id="emojiOverlay" class="overlay hidden" onclick="if(event.target===this)closeEmojiPicker()">
+  <div class="modal">
+    <h3>Pick an emoji</h3>
+    <div class="emojiG6" id="emojiAllGrid" style="margin-top:14px;max-height:min(55vh,440px)"></div>
+    <div class="edBtns"><button class="bCancel" style="flex:1" onclick="closeEmojiPicker()">Close</button></div>
+  </div>
+</div>
+
 <!-- EDIT POPUP -->
 <div id="editOverlay" class="overlay hidden" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
@@ -334,12 +344,18 @@ const MORE=["😂","🤣","😭","😅","😉","😘","🥳","😤","😡","🙄
 "🏠","🏫","🏥","🏖️","⛰️","🏕️","🎡","🎢","🎤","🎲","♟️","🎳","🏊","🏃","🚴","🧘","🏋️","⛺","🌍","🗺️","🧳","🚌","🚂","🚢","🚁",
 "💼","💻","📱","📷","📞","🔑","🎁","💰","🛒","💊","🩺","📖","✏️","📝","📌","📍","⌛","🕒","🛏️","🧹","🧺","🛁","🪥","🎓","🏁","✅","❌","❗","❓","💯","🔝","🆕","🔜"];
 MORE.forEach(e=>{if(!EMOJIS.includes(e))EMOJIS.push(e)});
+const EXTRA="😀 😃 😁 😆 🙂 🙃 🤓 🧐 😮 😲 😳 🥵 🥶 😪 😵 🤯 🤠 🥴 😷 🤕 🤑 🤫 🤐 😶 😐 😑 😒 😞 😔 😟 😕 🙁 😣 😖 😫 😩 😠 🤬 😓 😥 😰 😨 😧 😦 😯 🤡 👹 👺 ☠️ 🎃 🙈 🙉 🙊 🤙 🤟 🤘 👌 🤏 👈 👉 👆 👇 ☝️ ✊ 👊 🤛 🤜 🙋 🤷 🤦 💃 🕺 👯 🧚 🧜 🧞 🧙 🦸 🦹 👸 🤴 🎅 👼 👶 💗 💓 💟 ❣️ 💋 💐 🌷 🌴 🌵 🌲 🌳 🍂 🌾 ☘️ 🌱 🐭 🐹 🐇 🐗 🦌 🐑 🐐 🦙 🦥 🦦 🦘 🐊 🐅 🐆 🦍 🐕 🐩 🐈 🦇 🦎 🐛 🦗 🕷️ 🦂 🐞 🦑 🦐 🐡 🐟 🐚 🍍 🥭 🍋 🍊 🍐 🍈 🥝 🍅 🥥 🥕 🌽 🥔 🍞 🥖 🧀 🍗 🍖 🥩 🍤 🍱 🍙 🍚 🍛 🍢 🥟 🍧 🍨 🍬 🍭 🍮 🍯 🥛 🍼 🍶 🍾 🍸 🍻 🥤 🧃 🧊 🍴 🕹️ 👾 🎰 🎱 🎾 🏐 🏈 ⚾ 🥊 🥋 🎣 🛹 ⛸️ 🎿 🏂 🪁 🎭 🎪 🎻 🥁 🎺 🎷 🎼 🎵 🎶 🌞 🌝 🌛 🌜 🌠 🌤️ ⛅ ☁️ 🌧️ ⛈️ 🌩️ ❄️ ☃️ ⛄ 🌪️ 💨 💧 ☄️ 🌑 🌕 🚕 🚙 🏎️ 🚓 🚑 🚒 🛵 ⛵ 🚤 🛳️ 🗼 🗽 🏰 🏯 🎠 ⛲ 🌆 🌇 🌉 📸 🎥 📺 📻 ⌚ 🔋 💡 🔦 📦 ✉️ 📧 📆 🗓️ 📎 🖊️ 🔍 🔒 🔨 ⚙️ 🧲 💣 🎈 🎊 🛍️ 👗 👕 👟 👠 💍 💄 🎒 👓 🕶️ 🧢 🎩 ❇️ ✳️ ☑️ ✔️ ➕ ➖ ♻️ ⚠️ 🚫 ⭕ 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟤 🔶 🔷 ♠️ ♥️ ♦️ ♣️".split(" ");
+EXTRA.forEach(e=>{if(e&&!EMOJIS.includes(e))EMOJIS.push(e)});
 const QUICK=["😊","💎","🍓","🎮","🌸","✨"];
 const QUICK_ALL=[...new Set([...QUICK,...EMOJIS])];
 const PALETTE=["#FFA8D0","#FFC1DD","#FFCFE0","#FFBF94","#FFD3B0","#FFDD90","#FFF0A0","#DDF59A",
 "#BCF5A0","#B2EFD0","#A8E6CF","#8EE8E0","#A0E8F8","#9ED2F8","#A9CCFF","#BCC8FF",
 "#C8A8FF","#D8B8F4","#EBC4F6","#FBB9FF","#FFB9E4","#FFA8BC","#F0B49C","#D8C0A0",
-"#BCCFA8","#8ADCC0","#80C4EC","#A8A0E8","#C0A0D8","#FFFFFF"];
+"#BCCFA8","#8ADCC0","#80C4EC","#A8A0E8","#C0A0D8","#FFFFFF",
+"#FF6B81","#FF4D4D","#E53935","#FF8A3D","#FFB300","#FFE14D","#9BE564","#4CD964",
+"#2ECC71","#00C2A8","#00B8D9","#3B82F6","#5078F5","#7C5CFF","#B15CFF","#E91E63",
+"#FF5CC8","#8E5A3C",
+"#F2F3F7","#DADDE5","#C4C8D2","#A5A8B1","#8A90A8","#6B7390","#4A5068","#2B3045"];
 
 /* ---------- state ---------- */
 let allPlans=[];        // flat list (from Firestore)
@@ -348,7 +364,7 @@ let activity=[];        // activity docs (Firestore, only mine in FB mode)
 let remoteUsers={};     // avatars of everyone who owns a plan
 let users=store.get('pb_users',{});
 let profile=store.get('pb_profile',null);
-let colors=Object.assign({my:'#A8E6CF',group:'#93C5FD',groupCustom:false},store.get('pb_colors',{}));
+let colors=Object.assign({my:'#A8E6CF'},store.get('pb_colors',{}));
 let mode='my';
 let weekStart=mondayOf(new Date());
 let monthDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
@@ -380,8 +396,7 @@ const isMine=p=>p.owner===me();
 const iJoined=p=>(p.joinedIds||[]).includes(me());
 function planColor(p){
   if(isMine(p))return normHex(colors.my)||'#A8E6CF';
-  if(colors.groupCustom)return normHex(colors.group)||'#93C5FD';
-  return normHex(p.color)||normHex(colors.group)||'#93C5FD';
+  return normHex(p.color)||normHex(p.ownerColor)||'#93C5FD';   // friends keep their own My Week color
 }
 function userOf(id){
   if(profile&&id===profile.email)return{name:profile.name,emoji:profile.emoji,color:profile.color};
@@ -542,31 +557,23 @@ function syncOwnerMeta(){
   const ids=allPlans.filter(isMine).map(p=>p.id);
   if(ids.length)DB.meta(ids,{ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color});
 }
-function applyColor(which,h){
-  colors[which]=h;if(which==='group')colors.groupCustom=true;
-  store.set('pb_colors',colors);
-  $(which==='my'?'swMy':'swGroup').style.background=h;
-  if(which==='my')syncMyColor();
-  renderPlanner();renderMonth();
+function applyMyColor(h){
+  colors.my=h;store.set('pb_colors',colors);
+  syncMyColor();renderPlanner();renderMonth();
 }
-function setColor(which,v){
-  const h=normHex(v);if(!h)return;
-  $(which==='my'?'colMyHex':'colGroupHex').value=h;$(which==='my'?'colMyHex':'colGroupHex').classList.remove('bad');
-  applyColor(which,h);
-}
-function hexColor(which,v){
-  const el=$(which==='my'?'colMyHex':'colGroupHex');const h=normHex(v);
+function pickMyColor(h){$('colMyHex').classList.remove('bad');applyMyColor(h)}
+function hexColor(v){
+  const el=$('colMyHex');const h=normHex(v);
   el.classList.toggle('bad',!h&&v.length>=4);
-  if(!h)return;
-  $(which==='my'?'colMy':'colGroup').value=h.toLowerCase();
-  applyColor(which,h);
+  if(h)applyMyColor(h);
 }
+function toggleMyPalette(){$('myPalette').classList.toggle('hidden')}
 function syncColorUI(){
-  [['my','colMy','colMyHex','swMy'],['group','colGroup','colGroupHex','swGroup']].forEach(([k,c,hx,sw])=>{
-    const h=normHex(colors[k])||'#A8E6CF';
-    $(c).value=h.toLowerCase();$(sw).style.background=h;
-    if(document.activeElement!==$(hx))$(hx).value=h;
-  });
+  const h=normHex(colors.my)||'#A8E6CF';
+  $('swMy').style.background=h;
+  if(document.activeElement!==$('colMyHex'))$('colMyHex').value=h;
+  // same palette as the Profile color picker
+  $('myPalette').innerHTML=PALETTE.map(c=>`<button class="${c.toUpperCase()===h?'sel':''}" style="background:${c}" onclick="pickMyColor('${c}')" aria-label="${c}"></button>`).join('');
 }
 
 /* ---------- planner ---------- */
@@ -623,8 +630,7 @@ function renderPlanner(){
       }
     });
     if(mode==='my'){
-      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
-      html+=`<div class="quick">${QUICK_ALL.map(e=>`<span onclick="addEmoji('${key}','${e}')">${e}</span>`).join('')}</div>`;
+      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="emoBtn" onclick="openEmojiPicker('${key}')" aria-label="Pick emoji">😊</button><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
     }
     html+=`</div>`;
   }
@@ -634,6 +640,14 @@ function renderPlanner(){
 }
 const draftKey=k=>(profile?profile.email:'')+'|'+k;
 function saveDraft(key,v){const k=draftKey(key);if(v)drafts[k]=v;else delete drafts[k];store.set('pb_drafts',drafts)}
+let emojiTargetKey=null;
+function openEmojiPicker(key){
+  emojiTargetKey=key;
+  $('emojiAllGrid').innerHTML=EMOJIS.map(e=>`<button onclick="chooseEmoji('${e}')">${e}</button>`).join('');
+  $('emojiAllGrid').scrollTop=0;$('emojiOverlay').classList.remove('hidden');
+}
+function closeEmojiPicker(){$('emojiOverlay').classList.add('hidden');emojiTargetKey=null}
+function chooseEmoji(e){const k=emojiTargetKey;closeEmojiPicker();if(k)addEmoji(k,e)}
 function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();saveDraft(key,el.value);el.focus()}
 function addPlan(key){
   if(!syncReady())return;
@@ -709,7 +723,26 @@ function deleteFromEdit(){
 }
 
 /* ---------- month ---------- */
-function changeMonth(n){monthDate=new Date(monthDate.getFullYear(),monthDate.getMonth()+n,1);renderMonth()}
+let monthSel=keyOf(new Date());   // date tapped in the calendar
+function changeMonth(n){
+  monthDate=new Date(monthDate.getFullYear(),monthDate.getMonth()+n,1);
+  if(monthSel){const s0=parseKey(monthSel);if(s0.getFullYear()!==monthDate.getFullYear()||s0.getMonth()!==monthDate.getMonth())monthSel=null}
+  const t=new Date();
+  if(!monthSel&&t.getFullYear()===monthDate.getFullYear()&&t.getMonth()===monthDate.getMonth())monthSel=keyOf(t);
+  renderMonth();
+}
+function planItem(k,p){
+  const u=userOf(p.owner),j=p.joined||[];
+  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
+}
+function renderDayPanel(){
+  const el=$('dayPanel');
+  if(!monthSel){el.innerHTML=`<div class="empty">Tap a date to see everyone's plans for that day.</div>`;return}
+  const list=plans[monthSel]||[];   // everyone's plans + mine, no limit
+  el.innerHTML=`<div class="evCard"><div class="evDate">${dayLabel(monthSel)} • ${list.length} plan${list.length===1?'':'s'}</div>`
+    +(list.length?list.map(p=>planItem(monthSel,p)).join(''):`<div class="empty" style="margin-top:8px">No plans on this day yet.</div>`)
+    +`<button class="goWeek" onclick="goWeek('${monthSel}')">Open this week in Planner →</button></div>`;
+}
 function renderMonth(){
   const y=monthDate.getFullYear(),m=monthDate.getMonth();
   $('monthTitle').textContent=monthDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
@@ -719,21 +752,21 @@ function renderMonth(){
   for(let d=1;d<=last;d++){
     const k=y+'-'+pad(m+1)+'-'+pad(d);
     const cols=[...new Set((plans[k]||[]).map(planColor))].slice(0,3);
-    html+=`<div class="d ${k===todayK?'today':''}" onclick="selectDate('${k}')">${d}<div class="dots">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div></div>`;
+    html+=`<div class="d ${k===todayK?'today':''} ${k===monthSel?'sel':''}" onclick="selectDate('${k}')">${d}<div class="dots">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</div></div>`;
   }
   $('calendar').innerHTML=html;
+  renderDayPanel();
   const keys=Object.keys(plans).filter(k=>{const dt=parseKey(k);return dt.getFullYear()===y&&dt.getMonth()===m&&(plans[k]||[]).length}).sort();
   const count=keys.reduce((a,k)=>a+plans[k].length,0);
   $('monthSub').textContent=`${monthDate.toLocaleDateString('en-US',{month:'long'})} • ${count} event${count===1?'':'s'} from the group`;
   if(!keys.length){$('monthEvents').innerHTML=`<div class="empty">No events this month yet — add some in the Planner.</div>`;return}
-  $('monthEvents').innerHTML=keys.map(k=>{
-    return `<div class="evCard"><div class="evDate">${dayLabel(k)}</div>`+plans[k].map(p=>{
-      const u=userOf(p.owner),j=p.joined||[];
-      return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
-    }).join('')+`</div>`;
-  }).join('');
+  $('monthEvents').innerHTML=keys.map(k=>`<div class="evCard"><div class="evDate">${dayLabel(k)}</div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join('');
 }
-function selectDate(k){weekStart=mondayOf(parseKey(k));nav('planner')}
+function selectDate(k){
+  monthSel=k;renderMonth();
+  setTimeout(()=>{const el=$('dayPanel');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'})},50);
+}
+function goWeek(k){weekStart=mondayOf(parseKey(k));nav('planner')}
 
 /* ---------- activity ---------- */
 const ICON_BELL=`<svg viewBox="0 0 24 24"><path d="M12 22a2.2 2.2 0 0 0 2.2-2.2h-4.4A2.2 2.2 0 0 0 12 22zm6-6.2V11a6 6 0 0 0-4.5-5.8V4.5a1.5 1.5 0 0 0-3 0v.7A6 6 0 0 0 6 11v4.8l-2 2v1h16v-1l-2-2z"/></svg>`;
