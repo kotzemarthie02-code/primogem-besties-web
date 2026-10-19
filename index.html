@@ -111,6 +111,7 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .popRow small{display:block;font-size:12px;color:#aab0d0;font-weight:600;margin-top:2px;word-break:break-word}
 .popEmpty{font-size:14px;color:#aab0d0;font-weight:600;padding:8px 0}
 .pop .goWeek{position:relative;color:#9db4ff;margin-top:6px}
+#colorOverlay,#emojiOverlay{z-index:60}
 .colBtn{width:48px;height:48px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 0 0 2px #d4d8e8;padding:0}
 .dotsRow{display:inline-flex;gap:4px;margin-left:8px;vertical-align:middle}
 .dotsRow i,.cdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
@@ -335,7 +336,7 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 <div id="editOverlay" class="overlay hidden" onclick="if(event.target===this)closeEdit()">
   <div class="modal">
     <h3>Edit event</h3>
-    <div class="edTop"><div class="edEmoji" id="edEmoji">✨</div><input id="edText" placeholder="Plan" oninput="saveEditDraft()" onkeydown="if(event.key==='Enter')saveEdit()"></div>
+    <div class="edTop"><div class="edEmoji" id="edEmoji">✨</div><input id="edText" placeholder="Plan" oninput="saveEditDraft()" onkeydown="if(event.key==='Enter')saveEdit()"><button class="colBtn" id="edColBtn" onclick="openColorPicker('edit')" aria-label="Plan color"></button></div>
     <div class="pTitle" style="margin:16px 0 10px">Emoji</div>
     <div class="emojiG6" id="edGrid"></div>
     <div class="edBtns"><button class="bSave" onclick="saveEdit()">Save</button><button class="bCancel" onclick="closeEdit()">Cancel</button><button class="bDel" onclick="deleteFromEdit()">🗑️</button></div>
@@ -392,6 +393,7 @@ let mode='my';
 let weekStart=mondayOf(new Date());
 let monthDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let draft={emoji:'🧪',color:'#A8E6CF'};
+let planColorDraft=normHex((store.get('pb_colors',{})||{}).my)||'#A8E6CF';   // color for new plans (Planner circle)
 let editing=null;
 let useFB=false,syncStarted=false;
 let drafts=store.get('pb_drafts',{});
@@ -418,8 +420,7 @@ const me=()=>profile.email;
 const isMine=p=>p.owner===me();
 const iJoined=p=>(p.joinedIds||[]).includes(me());
 function planColor(p){
-  if(isMine(p))return normHex(profile.color)||'#A8E6CF';
-  return normHex(p.ownerColor)||normHex(p.color)||'#93C5FD';   // one color per person (same as their avatar)
+  return normHex(p.color)||normHex(p.ownerColor)||'#93C5FD';   // every plan keeps the color it was made with
 }
 function userOf(id){
   if(profile&&id===profile.email)return{name:profile.name,emoji:profile.emoji,color:profile.color};
@@ -475,7 +476,7 @@ function buildMigration(){
     const names=jn.map(j=>j.includes('@')?((users[j]&&users[j].name)||j.split('@')[0]):j);
     const ids=(p.joinedIds&&p.joinedIds.length?p.joinedIds:jn.filter(j=>j.includes('@')));
     return {id:'mig_'+String(p.id).replace(/[^A-Za-z0-9]/g,'')+'_'+tag,owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
-      text:p.text||'',emoji:p.emoji||'',color:normHex(profile.color)||'#A8E6CF',
+      text:p.text||'',emoji:p.emoji||'',color:normHex(planColorDraft)||'#A8E6CF',
       day:parseKey(p.date).toLocaleDateString('en-US',{weekday:'short'}),date:p.date,joined:names,joinedIds:ids,createdAt:p.createdAt||Date.now()};
   });
 }
@@ -565,19 +566,13 @@ function invite(){
   else window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
 }
 
-/* ---------- color (ONE color per person: avatar + plans + month dots) ---------- */
-let colTimer=null;
+/* ---------- colors: avatar color (Profile) is separate from plan color (Planner / Edit) ---------- */
 function syncOwnerMeta(){
   const ids=allPlans.filter(isMine).map(p=>p.id);
-  if(ids.length)DB.meta(ids,{color:normHex(profile.color)||'#A8E6CF',ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color});
+  if(ids.length)DB.meta(ids,{ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color});
 }
-function applyMyColor(h){          // planner circle: saves instantly
-  profile.color=h;draft.color=h;saveProf();
-  clearTimeout(colTimer);colTimer=setTimeout(syncOwnerMeta,350);
-  renderAll();
-}
-let colorTarget=null;   // 'my' = planner circle (instant) | '@profile' = profile circle (saved with Save avatar)
-const curColor=()=>(colorTarget==='@profile'?draft.color:profile.color)||'#A8E6CF';
+let colorTarget=null;   // 'plan' = Planner circle | 'edit' = Edit popup | '@profile' = Profile avatar color
+const curColor=()=>(colorTarget==='@profile'?draft.color:colorTarget==='edit'?(editing&&editing.color):planColorDraft)||'#A8E6CF';
 function renderColorGrid(){
   const cur=curColor().toUpperCase();
   $('colorAllGrid').innerHTML=PALETTE.map(c=>`<button class="${c.toUpperCase()===cur?'sel':''}" style="background:${c}" onclick="chooseColor('${c}')" aria-label="${c}"></button>`).join('');
@@ -588,7 +583,11 @@ function openColorPicker(target){
   $('colorAllGrid').scrollTop=0;$('colorOverlay').classList.remove('hidden');
 }
 function closeColorPicker(){$('colorOverlay').classList.add('hidden');colorTarget=null}
-function applyColorChoice(h){if(colorTarget==='@profile'){draft.color=h;renderProfile()}else applyMyColor(h)}
+function applyColorChoice(h){
+  if(colorTarget==='@profile'){draft.color=h;renderProfile()}
+  else if(colorTarget==='edit'){if(editing){editing.color=h;edPreview();saveEditDraft()}}
+  else{planColorDraft=h;store.set('pb_colors',{my:h});renderPlanner()}
+}
 function chooseColor(c){applyColorChoice(c);closeColorPicker()}
 function colorHexTyped(v){
   const el=$('colorHex'),h=normHex(v);
@@ -649,7 +648,7 @@ function renderPlanner(){
       }
     });
     if(mode==='my'){
-      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="emoBtn" onclick="openEmojiPicker('${key}')" aria-label="Pick emoji">😊</button><button class="colBtn" style="background:${esc(profile.color)}" onclick="openColorPicker('my')" aria-label="Pick color"></button><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
+      html+=`<div class="addRow">${avatar(profile,48)}<input id="in-${key}" value="${esc(drafts[draftKey(key)]||'')}" oninput="saveDraft('${key}',this.value)" placeholder="Ek soek... type anything + emoji 😊" onkeydown="if(event.key==='Enter')addPlan('${key}')"><button class="emoBtn" onclick="openEmojiPicker('${key}')" aria-label="Pick emoji">😊</button><button class="colBtn" style="background:${esc(planColorDraft)}" onclick="openColorPicker('plan')" aria-label="Pick plan color"></button><button class="plusBtn" onclick="addPlan('${key}')">+</button></div>`;
     }
     html+=`</div>`;
   }
@@ -677,7 +676,7 @@ function addPlan(key){
   el.value='';saveDraft(key,'');
   DB.addPlan({
     id:uid(),owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,
-    text:text,emoji:emoji,color:normHex(profile.color)||'#A8E6CF',
+    text:text,emoji:emoji,color:normHex(planColorDraft)||'#A8E6CF',
     day:d.toLocaleDateString('en-US',{weekday:'short'}),date:key,
     joined:[],joinedIds:[],createdAt:Date.now()
   });
@@ -696,16 +695,16 @@ function joinPlan(key,id){
 /* ---------- edit popup ---------- */
 function openEdit(key,id){
   const f=findPlan(key,id);if(!f||!isMine(f.p))return;
-  editing={key,id,emoji:f.p.emoji||''};
+  editing={key,id,emoji:f.p.emoji||'',color:planColor(f.p)};
   $('edText').value=f.p.text;edPreview();
   renderEdGrid();$('editOverlay').classList.remove('hidden');
 }
 function renderEdGrid(){
   $('edGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===editing.emoji?'sel':''}" onclick="pickEdEmoji('${e}')">${e}</button>`).join('');
 }
-function edPreview(){const el=$('edEmoji');el.textContent=editing.emoji||'✨';el.style.opacity=editing.emoji?1:.3}
+function edPreview(){const el=$('edEmoji');el.textContent=editing.emoji||'✨';el.style.opacity=editing.emoji?1:.3;$('edColBtn').style.background=editing.color||'#A8E6CF'}
 function pickEdEmoji(e){editing.emoji=(editing.emoji===e)?'':e;edPreview();renderEdGrid();saveEditDraft()}
-function saveEditDraft(){if(!editing)return;store.set('pb_editdraft',{email:me(),key:editing.key,id:editing.id,emoji:editing.emoji,text:$('edText').value})}
+function saveEditDraft(){if(!editing)return;store.set('pb_editdraft',{email:me(),key:editing.key,id:editing.id,emoji:editing.emoji,color:editing.color,text:$('edText').value})}
 function restoreEditDraft(meta){
   if(editDraftRestored||editing||!profile)return;
   const d=store.get('pb_editdraft',null);
@@ -713,7 +712,7 @@ function restoreEditDraft(meta){
   const f=findPlan(d.key,d.id);
   if(!f){if(meta&&!meta.fromCache){store.set('pb_editdraft',null);editDraftRestored=true}return}
   editDraftRestored=true;openEdit(d.key,d.id);
-  if(editing){editing.emoji=d.emoji||'';$('edText').value=d.text||'';edPreview();renderEdGrid()}
+  if(editing){editing.emoji=d.emoji||'';if(d.color)editing.color=d.color;$('edText').value=d.text||'';edPreview();renderEdGrid()}
 }
 function closeEdit(){editing=null;store.set('pb_editdraft',null);$('editOverlay').classList.add('hidden')}
 function saveEdit(){
@@ -722,10 +721,11 @@ function saveEdit(){
   const newEmoji=e2||editing.emoji,newText=text;
   if(!newText&&!newEmoji)return;
   const p=f.p,key=editing.key,id=editing.id;
-  const changed=p.text!==newText||(p.emoji||'')!==newEmoji;
+  const newColor=normHex(editing.color)||planColor(p);
+  const changed=p.text!==newText||(p.emoji||'')!==newEmoji||normHex(p.color)!==newColor;
   if(changed){
     const lbl=dayLabel(key).replace(',','');
-    DB.updatePlan(id,{text:newText,emoji:newEmoji});
+    DB.updatePlan(id,{text:newText,emoji:newEmoji,color:newColor});
     pushAct(me(),'blue','You edited plan',`Plan for ${lbl} was updated`);
     (p.joinedIds||[]).filter(j=>j!==me()).forEach(j=>pushAct(j,'blue',`${profile.name} edited plan you joined`,`${lbl} • ${newEmoji} ${newText}`.trim()));
   }
