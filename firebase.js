@@ -16,7 +16,7 @@ export const firebaseConfig = {
 // PUSH (red number on the app icon even when the app is closed):
 // Firebase Console → Project settings → Cloud Messaging → "Web configuration"
 // → "Generate key pair" → paste the PUBLIC key below.
-export const vapidKey = "PASTE_YOUR_VAPID_KEY_HERE";
+export const vapidKey = "BMLSZcoctYtQZ6vzFCoOWWVf6emlDC1Eq8zXG6VqBMJYKuBRrmlEr4ZpqP2PvdubxdfjxpJUIhs-ameI2L1SKnc";
 // ============================================================
 
 const SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
