@@ -13,6 +13,11 @@ export const firebaseConfig = {
   appId:             "1:72035223407:web:b1a40d9ce96ae479be4a9a"
 };
 // ============================================================
+// PUSH (red number on the app icon even when the app is closed):
+// Firebase Console → Project settings → Cloud Messaging → "Web configuration"
+// → "Generate key pair" → paste the PUBLIC key below.
+export const vapidKey = "PASTE_YOUR_VAPID_KEY_HERE";
+// ============================================================
 
 const SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
 const configured = !String(firebaseConfig.apiKey).startsWith("PASTE");
@@ -95,7 +100,23 @@ if (!configured) {
 
       // ---- activity ----
       addActivity(a)          { return track("addActivity", setDoc(doc(db, "activity", a.id), a)); },
-      updateActivity(id, f)   { return track("updateActivity", updateDoc(doc(db, "activity", id), f)); }
+      updateActivity(id, f)   { return track("updateActivity", updateDoc(doc(db, "activity", id), f)); },
+
+      // ---- push: save this phone's push address so the server can notify it ----
+      async enablePush(info) {
+        if (String(vapidKey).startsWith("PASTE")) return { ok: false, reason: "no VAPID key in firebase.js yet" };
+        const { getMessaging, getToken, isSupported } = await import(SDK + "firebase-messaging.js");
+        if (!(await isSupported())) return { ok: false, reason: "push not supported on this browser" };
+        if (!("serviceWorker" in navigator)) return { ok: false, reason: "no service worker" };
+        const reg = await navigator.serviceWorker.ready;
+        const token = await getToken(getMessaging(app), { vapidKey, serviceWorkerRegistration: reg });
+        if (!token) return { ok: false, reason: "no token (notifications blocked?)" };
+        await setDoc(doc(db, "pushTokens", token), {
+          token, email: info.email, name: info.name || "", rxk: info.rxk || "",
+          ua: String(navigator.userAgent).slice(0, 120), ts: Date.now()
+        });
+        return { ok: true };
+      }
     };
     console.log("[Primogem] Firebase connected: project " + firebaseConfig.projectId);
   } catch (e) {

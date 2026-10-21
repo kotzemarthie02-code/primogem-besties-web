@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#5078f5">
+<script>(function(){try{var p=JSON.parse(localStorage.getItem('pb_theme'))||'auto';var d=p==='dark'||(p==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light')}catch(e){}})()</script>
 <meta name="application-name" content="Primogem Besties">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -104,7 +105,7 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 .pop{position:fixed;background:#1b2036;color:#fff;border-radius:20px;padding:14px 16px;width:min(340px,calc(100vw - 24px));box-shadow:0 12px 36px rgba(10,14,35,.45)}
 .popArrow{position:absolute;width:16px;height:16px;background:#1b2036;transform:rotate(45deg);border-radius:3px}
 .popHead{position:relative;font-weight:800;font-size:15px;color:#aebcff;margin-bottom:6px}
-.popList{position:relative;max-height:min(45vh,320px);overflow-y:auto;overscroll-behavior:contain}
+.popList{position:relative;max-height:min(45vh,320px);max-height:min(45dvh,320px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .popRow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.12)}
 .popRow:first-child{border-top:none}
 .popRow .t{font-size:15px;font-weight:700;word-break:break-word}
@@ -218,7 +219,11 @@ h2.sec{font-size:24px;font-weight:800;margin-top:22px}
 /* ================= RESPONSIVE: fits any phone, tablet, laptop or desktop ================= */
 :root{--pad:clamp(12px,3vw,32px)}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-html,body{width:100%;overflow-x:hidden}
+html,body{width:100%}
+/* NB: overflow-x:hidden op BEIDE html en body maak van body 'n eie scroller wat die
+   bladsy-scroll en sticky-goed laat vasval (veral op tablets). Net html klip nou. */
+html{overflow-x:hidden}
+body{overflow-x:clip}
 body{min-height:100vh;min-height:100dvh}
 img,svg{max-width:100%}
 /* fluid container instead of a fixed 480px column */
@@ -247,6 +252,7 @@ img,svg{max-width:100%}
 }
 /* phone in landscape (short screens) */
 @media (max-height:480px){
+  .popList{max-height:min(40vh,200px)}
   .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
   .bottomNav{padding:4px 8px}
   .bottomNav svg{width:24px;height:24px}
@@ -262,7 +268,12 @@ img,svg{max-width:100%}
   .colorRow{max-width:640px}
   #tab-month{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:start}
   #tab-month .monCol1,#tab-month .monCol2{min-width:0}
-  #tab-month .monCol1{position:sticky;top:calc(68px + env(safe-area-inset-top))}
+  /* plakkerige kolom: net as die skerm hoog genoeg is; anders skuif dit gewoon saam met die bladsy
+     (anders kan jy nie die onderkant van die lys sien of daarby scroll nie) */
+  #tab-month .monCol1{position:static}
+  @media (min-height:800px){
+    #tab-month .monCol1{position:sticky;top:calc(68px + env(safe-area-inset-top));max-height:calc(100vh - 68px - 110px - env(safe-area-inset-top));max-height:calc(100dvh - 68px - 110px - env(safe-area-inset-top));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  }
   #tab-month h2.sec{margin-top:20px!important}
   .modal{max-width:520px}
 }
@@ -288,6 +299,86 @@ img,svg{max-width:100%}
   .cal .d.today:hover{background:#bff0d6}
   .emojiG7 button:hover,.emojiG6 button:hover{background:#eaf0ff}
 }
+
+/* ================= reactions + notifications ================= */
+.rxRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.rx{border:1.5px solid #dfe4f5;background:#f3f4fb;border-radius:999px;padding:3px 10px;font-size:15px;font-weight:700;display:inline-flex;gap:5px;align-items:center;color:var(--ink);min-height:30px}
+.rx b{font-size:12px;font-weight:800;color:var(--gray)}
+.rx.mine{background:#dfe8ff;border-color:var(--blue)}
+.rx.mine b{color:var(--blue)}
+.rxAdd{border:1.5px dashed #c4cbe6;background:transparent;border-radius:999px;padding:3px 10px;font-size:14px;color:var(--gray);min-height:30px;font-weight:700}
+#rxPop{position:fixed;z-index:70;background:#1b2036;border-radius:18px;padding:8px;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;width:min(300px,calc(100vw - 24px));max-height:min(50vh,260px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 12px 36px rgba(10,14,35,.45)}
+#rxPop button{font-size:24px;background:transparent;border:none;border-radius:10px;height:44px}
+#rxPop button:active{background:rgba(255,255,255,.14)}
+.bell{position:absolute;left:var(--pad,14px);top:calc(8px + env(safe-area-inset-top));width:44px;height:44px;border-radius:50%;background:#a5a8b1;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.bell svg{width:24px;height:24px;fill:#fff}
+.bell.has{background:var(--blue)}
+.bellBadge{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;border-radius:10px;background:#e11d2e;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--bg)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top));z-index:90;background:#1b2036;color:#fff;border-radius:16px;padding:12px 16px;width:max-content;max-width:min(92vw,420px);font-size:14px;font-weight:700;box-shadow:0 10px 30px rgba(10,14,35,.4);cursor:pointer}
+.toast small{display:block;font-size:12px;color:#aebcff;font-weight:600;margin-top:2px}
+.nList{max-height:min(55vh,420px);max-height:min(55dvh,420px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-top:10px}
+.nItem{display:flex;gap:10px;align-items:flex-start;padding:10px 8px;border-top:1px solid #eceef7;cursor:pointer;border-radius:12px}
+.nItem:first-child{border-top:none}
+.nItem.unread{background:#eef2ff}
+.nItem .nt{font-size:14px;font-weight:700;word-break:break-word}
+.nItem small{display:block;font-size:12px;color:var(--gray);font-weight:600;margin-top:2px;word-break:break-word}
+.nEmpty{padding:18px 6px;text-align:center;color:var(--gray);font-weight:600;font-size:14px}
+.nBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.nBtns button{flex:1;min-width:120px;height:46px;border:none;border-radius:14px;font-weight:800;font-size:14px;background:#eceef7;color:var(--ink)}
+.nBtns button.p{background:var(--blue);color:#fff}
+
+/* ---- WhatsApp-style red badge on the bottom-nav "Updates" button ---- */
+.bottomNav button{position:relative}
+.navIcon{position:relative;display:inline-flex}
+.navBadge{position:absolute;top:-6px;right:-10px;min-width:20px;height:20px;border-radius:10px;background:#ff3347;color:#fff;font-style:normal;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 6px;border:2px solid #fff;line-height:1}
+.themeSeg{display:flex;gap:6px;background:var(--chip);border-radius:18px;padding:5px;margin-top:12px}
+.themeSeg button{flex:1;border:none;background:transparent;padding:13px 6px;border-radius:14px;font-weight:800;font-size:14px;color:var(--ink)}
+.themeSeg button.active{background:var(--blue);color:#fff}
+.themeCard{margin-top:16px;padding:20px 18px}
+#tab-alerts .nList{max-height:none;overflow:visible}
+#tab-alerts .nItem{background:var(--chipSoft,#fff);margin-top:10px;border:none;border-radius:20px;padding:14px;box-shadow:0 4px 14px rgba(30,40,90,.07)}
+#tab-alerts .nItem.unread{background:#e3ebff}
+
+/* ================= DARK THEME ================= */
+html[data-theme="dark"]{color-scheme:dark;--bg:#0e1120;--ink:#e9ecff;--gray:#9aa3c7;--chip:#242a49;--chipSoft:#1a1f38}
+html[data-theme="dark"] .cpick,html[data-theme="dark"] .dayCard,html[data-theme="dark"] .wkHead,html[data-theme="dark"] .pCard,html[data-theme="dark"] .logout,html[data-theme="dark"] .bottomNav,html[data-theme="dark"] .modal,html[data-theme="dark"] .lcard,html[data-theme="dark"] .notif.red{background:#1a1f38;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+html[data-theme="dark"] .hexBox,html[data-theme="dark"] .addRow input,html[data-theme="dark"] .hexIn,html[data-theme="dark"] .nameRow input,html[data-theme="dark"] .edTop input,html[data-theme="dark"] .input,html[data-theme="dark"] .emojiG7 button,html[data-theme="dark"] .emojiG6 button,html[data-theme="dark"] .emoBtn,html[data-theme="dark"] .pairCircle{background:#272d4c;border-color:#343c66;color:var(--ink)}
+html[data-theme="dark"] .hexBox:focus{background:#1a1f38}
+html[data-theme="dark"] .addRow input::placeholder,html[data-theme="dark"] .input::placeholder{color:#6f78a3}
+html[data-theme="dark"] .seg,html[data-theme="dark"] .tab2,html[data-theme="dark"] .calHead,html[data-theme="dark"] .pkHead{background:#242a49}
+html[data-theme="dark"] .wkHead.open,html[data-theme="dark"] .pkGrid .pd.wk,html[data-theme="dark"] .emojiG7 button.sel,html[data-theme="dark"] .emojiG6 button.sel{background:#2a3566}
+html[data-theme="dark"] .evCard{background:#1f2544;border-color:#2c3560}
+html[data-theme="dark"] .invite{background:#27305a;color:#9db4ff}
+html[data-theme="dark"] .wkN{background:#272d4c}
+html[data-theme="dark"] .wkT em{background:#143b2c;color:#4ade80}
+html[data-theme="dark"] .pmeta.has{color:#4ade80}
+html[data-theme="dark"] .dayCard.today{box-shadow:0 0 0 2px #1f7a52,0 4px 16px rgba(0,0,0,.35)}
+html[data-theme="dark"] .cal .d.today,html[data-theme="dark"] .cal .d.today:hover{background:#14543a}
+html[data-theme="dark"] .cal .d:hover{background:#262d52}
+html[data-theme="dark"] .swatch,html[data-theme="dark"] .colBtn,html[data-theme="dark"] .pairCircle,html[data-theme="dark"] .loginAvatars div{border-color:#1a1f38;box-shadow:0 0 0 2px #3a4170}
+html[data-theme="dark"] .colorG button{border-color:#3a4170}
+html[data-theme="dark"] .bottomNav button{color:#7f87b0}
+html[data-theme="dark"] .bottomNav button.active{color:#8fabff}
+html[data-theme="dark"] .navBadge{border-color:#1a1f38}
+html[data-theme="dark"] .bottomNav button.active svg .w{stroke:#1a1f38}
+html[data-theme="dark"] .gear{background:#3a4170}
+html[data-theme="dark"] .joinBtn.joined{background:#2c3a6a}
+html[data-theme="dark"] .bCancel{background:#2a3050;color:#c8cdee}
+html[data-theme="dark"] .bDel{background:#4a2530}
+html[data-theme="dark"] .notif.blue{background:#1f2a50}
+html[data-theme="dark"] .notif.green{background:#143b2c}
+html[data-theme="dark"] .rx{background:#242a49;border-color:#343c66}
+html[data-theme="dark"] .rx.mine{background:#27356a;border-color:#5078f5}
+html[data-theme="dark"] .rxAdd{border-color:#3a4170}
+html[data-theme="dark"] #tab-alerts .nItem{background:#1a1f38;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+html[data-theme="dark"] #tab-alerts .nItem.unread{background:#222c56}
+html[data-theme="dark"] .nBtns button{background:#272d4c;color:var(--ink)}
+html[data-theme="dark"] .nBtns button.p{background:var(--blue);color:#fff}
+html[data-theme="dark"] .toast{background:#2a3566}
+html[data-theme="dark"] .overlay{background:rgba(0,0,0,.65)}
+html[data-theme="dark"] .chip em{color:#9aa3c7}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3a4170}
+@media (max-width:400px){.bottomNav button{font-size:11px}}
 </style>
 </head>
 <body>
@@ -346,6 +437,17 @@ img,svg{max-width:100%}
   </div>
 
   <!-- PROFILE -->
+  <div id="tab-alerts" class="hidden">
+    <h2 class="sec">Notifications</h2>
+    <div class="secSub">New plans, edits, joins and reactions from the group</div>
+    <div class="nList" id="nList"></div>
+    <div class="nBtns">
+      <button class="p" id="nAllow" onclick="allowAlerts()">Turn on notifications</button>
+      <button onclick="markAllRead()">Mark all read</button>
+    </div>
+    <p style="margin-top:10px;font-size:12px;color:var(--gray);font-weight:600" id="nNote"></p>
+  </div>
+
   <div id="tab-profile" class="hidden">
     <div class="pCard">
       <div id="bigAvatar" class="bigAv">🧪</div>
@@ -361,6 +463,14 @@ img,svg{max-width:100%}
       </div>
       <button class="saveAv" onclick="saveAvatar()">Save avatar</button>
     </div>
+    <div class="pCard themeCard">
+      <div class="pTitle">Theme</div>
+      <div class="themeSeg" id="themeSeg">
+        <button data-t="light" onclick="setTheme('light')">☀️ Light</button>
+        <button data-t="dark" onclick="setTheme('dark')">🌙 Dark</button>
+        <button data-t="auto" onclick="setTheme('auto')">🖥️ Auto</button>
+      </div>
+    </div>
     <button class="waBig" onclick="shareWhatsApp()">💬 Share my week to WhatsApp</button>
     <button class="logout" onclick="doLogout()">Log out</button>
   </div>
@@ -368,6 +478,7 @@ img,svg{max-width:100%}
   <div class="bottomNav">
     <button id="nav-planner" class="active" onclick="nav('planner')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><line class="w" x1="12" y1="3.5" x2="12" y2="20.5"/></svg>Planner</button>
     <button id="nav-month" onclick="nav('month')"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><line class="w" x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>Month</button>
+    <button id="nav-alerts" onclick="nav('alerts')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><i class="navBadge hidden" id="bellBadge">0</i></span>Notifications</button>
     <button id="nav-profile" onclick="nav('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Profile</button>
   </div>
 </div>
@@ -389,6 +500,8 @@ img,svg{max-width:100%}
 </div>
 
 <!-- DAY POPUP (Month: tap a date) -->
+<div id="toast" class="toast hidden" onclick="openNotifs()"></div>
+<div id="rxPop" class="hidden"></div>
 <div id="dayPop" class="popLayer hidden" onclick="if(event.target===this)closeDayPop()">
   <div class="pop" id="popBox">
     <div class="popArrow" id="popArrow"></div>
@@ -551,6 +664,7 @@ function onPlans(list,meta){
   if(profile&&!$('appScreen').classList.contains('hidden')){renderGroup();renderPlanner();renderMonth()}
   if(profile&&!$('appScreen').classList.contains('hidden'))restoreEditDraft(meta);
   if(useFB&&profile&&meta&&!meta.fromCache)migrateStep(list,meta);
+  try{processNotifs(list,meta)}catch(e){dbg('notif error '+e.message)}
 }
 /* one-time: copy plans that were saved only on THIS phone (old local mode) into Firestore */
 function buildMigration(){
@@ -633,11 +747,12 @@ function checkLogin(){
 }
 
 /* ---------- navigation ---------- */
-const TITLES={planner:'Group Weekly Planner',month:'Calendar',profile:'Profile'};
+const TITLES={planner:'Group Weekly Planner',month:'Calendar',alerts:'Notifications',profile:'Profile'};
 function nav(t){
-  ['planner','month','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
+  ['planner','month','alerts','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
   $('pageTitle').textContent=TITLES[t];
   renderAll();window.scrollTo(0,0);
+  if(t==='alerts')enterAlerts();else leaveAlerts();
 }
 function renderAll(){renderGroup();renderPlanner();renderMonth();renderProfile()}
 function renderGroup(){
@@ -727,10 +842,10 @@ function renderPlanner(){
     if(!list.length)html+=`<div class="none">No plans yet</div>`;
     list.forEach(p=>{
       if(mode==='my'&&isMine(p)){
-        html+=`<div class="plan"><div class="planLine">${bubble(p)}<button class="editBtn" onclick="openEdit('${key}','${p.id}')" aria-label="Edit">${PENCIL}</button></div>${joinedLine(p)}</div>`;
+        html+=`<div class="plan"><div class="planLine">${bubble(p)}<button class="editBtn" onclick="openEdit('${key}','${p.id}')" aria-label="Edit">${PENCIL}</button></div>${joinedLine(p)}${reactBar(p)}</div>`;
       }else{
         const u=userOf(p.owner),joined=iJoined(p);
-        html+=`<div class="plan"><div class="planTop">${avatar(u,24)}${esc(u.name)}${isMine(p)?' (you)':''}</div><div class="planLine">${bubble(p)}<button class="joinBtn ${joined?'joined':''}" onclick="joinPlan('${key}','${p.id}')">${joined?'✓ Joined':'Join'}</button></div>${joinedLine(p)}</div>`;
+        html+=`<div class="plan"><div class="planTop">${avatar(u,24)}${esc(u.name)}${isMine(p)?' (you)':''}</div><div class="planLine">${bubble(p)}<button class="joinBtn ${joined?'joined':''}" onclick="joinPlan('${key}','${p.id}')">${joined?'✓ Joined':'Join'}</button></div>${joinedLine(p)}${reactBar(p)}</div>`;
       }
     });
     if(mode==='my'){
@@ -811,7 +926,7 @@ function saveEdit(){
   const changed=p.text!==newText||(p.emoji||'')!==newEmoji||normHex(p.color)!==newColor;
   if(changed){
     const lbl=dayLabel(key).replace(',','');
-    DB.updatePlan(id,{text:newText,emoji:newEmoji,color:newColor});
+    DB.updatePlan(id,{text:newText,emoji:newEmoji,color:newColor,updatedAt:Date.now(),updatedBy:me(),updatedByName:profile.name});
     pushAct(me(),'blue','You edited plan',`Plan for ${lbl} was updated`);
     (p.joinedIds||[]).filter(j=>j!==me()).forEach(j=>pushAct(j,'blue',`${profile.name} edited plan you joined`,`${lbl} • ${newEmoji} ${newText}`.trim()));
   }
@@ -836,7 +951,7 @@ function changeMonth(n){
 }
 function planItem(k,p){
   const u=userOf(p.owner),j=p.joined||[];
-  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}</div>`;
+  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}${reactBar(p)}</div>`;
 }
 function popRow(p){
   const u=userOf(p.owner),j=p.joined||[];
@@ -935,6 +1050,256 @@ function shareWhatsApp(){
 {const le=store.get('pb_last_email',null);if(le&&$('loginEmail'))$('loginEmail').value=le}
 checkLogin();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+
+/* ---- Rotate / resize: laat die skerm vrylik draai en pas die popup weer in ---- */
+(function(){
+  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
+  let t=null;
+  function refit(){
+    clearTimeout(t);
+    t=setTimeout(function(){
+      try {
+        if (typeof popKey!=='undefined' && popKey){
+          const cell=document.querySelector('#calendar .d[data-k="'+popKey+'"]');
+          showDayPop(popKey,cell);          // plaas die popup weer reg vir die nuwe skerm-grootte
+        }
+      } catch(e){}
+    },180);
+  }
+  window.addEventListener('resize',refit);
+  window.addEventListener('orientationchange',refit);
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change',refit);
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden){ try{ if(screen.orientation&&screen.orientation.unlock) screen.orientation.unlock(); }catch(e){} refit(); }
+  });
+})();
+
+/* ================= REACTIONS ================= */
+// Elke persoon se reaksies word in sy EIE veld op die plan gestoor (rx_<epos>), sodat twee mense
+// op dieselfde oomblik nooit mekaar se reaksies oorskryf nie.
+var RX_SET=["👍","❤️","😂","😮","😢","🔥","🎉","💎","✨","😍","🥰","😎","🤩","💪","🙏","👏","🎮","⚔️","🍀","🌸","💙","💜","😭","🤔","👀","💯","🥳","😴","🤣","😡","💀","🫶"];
+function rxKey(e){return 'rx_'+String(e||'').toLowerCase().replace(/[^a-z0-9]/g,'_')}
+function rxOwnerOf(k){
+  const ids=[...Object.keys(remoteUsers||{}),...Object.keys(users||{}),profile&&profile.email].filter(Boolean);
+  const hit=ids.find(id=>rxKey(id)===k);return hit||k.slice(3);
+}
+function reactionsOf(p){
+  const map={};
+  Object.keys(p).forEach(k=>{
+    if(k.indexOf('rx_')!==0||!Array.isArray(p[k]))return;
+    p[k].forEach(e=>{(map[e]=map[e]||[]).push(k)});
+  });
+  return Object.keys(map).map(e=>({e,keys:map[e]}));
+}
+function reactBar(p){
+  const mine=rxKey(me());
+  const chips=reactionsOf(p).map(r=>{
+    const names=r.keys.map(k=>k===mine?'You':userOf(rxOwnerOf(k)).name).join(', ');
+    return `<button class="rx ${r.keys.includes(mine)?'mine':''}" data-pid="${esc(p.id)}" data-e="${esc(r.e)}" title="${esc(names)}">${esc(r.e)}<b>${r.keys.length}</b></button>`;
+  }).join('');
+  return `<div class="rxRow">${chips}<button class="rxAdd" data-pid="${esc(p.id)}" data-add="1" aria-label="Add reaction">☺ +</button></div>`;
+}
+function toggleReact(pid,emo){
+  if(!syncReady())return;
+  const p=allPlans.find(x=>x.id===pid);if(!p)return;
+  const k=rxKey(me()),cur=Array.isArray(p[k])?p[k].slice():[];
+  const i=cur.indexOf(emo);if(i<0)cur.push(emo);else cur.splice(i,1);
+  p[k]=cur;                       // wys dadelik
+  DB.updatePlan(pid,{[k]:cur});
+  renderAll();
+}
+var rxPid;
+function openRxPop(pid,btn){
+  rxPid=pid;const pop=$('rxPop');
+  const mine=(allPlans.find(x=>x.id===pid)||{})[rxKey(me())]||[];
+  pop.innerHTML=RX_SET.map(e=>`<button data-pick="${esc(e)}" style="${mine.includes(e)?'background:rgba(255,255,255,.2)':''}">${e}</button>`).join('');
+  pop.classList.remove('hidden');
+  const r=btn.getBoundingClientRect(),vw=window.innerWidth,vh=window.innerHeight;
+  const w=pop.offsetWidth,h=pop.offsetHeight;
+  const left=Math.max(12,Math.min(r.left,vw-12-w));
+  const below=r.bottom+8+h<=vh-12;
+  pop.style.left=left+'px';pop.style.top=Math.max(12,below?r.bottom+8:r.top-8-h)+'px';
+  pop.scrollTop=0;
+}
+function closeRxPop(){$('rxPop').classList.add('hidden');rxPid=null}
+document.addEventListener('click',function(e){
+  const pick=e.target.closest('#rxPop [data-pick]');
+  if(pick){const id=rxPid;closeRxPop();toggleReact(id,pick.dataset.pick);return}
+  const add=e.target.closest('.rxAdd');
+  if(add){e.stopPropagation();rxPid===add.dataset.pid&&!$('rxPop').classList.contains('hidden')?closeRxPop():openRxPop(add.dataset.pid,add);return}
+  const chip=e.target.closest('.rx[data-pid]');
+  if(chip){toggleReact(chip.dataset.pid,chip.dataset.e);return}
+  if(!e.target.closest('#rxPop'))closeRxPop();
+});
+window.addEventListener('resize',closeRxPop);
+
+/* ================= NOTIFICATIONS ================= */
+// Wie het wat bygevoeg (en wie het op jou plan gereageer) – lys + klokkie + 'n kort boodskap
+// bo-aan die skerm, en 'n foon-kennisgewing as die app op die agtergrond is (en jy dit toegelaat het).
+function nKey(n){return n+'_'+(profile?profile.email:'')}
+var feed,seenN,nBase,nBase2,nLoaded;
+function loadNotifs(){
+  if(!profile||nLoaded===profile.email)return;
+  nLoaded=profile.email;
+  feed=store.get(nKey('pb_feed'),[]);if(!Array.isArray(feed))feed=[];
+  seenN=new Set(store.get(nKey('pb_nseen'),[]));
+  nBase=store.get(nKey('pb_nbase'),0);
+  if(!nBase){nBase=Date.now();store.set(nKey('pb_nbase'),nBase)}   // eerste keer: net NUWE dinge van nou af
+  nBase2=store.get(nKey('pb_nbase2'),0);
+  if(!nBase2){nBase2=Date.now();store.set(nKey('pb_nbase2'),nBase2)}   // edits + joins: ook net NUWE dinge van nou af
+}
+function saveNotifs(){
+  feed=feed.slice(0,80);
+  store.set(nKey('pb_feed'),feed);
+  store.set(nKey('pb_nseen'),[...seenN].slice(-800));
+}
+function unreadCount(){return (feed||[]).filter(f=>!f.read).length}
+function setIconBadge(n){
+  try{if(navigator.setAppBadge){n?navigator.setAppBadge(n):navigator.clearAppBadge()}}catch(e){}
+  try{if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage({type:'badge',n:n})}catch(e){}   // sw.js onthou die nommer vir push
+}
+/* ---- push: die server kan jou foon bereik al is die app toe ---- */
+var pushDone=false;
+function ensurePush(force){
+  try{
+    if(!profile||!window.FB||!FB.enablePush||!('Notification' in window)||Notification.permission!=='granted')return;
+    if(pushDone&&!force)return;pushDone=true;
+    FB.enablePush({email:me(),name:profile.name,rxk:rxKey(me())})
+      .then(r=>{if(r&&!r.ok)dbg('push: '+r.reason)}).catch(e=>dbg('push error: '+(e&&e.message)));
+  }catch(e){}
+}
+function updateBell(){
+  const n=unreadCount(),b=$('bellBadge');
+  if(b){b.textContent=n>99?'99+':n;b.classList.toggle('hidden',!n)}
+  document.title=(n?'('+n+') ':'')+'Primogem Besties';
+  setIconBadge(n);   // rooi nommer op die app-ikoon (as die toestel dit ondersteun)
+}
+var hl;   // kennisgewings wat nuut was toe jy die Updates-blad oopgemaak het (bly uitgelig terwyl jy kyk)
+function hlSet(){return hl||(hl=new Set())}
+function enterAlerts(){
+  loadNotifs();hl=new Set((feed||[]).filter(f=>!f.read).map(f=>f.id));
+  (feed||[]).forEach(f=>f.read=true);saveNotifs();updateBell();renderNotifs();   // soos WhatsApp: oopmaak = gelees
+}
+function leaveAlerts(){hl=null}
+function processNotifs(list,meta){
+  if(!profile)return;loadNotifs();
+  const silentReact=(Date.now()-nBase)<20000;
+  const quiet2=(Date.now()-nBase2)<20000;          // edits/joins wat reeds bestaan is nie "nuut" nie     // eerste 20s ná installasie: bestaande reaksies is nie "nuut" nie
+  const added=[];
+  list.forEach(p=>{
+    if(!p||!p.id)return;
+    // 1) iemand anders het 'n plan bygevoeg
+    if(p.owner&&p.owner!==me()&&(p.createdAt||0)>nBase){
+      const id='add_'+p.id;
+      if(!seenN.has(id)){
+        seenN.add(id);
+        added.push({id,type:'add',pid:p.id,date:p.date,who:p.ownerName||String(p.owner).split('@')[0],emoji:p.emoji||'',text:p.text||'',ts:p.createdAt||Date.now(),read:false,fresh:(Date.now()-(p.createdAt||0))<180000});
+      }
+    }
+    // 3) iemand het 'n plan verander (teks / emoji / kleur)
+    if(p.updatedBy&&p.updatedBy!==me()&&(p.updatedAt||0)>nBase2){
+      const id='edit_'+p.id+'_'+p.updatedAt;
+      if(!seenN.has(id)){
+        seenN.add(id);
+        added.push({id,type:'edit',pid:p.id,date:p.date,who:p.updatedByName||String(p.updatedBy).split('@')[0],emoji:p.emoji||'',text:p.text||'',ts:p.updatedAt,read:false,fresh:(Date.now()-p.updatedAt)<180000});
+      }
+    }
+    // 4) iemand wil by 'n plan join
+    (p.joinedIds||[]).forEach((em,ix)=>{
+      if(!em||em===me())return;
+      const id='join_'+p.id+'_'+em;
+      if(seenN.has(id))return;seenN.add(id);
+      if(quiet2)return;
+      const nm=(p.joined&&p.joined.length===p.joinedIds.length&&p.joined[ix])||userOf(em).name;
+      added.push({id,type:'join',pid:p.id,date:p.date,who:nm,emoji:p.emoji||'',text:p.text||'',ts:Date.now(),read:false,fresh:true});
+    });
+    // 2) iemand het op JOU plan gereageer
+    if(isMine(p)){
+      const mine=rxKey(me());
+      Object.keys(p).forEach(k=>{
+        if(k.indexOf('rx_')!==0||k===mine||!Array.isArray(p[k]))return;
+        p[k].forEach(e=>{
+          const id='rx_'+p.id+'_'+k+'_'+e;
+          if(seenN.has(id))return;seenN.add(id);
+          if(silentReact)return;
+          added.push({id,type:'react',pid:p.id,date:p.date,who:userOf(rxOwnerOf(k)).name,reaction:e,emoji:p.emoji||'',text:p.text||'',ts:Date.now(),read:false,fresh:true});
+        });
+      });
+    }
+  });
+  if(!added.length){updateBell();return}
+  added.sort((a,b)=>b.ts-a.ts);
+  const viewing=!$('tab-alerts').classList.contains('hidden')&&!document.hidden;
+  if(viewing)added.forEach(a=>{a.read=true;hlSet().add(a.id)});     // jy kyk reeds: geen rooi nommer nodig nie
+  feed=added.concat(feed);saveNotifs();updateBell();
+  if(viewing){renderNotifs();return}
+  const fresh=added.filter(a=>a.fresh);
+  if(fresh.length){
+    const f=fresh[0];
+    showToast(notifTitle(f)+(fresh.length>1?`  (+${fresh.length-1} more)`:''),notifSub(f));
+    if(document.hidden)systemNotify(notifTitle(f),notifSub(f),f.id);
+  }else if(!meta||!meta.fromCache){
+    showToast(`🔔 ${added.length} new update${added.length>1?'s':''} while you were away`,'Tap to see');
+  }
+}
+function planLbl(f){return `${f.emoji?f.emoji+' ':''}${f.text}`.trim()}
+function notifTitle(f){
+  if(f.type==='react')return `${f.who} reacted ${f.reaction} to your plan`;
+  if(f.type==='edit')return `${f.who} updated ${planLbl(f)}`;
+  if(f.type==='join')return `${f.who} joined ${planLbl(f)}`;
+  return `${f.who} added ${planLbl(f)}`;
+}
+function notifSub(f){return f.type==='react'?planLbl(f):(f.date?dayLabel(f.date):'')}
+var toastT;
+function showToast(t,sub){
+  const el=$('toast');el.innerHTML=esc(t)+(sub?`<small>${esc(sub)}</small>`:'');
+  el.classList.remove('hidden');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.add('hidden'),5500);
+}
+function systemNotify(title,body,tag){
+  try{
+    if(!('Notification' in window)||Notification.permission!=='granted')return;
+    const opts={body,tag,icon:'apple-touch-icon.png'};
+    if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(r=>{if(r)r.showNotification(title,opts);else{try{new Notification(title,opts)}catch(e){}}}).catch(()=>{try{new Notification(title,opts)}catch(e){}});
+    }else new Notification(title,opts);
+  }catch(e){}
+}
+function allowAlerts(){
+  if(!('Notification' in window)){alert('On iPhone: tap Share → Add to Home Screen, open the app from its icon, then turn notifications on here.');return}
+  Notification.requestPermission().then(()=>{renderNotifs();updateBell();ensurePush(true)});
+}
+function renderNotifs(){
+  loadNotifs();
+  $('nList').innerHTML=feed.length?feed.map((f,i)=>`<div class="nItem ${(f.read&&!hlSet().has(f.id))?'':'unread'}" onclick="goNotif(${i})">${avatar(userOf(f.who&&Object.keys(remoteUsers).find(id=>userOf(id).name===f.who)||f.who),38)}<div style="min-width:0"><div class="nt">${esc(notifTitle(f))}</div><small>${esc(notifSub(f))} • ${esc(ago(f.ts))}</small></div></div>`).join(''):`<div class="nEmpty">Nothing yet. When someone in the group adds a plan or reacts to yours, you'll see it here. 💎</div>`;
+  const ok='Notification' in window&&Notification.permission==='granted';
+  $('nAllow').classList.toggle('hidden',ok||!('Notification' in window)||Notification.permission==='denied');
+  $('nNote').textContent=ok?'Notifications are ON. The red number on the app icon updates while the app is open or in the background.':(('Notification' in window&&Notification.permission==='denied')?'Notifications are blocked in your browser settings.':(!('Notification' in window)?'iPhone: tap Share → Add to Home Screen, open the app from its icon, then turn notifications on.':''));
+}
+function openNotifs(){nav('alerts')}
+function markAllRead(){(feed||[]).forEach(f=>f.read=true);hl=new Set();saveNotifs();updateBell();renderNotifs()}
+function goNotif(i){
+  const f=(feed||[])[i];if(!f)return;f.read=true;saveNotifs();updateBell();
+  if(f.date){mode='group';friendFilter=null;weekStart=mondayOf(parseKey(f.date))}
+  nav('planner');
+}
+(function(){const ra=renderAll;renderAll=function(){ra();try{ensurePush();loadNotifs();updateBell();if(!$('tab-alerts').classList.contains('hidden'))renderNotifs()}catch(e){}}})();
+document.addEventListener('visibilitychange',()=>{try{document.hidden?setIconBadge(unreadCount()):updateBell()}catch(e){}});
+window.addEventListener('pagehide',()=>{try{setIconBadge(unreadCount())}catch(e){}});
+try{loadNotifs();updateBell()}catch(e){}
+
+/* ================= THEME: Light / Dark / Auto ================= */
+function themePref(){var t=store.get('pb_theme','auto');return(t==='light'||t==='dark')?t:'auto'}
+function applyTheme(){
+  var p=themePref(),sysDark=false;
+  try{sysDark=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches}catch(e){}
+  var dark=p==='dark'||(p==='auto'&&sysDark);
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',dark?'#0e1120':'#5078f5');
+  document.querySelectorAll('#themeSeg button').forEach(function(b){b.classList.toggle('active',b.dataset.t===p)});
+}
+function setTheme(t){store.set('pb_theme',t);applyTheme()}
+try{var _mq=window.matchMedia('(prefers-color-scheme: dark)');(_mq.addEventListener?_mq.addEventListener('change',applyTheme):_mq.addListener&&_mq.addListener(applyTheme))}catch(e){}
+applyTheme();
 </script>
 </body>
 </html>
