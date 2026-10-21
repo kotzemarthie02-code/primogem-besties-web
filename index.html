@@ -307,8 +307,8 @@ img,svg{max-width:100%}
 .rx.mine{background:#dfe8ff;border-color:var(--blue)}
 .rx.mine b{color:var(--blue)}
 .rxAdd{border:1.5px dashed #c4cbe6;background:transparent;border-radius:999px;padding:3px 10px;font-size:14px;color:var(--gray);min-height:30px;font-weight:700}
-#rxPop{position:fixed;z-index:70;background:#1b2036;border-radius:18px;padding:8px;display:grid;grid-template-columns:repeat(6,1fr);gap:2px;width:min(300px,calc(100vw - 24px));max-height:min(50vh,260px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 12px 36px rgba(10,14,35,.45)}
-#rxPop button{font-size:24px;background:transparent;border:none;border-radius:10px;height:44px}
+#rxPop{position:fixed;z-index:70;background:#1b2036;border-radius:18px;padding:8px;display:grid;grid-template-columns:repeat(8,1fr);gap:2px;width:min(360px,calc(100vw - 24px));max-height:min(60vh,380px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-shadow:0 12px 36px rgba(10,14,35,.45)}
+#rxPop button{font-size:24px;background:transparent;border:none;border-radius:10px;height:42px}
 #rxPop button:active{background:rgba(255,255,255,.14)}
 .bell{position:absolute;left:var(--pad,14px);top:calc(8px + env(safe-area-inset-top));width:44px;height:44px;border-radius:50%;background:#a5a8b1;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .bell svg{width:24px;height:24px;fill:#fff}
@@ -1078,6 +1078,8 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 // Elke persoon se reaksies word in sy EIE veld op die plan gestoor (rx_<epos>), sodat twee mense
 // op dieselfde oomblik nooit mekaar se reaksies oorskryf nie.
 var RX_SET=["👍","❤️","😂","😮","😢","🔥","🎉","💎","✨","😍","🥰","😎","🤩","💪","🙏","👏","🎮","⚔️","🍀","🌸","💙","💜","😭","🤔","👀","💯","🥳","😴","🤣","😡","💀","🫶"];
+// baie meer reaksies: al die emoji's van die app agter die gunstelinge
+RX_SET=[...new Set([...RX_SET,...(typeof EMOJIS!=='undefined'?EMOJIS:[])])];
 function rxKey(e){return 'rx_'+String(e||'').toLowerCase().replace(/[^a-z0-9]/g,'_')}
 function rxOwnerOf(k){
   const ids=[...Object.keys(remoteUsers||{}),...Object.keys(users||{}),profile&&profile.email].filter(Boolean);
