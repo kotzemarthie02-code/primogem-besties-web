@@ -300,6 +300,15 @@ img,svg{max-width:100%}
   .emojiG7 button:hover,.emojiG6 button:hover{background:#eaf0ff}
 }
 
+
+/* ---- big emoji picker with category tabs (😊 button + edit) ---- */
+.emoTabs{display:flex;gap:4px;overflow-x:auto;margin-top:12px;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.emoTabs::-webkit-scrollbar{display:none}
+.emoTabs button{flex:none;width:46px;height:42px;border-radius:13px;border:2px solid transparent;background:#f3f4fb;font-size:22px;padding:0}
+.emoTabs button.on{border-color:var(--blue);background:#eaf0ff}
+.emoCap{font-size:12px;font-weight:800;color:var(--gray);margin:8px 2px 8px}
+html[data-theme="dark"] .emoTabs button{background:#272d4c;color:var(--ink)}
+html[data-theme="dark"] .emoTabs button.on{background:#2a3566;border-color:var(--blue)}
 /* ================= reactions + notifications ================= */
 .rxRow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
 .rx{border:1.5px solid #dfe4f5;background:#f3f4fb;border-radius:999px;padding:3px 10px;font-size:15px;font-weight:700;display:inline-flex;gap:5px;align-items:center;color:var(--ink);min-height:30px}
@@ -532,7 +541,8 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3a4170}
 <div id="emojiOverlay" class="overlay hidden" onclick="if(event.target===this)closeEmojiPicker()">
   <div class="modal">
     <h3>Pick an emoji</h3>
-    <div class="emojiG6" id="emojiAllGrid" style="margin-top:14px;max-height:min(55vh,440px)"></div>
+    <div class="emoTabs" id="emojiTabs"></div><div class="emoCap" id="emojiCap"></div>
+    <div class="emojiG6" id="emojiAllGrid" style="max-height:min(50vh,400px)"></div>
     <div class="edBtns"><button class="bCancel" style="flex:1" onclick="closeEmojiPicker()">Close</button></div>
   </div>
 </div>
@@ -543,6 +553,7 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:#3a4170}
     <h3>Edit event</h3>
     <div class="edTop"><div class="edEmoji" id="edEmoji">✨</div><input id="edText" placeholder="Plan" oninput="saveEditDraft()" onkeydown="if(event.key==='Enter')saveEdit()"><button class="colBtn" id="edColBtn" onclick="openColorPicker('edit')" aria-label="Plan color"></button></div>
     <div class="pTitle" style="margin:16px 0 10px">Emoji</div>
+    <div class="emoTabs" id="edTabs"></div><div class="emoCap" id="edCap"></div>
     <div class="emojiG6" id="edGrid"></div>
     <div class="edBtns"><button class="bSave" onclick="saveEdit()">Save</button><button class="bCancel" onclick="closeEdit()">Cancel</button><button class="bDel" onclick="deleteFromEdit()">🗑️</button></div>
   </div>
@@ -578,6 +589,8 @@ const EXTRA="😀 😃 😁 😆 🙂 🙃 🤓 🧐 😮 😲 😳 🥵 🥶 �
 EXTRA.forEach(e=>{if(e&&!EMOJIS.includes(e))EMOJIS.push(e)});
 const QUICK=["😊","💎","🍓","🎮","🌸","✨"];
 const QUICK_ALL=[...new Set([...QUICK,...EMOJIS])];
+// PROFIEL-emoji's: eie, aparte lys (verander dit gerus sonder om die ander te raak)
+const PROF_EMOJIS=EMOJIS.slice();
 const PALETTE=["#FFA8D0","#FFC1DD","#FFCFE0","#FFBF94","#FFD3B0","#FFDD90","#FFF0A0","#DDF59A",
 "#BCF5A0","#B2EFD0","#A8E6CF","#8EE8E0","#A0E8F8","#9ED2F8","#A9CCFF","#BCC8FF",
 "#C8A8FF","#D8B8F4","#EBC4F6","#FBB9FF","#FFB9E4","#FFA8BC","#F0B49C","#D8C0A0",
@@ -866,11 +879,27 @@ function renderPlanner(){
 const draftKey=k=>(profile?profile.email:'')+'|'+k;
 function saveDraft(key,v){const k=draftKey(key);if(v)drafts[k]=v;else delete drafts[k];store.set('pb_drafts',drafts)}
 let emojiTargetKey=null;
+var pickCat=0,edCat=0;
+function emoTabsHtml(cur,fn){return ED_CATS.map((t,i)=>`<button class="${i===cur?'on':''}" onclick="${fn}(${i})" aria-label="${esc(t[1])}">${t[0]}</button>`).join('')}
+function emoGridHtml(cat,sel,fn){return ED_CATS[cat][2].map(e=>`<button class="${e===sel?'sel':''}" onclick="${fn}('${e}')">${e}</button>`).join('')}
+function renderPickGrid(){
+  const prof=emojiTargetKey==='@profile';
+  $('emojiTabs').style.display=prof?'none':'';$('emojiCap').style.display=prof?'none':'';
+  if(prof){
+    $('emojiAllGrid').style.marginTop='14px';
+    $('emojiAllGrid').innerHTML=PROF_EMOJIS.map(e=>`<button class="${e===draft.emoji?'sel':''}" onclick="chooseEmoji('${e}')">${e}</button>`).join('');
+  }else{
+    $('emojiAllGrid').style.marginTop='';
+    $('emojiTabs').innerHTML=emoTabsHtml(pickCat,'setPickCat');
+    $('emojiCap').textContent=ED_CATS[pickCat][1]+' • '+ED_CATS[pickCat][2].length;
+    $('emojiAllGrid').innerHTML=emoGridHtml(pickCat,null,'chooseEmoji');
+  }
+  $('emojiAllGrid').scrollTop=0;
+}
+function setPickCat(i){pickCat=i;renderPickGrid()}
 function openEmojiPicker(key){
   emojiTargetKey=key;
-  const cur=key==='@profile'?draft.emoji:null;
-  $('emojiAllGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===cur?'sel':''}" onclick="chooseEmoji('${e}')">${e}</button>`).join('');
-  $('emojiAllGrid').scrollTop=0;$('emojiOverlay').classList.remove('hidden');
+  renderPickGrid();$('emojiOverlay').classList.remove('hidden');
 }
 function closeEmojiPicker(){$('emojiOverlay').classList.add('hidden');emojiTargetKey=null}
 function chooseEmoji(e){const k=emojiTargetKey;closeEmojiPicker();if(k==='@profile')setDraftEmoji(e);else if(k)addEmoji(k,e)}
@@ -906,11 +935,16 @@ function openEdit(key,id){
   $('edText').value=f.p.text;edPreview();
   renderEdGrid();$('editOverlay').classList.remove('hidden');
 }
-function renderEdGrid(){
-  $('edGrid').innerHTML=EMOJIS.map(e=>`<button class="${e===editing.emoji?'sel':''}" onclick="pickEdEmoji('${e}')">${e}</button>`).join('');
+function renderEdGrid(keepScroll){
+  const g=$('edGrid'),top=keepScroll?g.scrollTop:0;
+  $('edTabs').innerHTML=emoTabsHtml(edCat,'setEdCat');
+  $('edCap').textContent=ED_CATS[edCat][1]+' • '+ED_CATS[edCat][2].length;
+  g.innerHTML=emoGridHtml(edCat,editing.emoji,'pickEdEmoji');
+  g.scrollTop=top;
 }
+function setEdCat(i){edCat=i;renderEdGrid()}
 function edPreview(){const el=$('edEmoji');el.textContent=editing.emoji||'✨';el.style.opacity=editing.emoji?1:.3;$('edColBtn').style.background=editing.color||'#A8E6CF'}
-function pickEdEmoji(e){editing.emoji=(editing.emoji===e)?'':e;edPreview();renderEdGrid();saveEditDraft()}
+function pickEdEmoji(e){editing.emoji=(editing.emoji===e)?'':e;edPreview();renderEdGrid(true);saveEditDraft()}
 function saveEditDraft(){if(!editing)return;store.set('pb_editdraft',{email:me(),key:editing.key,id:editing.id,emoji:editing.emoji,color:editing.color,text:$('edText').value})}
 function restoreEditDraft(meta){
   if(editDraftRestored||editing||!profile)return;
@@ -1088,6 +1122,8 @@ var RX_CATS=[["😀", "Gesigte", ["😀", "😁", "😂", "😃", "😄", "😅"
 // eerste blad = gunstelinge (jou ou 32 + die app se emoji's), die res is per groep
 RX_CATS.unshift(["⭐","Gunstelinge",[...new Set([...RX_SET,...(typeof EMOJIS!=='undefined'?EMOJIS:[])])]]);
 var rxCat=0;
+// PLAN-emoji's (😊 knoppie + edit): eie, aparte kopie – los van die reaksies en die profiel
+var ED_CATS=RX_CATS.map(t=>[t[0],t[1],t[2].slice()]);
 function rxKey(e){return 'rx_'+String(e||'').toLowerCase().replace(/[^a-z0-9]/g,'_')}
 function rxOwnerOf(k){
   const ids=[...Object.keys(remoteUsers||{}),...Object.keys(users||{}),profile&&profile.email].filter(Boolean);
