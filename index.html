@@ -468,7 +468,7 @@ html[data-theme="dark"] .memTa,html[data-theme="dark"] .cmItem,html[data-theme="
 
 .gInl{display:inline-flex;align-items:center;gap:8px}
 .gInl .gName{font-size:14px}
-.gRow .gPill.push{margin-left:auto}
+.gRight{display:inline-flex;align-items:center;gap:10px;margin-left:auto}
 .gSub{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 0 6px 30px}
 .gSub .gName{font-size:14px}
 .gPanel .two.x{grid-template-columns:1fr 1fr 34px}
@@ -1175,7 +1175,7 @@ function renderMonth(){
     const n=ks.reduce((a,k)=>a+plans[k].length,0);
     const cols=[...new Set(ks.flatMap(k=>plans[k].map(planColor)))].slice(0,6);
     return `<div class="wkBox"><button class="wkHead ${open?'open':''}" onclick="toggleWeek('${w}')"><span class="wkT">${fmtDM(ws)} – ${fmtDM(we)}${w===keyOf(mondayOf(new Date()))?'<em>This week</em>':''}</span><span class="dotsRow">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="wkN">${n}</span><span class="wkArrow">${open?'▴':'▾'}</span></button>`
-      +(open?ks.map(k=>`<div class="evCard"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">📍 ${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
+      +(open?ks.map(k=>`<div class="evCard"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
       +`</div>`;
   }).join('');
 }
@@ -1391,7 +1391,7 @@ function renderRemind(force){
   h+=RM_DAILY.map((it,i)=>{const on=RM.daily.c[i];return `<div class="gItem ${it.link?'hl':''} ${on?'on':''}"><button class="gBox" ${on?'data-on="1"':''} onclick="rmDaily(${i})">${on?'✓':''}</button><div><span class="t" ${it.b?'style="font-weight:800"':''}>${it.pre||''}${esc(it.t)}${it.post||''}</span>${it.link?'<a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481" target="_blank" rel="noopener">HoyoLab Check-in Link 🔗</a>':''}</div></div>`}).join('');
   h+='</div>';
   h+=`<div class="gCard"><div class="gH">📅 Weekly Objectives</div>`;
-  h+=`<div class="gRow"><span>📜</span><span class="gName">The Ministry of Affairs</span>${gSel(RM_REGIONS,S.region,'Region',"rmSel('region',this.value)",'sm')}${gSubI('min','⚔️ Enemy fights',0,3)}${gSubI('min','📋 Requests',3,6)}${gPill('min','Before Sunday',sun).replace('class="gPill','class="gPill push')}</div>`;
+  h+=`<div class="gRow"><span>📜</span><span class="gName">The Ministry of Affairs</span>${gSel(RM_REGIONS,S.region,'Region',"rmSel('region',this.value)",'sm')}${gSubI('min','⚔️ Enemy fights',0,3)}<span class="gRight">${gSubI('min','📋 Requests',3,6)}${gPill('min','Before Sunday',sun)}</span></div>`;
   h+=gRow('boss','⚔️','Weekly Boss','',gPill('boss','Before Sunday',sun));
   h+=`<div class="gPanel">${S.rows.map((r,i)=>`<div class="two ${i>=3?'x':''}"><input class="gIn" placeholder="— Choose Character —" value="${esc(r.c)}" oninput="rmBoss(${i},'c',this.value)">${gSel(RM_BOSSES,r.b,'— Weekly Boss —',`rmBoss(${i},'b',this.value)`)}${i>=3?`<button class="gX" onclick="rmBossDel(${i})" aria-label="Remove">✕</button>`:''}</div>`).join('')}<button class="gAdd" onclick="rmBossAdd()">+ Add</button></div>`;
   h+=gRow('sty','⚔️','Stygian Onslaught','<span class="gNote">150 Primogems ✨</span>',gPill('sty','Before Sunday',sun));
