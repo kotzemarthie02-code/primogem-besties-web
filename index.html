@@ -500,6 +500,15 @@ html[data-theme="dark"] .memTa,html[data-theme="dark"] .cmItem,html[data-theme="
 html[data-theme="dark"] .nCard{background:linear-gradient(var(--nbg),var(--nbg)),#1a1f38}
 html[data-theme="dark"] .nRow input.nt{background:rgba(0,0,0,.28)}
 html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170}
+.memPrev .pv.lk{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:96px;background:#e8ecff;color:var(--ink)}
+.memPrev .pv.lk small{font-size:10px;font-weight:700;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.memLinks{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.memLink{display:flex;align-items:center;gap:12px;background:#f3f4fb;border-radius:16px;padding:12px;text-decoration:none;color:var(--ink)}
+.memLink>span{width:40px;height:40px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.memLink b{font-size:14px;font-weight:800;display:block;word-break:break-all}
+.memLink small{font-size:12px;color:var(--gray);font-weight:600}
+html[data-theme="dark"] .memLink{background:#242a49}
+html[data-theme="dark"] .memPrev .pv.lk{background:#242a49}
 </style>
 </head>
 <body>
@@ -579,7 +588,7 @@ html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170
     <div class="memBox">
       <textarea id="in-memo" class="memTa" maxlength="500" placeholder="Today I got a 5★ on my wish pull! 🎉"></textarea>
       <div id="memPrev" class="memPrev"></div>
-      <div class="memBar"><button class="emoBtn" onclick="openEmojiPicker('memo')" aria-label="Pick emoji">😊</button><button class="emoBtn" onclick="$('memFile').click()" aria-label="Add photo or video">📷</button><input id="memFile" type="file" accept="image/*,video/*" multiple hidden onchange="memPick(this)"><button class="share" onclick="addMemory()">Share memory</button></div>
+      <div class="memBar"><button class="emoBtn" onclick="openEmojiPicker('memo')" aria-label="Pick emoji">😊</button><button class="emoBtn" onclick="$('memFile').click()" aria-label="Add photo or video">📷</button><button class="emoBtn" onclick="memAddLink()" aria-label="Add link">🔗</button><input id="memFile" type="file" accept="image/*,video/*" multiple hidden onchange="memPick(this)"><button class="share" onclick="addMemory()">Share memory</button></div>
     </div>
     <div id="memList"></div>
   </div>
@@ -1459,7 +1468,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&pro
 
 
 /* ================= GOOD MEMORIES ================= */
-var memEditId=null,memMedia=[];
+var memEditId=null,memMedia=[],memLinks=[];
 const MEM_MAX_CHARS=850000;          // Firestore: 1 MB per memory — photos/videos must fit inside it together
 const memChars=()=>memMedia.reduce((n,m)=>n+m.d.length,0);
 function memReadFile(f){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(r.error);r.readAsDataURL(f)})}
@@ -1495,7 +1504,13 @@ async function memPick(inp){
 }
 function memPreview(){
   const el=$('memPrev');if(!el)return;
-  el.innerHTML=memMedia.map((m,i)=>`<div class="pv">${m.t==='v'?`<video src="${m.d}" muted playsinline></video>`:`<img src="${m.d}" alt="">`}<button onclick="memMedia.splice(${i},1);memPreview()" aria-label="Remove">✕</button></div>`).join('');
+  el.innerHTML=memMedia.map((m,i)=>`<div class="pv">${m.t==='v'?`<video src="${m.d}" muted playsinline></video>`:`<img src="${m.d}" alt="">`}<button onclick="memMedia.splice(${i},1);memPreview()" aria-label="Remove">✕</button></div>`).join('')+memLinks.map((l,i)=>`<div class="pv lk"><span>🔗</span><small>${esc(l.h)}</small><button onclick="memLinks.splice(${i},1);memPreview()" aria-label="Remove">✕</button></div>`).join('');
+}
+function memAddLink(){
+  if(memLinks.length>=3){alert('Up to 3 links per memory');return}
+  let v=(prompt('Paste a link to your photo/video (YouTube, Google Photos, Google Drive…)')||'').trim();if(!v)return;
+  if(!/^https?:\/\//i.test(v))v='https://'+v;
+  try{const u=new URL(v);memLinks.push({u:u.href,h:u.hostname.replace(/^www\./,'')});memPreview()}catch(e){alert('That does not look like a link')}
 }
 function openMedia(src){
   const o=document.createElement('div');o.className='mediaView';o.onclick=()=>o.remove();
@@ -1518,14 +1533,14 @@ function renderMemories(force){
   const L=allPlans.filter(p=>p.kind==='memory').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   el.innerHTML=L.length?L.map(p=>{
     const u=userOf(p.owner),mine=isMine(p),pid=esc(p.id);
-    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>`<div class="cmItem"><b>${esc(c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`).join('')}</div><div class="cmAdd"><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
+    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${Array.isArray(p.links)&&p.links.length?`<div class="memLinks">${p.links.map(l=>`<a class="memLink" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span>▶</span><div><b>${esc(l.h)}</b><small>Tap to open</small></div></a>`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>`<div class="cmItem"><b>${esc(c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`).join('')}</div><div class="cmAdd"><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
   }).join(''):'<div class="empty">No memories yet — share your first one! 💎</div>';
   Object.keys(keep).forEach(id=>{const e=$(id);if(e)e.value=keep[id]});
 }
 function addMemory(){
-  if(!syncReady())return;const el=$('in-memo'),t=el.value.trim();if(!t&&!memMedia.length)return;el.value='';
-  const media=memMedia;memMedia=[];memPreview();
-  DB.addPlan(Object.assign({id:uid(),kind:'memory',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date()),joined:[],joinedIds:[],createdAt:Date.now()},media.length?{media}:{}));
+  if(!syncReady())return;const el=$('in-memo'),t=el.value.trim();if(!t&&!memMedia.length&&!memLinks.length)return;el.value='';
+  const media=memMedia,links=memLinks;memMedia=[];memLinks=[];memPreview();
+  DB.addPlan(Object.assign({id:uid(),kind:'memory',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date()),joined:[],joinedIds:[],createdAt:Date.now()},(media.length?{media}:{}),(links.length?{links}:{})));
   renderMemories(true);
 }
 function addComment(pid){
@@ -1546,7 +1561,7 @@ function openMemEdit(pid){
 function closeMemEdit(){memEditId=null;$('memEditOverlay').classList.add('hidden')}
 function saveMemEdit(){
   if(!memEditId||!syncReady())return;const t=$('in-memoedit').value.trim();
-  const p=allPlans.find(x=>x.id===memEditId);if(!t&&!(p&&p.media&&p.media.length))return;
+  const p=allPlans.find(x=>x.id===memEditId);if(!t&&!(p&&((p.media&&p.media.length)||(p.links&&p.links.length))))return;
   if(p&&p.text!==t){p.text=t;p.updatedAt=Date.now();DB.updatePlan(memEditId,{text:t,updatedAt:p.updatedAt})}
   closeMemEdit();renderMemories(true);
 }
