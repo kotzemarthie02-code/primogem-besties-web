@@ -1351,6 +1351,7 @@ function renderRemind(force){
   $('rmChecklists').innerHTML=h;
   const dot=$('rmDot');if(dot)dot.classList.toggle('hidden',!rmAlerts());
   rmNotify();
+  try{updateBell()}catch(e){}
 }
 function rmBox(k,i){RM[k].c[i]=!RM[k].c[i];rmSave();renderRemind(true)}
 function rmDaily(i){RM.daily.c[i]=!RM.daily.c[i];rmSave();renderRemind(true)}
@@ -1494,7 +1495,7 @@ function updateBell(){
   const n=unreadCount(),b=$('bellBadge');
   if(b){b.textContent=n>99?'99+':n;b.classList.toggle('hidden',!n)}
   document.title=(n?'('+n+') ':'')+'Primogem Besties';
-  setIconBadge(n);   // rooi nommer op die app-ikoon (as die toestel dit ondersteun)
+  setIconBadge(n+((typeof rmAlerts==='function'&&rmAlerts())?1:0));   // rooi nommer op die app-ikoon (as die toestel dit ondersteun)
 }
 var hl;   // kennisgewings wat nuut was toe jy die Updates-blad oopgemaak het (bly uitgelig terwyl jy kyk)
 function hlSet(){return hl||(hl=new Set())}
