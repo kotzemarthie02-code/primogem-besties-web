@@ -466,6 +466,9 @@ html[data-theme="dark"] .gSel option{color:#e9ecff;background:#1a1f38}
 html[data-theme="dark"] .memBox,html[data-theme="dark"] .memCard{background:#1a1f38;box-shadow:0 4px 16px rgba(0,0,0,.35)}
 html[data-theme="dark"] .memTa,html[data-theme="dark"] .cmItem,html[data-theme="dark"] .cmAdd input{background:#242a49}
 
+.gInl{display:inline-flex;align-items:center;gap:8px}
+.gInl .gName{font-size:14px}
+.gRow .gPill.push{margin-left:auto}
 .gSub{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 0 6px 30px}
 .gSub .gName{font-size:14px}
 .gPanel .two.x{grid-template-columns:1fr 1fr 34px}
@@ -631,7 +634,7 @@ html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170
 <div id="toast" class="toast hidden" onclick="openNotifs()"></div>
 <div id="rxPop" class="hidden"></div>
 <div id="rxWho" class="hidden"></div>
-<div id="dayPop" class="popLayer hidden" onclick="if(event.target===this)closeDayPop()">
+<div id="dayPop" class="popLayer hidden" onclick="popLayerClick(event)">
   <div class="pop" id="popBox">
     <div class="popArrow" id="popArrow"></div>
     <div class="popHead" id="popHead"></div>
@@ -1172,7 +1175,7 @@ function renderMonth(){
     const n=ks.reduce((a,k)=>a+plans[k].length,0);
     const cols=[...new Set(ks.flatMap(k=>plans[k].map(planColor)))].slice(0,6);
     return `<div class="wkBox"><button class="wkHead ${open?'open':''}" onclick="toggleWeek('${w}')"><span class="wkT">${fmtDM(ws)} – ${fmtDM(we)}${w===keyOf(mondayOf(new Date()))?'<em>This week</em>':''}</span><span class="dotsRow">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="wkN">${n}</span><span class="wkArrow">${open?'▴':'▾'}</span></button>`
-      +(open?ks.map(k=>`<div class="evCard"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">📍 ${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
+      +(open?ks.map(k=>`<div class="evCard" data-k="${k}"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">📍 ${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
       +`</div>`;
   }).join('');
 }
@@ -1181,9 +1184,26 @@ let weekOpenState={};   // which weeks are open in the Month list (this week is 
 const weekOpen=w=>(w in weekOpenState)?weekOpenState[w]:(w===keyOf(mondayOf(new Date())));
 function toggleWeek(w){weekOpenState[w]=!weekOpen(w);renderMonth()}
 function selectDate(k){
+  lastDayTap={k,t:Date.now()};
   monthSel=k;renderMonth();
   showDayPop(k,document.querySelector('#calendar .d[data-k="'+k+'"]'));
 }
+let lastDayTap={k:null,t:0};
+function openDayInList(k){
+  closeDayPop(true);monthSel=k;
+  weekOpenState[keyOf(mondayOf(parseKey(k)))]=true;
+  renderMonth();
+  const el=document.querySelector('#monthEvents .evCard[data-k="'+k+'"]');
+  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.animate([{boxShadow:'0 0 0 4px rgba(59,91,255,.55)'},{boxShadow:'0 0 0 0 rgba(59,91,255,0)'}],{duration:1400})}
+}
+// the popup layer covers the page, so a 2nd tap on the same date lands on it: catch it there
+function popLayerClick(e){
+  if(e.target!==$('dayPop'))return;
+  const cell=document.elementsFromPoint(e.clientX,e.clientY).find(n=>n.classList&&n.classList.contains('d')&&n.dataset.k);
+  if(cell&&cell.dataset.k===lastDayTap.k&&Date.now()-lastDayTap.t<450){openDayInList(cell.dataset.k);return}
+  closeDayPop();
+}
+document.addEventListener('dblclick',e=>{const c=e.target.closest&&e.target.closest('#calendar .d[data-k]');if(c)openDayInList(c.dataset.k)});
 function focusDate(k){window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>{try{selectDate(k)}catch(e){}},250)}
 function goWeek(k){weekStart=mondayOf(parseKey(k));nav('planner')}
 
@@ -1369,7 +1389,7 @@ function renderRemind(force){
   h+=RM_DAILY.map((it,i)=>{const on=RM.daily.c[i];return `<div class="gItem ${it.link?'hl':''} ${on?'on':''}"><button class="gBox" ${on?'data-on="1"':''} onclick="rmDaily(${i})">${on?'✓':''}</button><div><span class="t" ${it.b?'style="font-weight:800"':''}>${it.pre||''}${esc(it.t)}${it.post||''}</span>${it.link?'<a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481" target="_blank" rel="noopener">HoyoLab Check-in Link 🔗</a>':''}</div></div>`}).join('');
   h+='</div>';
   h+=`<div class="gCard"><div class="gH">📅 Weekly Objectives</div>`;
-  h+=`<div class="gRow"><span>📜</span><span class="gName">The Ministry of Affairs</span>${gSel(RM_REGIONS,S.region,'Region',"rmSel('region',this.value)",'sm')}${gPill('min','Before Sunday',sun)}</div>`+gSub('min','⚔️ Enemy fights',0,3)+gSub('min','📋 Requests',3,6);
+  h+=`<div class="gRow"><span>📜</span><span class="gName">The Ministry of Affairs</span>${gSel(RM_REGIONS,S.region,'Region',"rmSel('region',this.value)",'sm')}${gSubI('min','⚔️ Enemy fights',0,3)}${gSubI('min','📋 Requests',3,6)}${gPill('min','Before Sunday',sun).replace('class="gPill','class="gPill push')}</div>`;
   h+=gRow('boss','⚔️','Weekly Boss','',gPill('boss','Before Sunday',sun));
   h+=`<div class="gPanel">${S.rows.map((r,i)=>`<div class="two ${i>=3?'x':''}"><input class="gIn" placeholder="— Choose Character —" value="${esc(r.c)}" oninput="rmBoss(${i},'c',this.value)">${gSel(RM_BOSSES,r.b,'— Weekly Boss —',`rmBoss(${i},'b',this.value)`)}${i>=3?`<button class="gX" onclick="rmBossDel(${i})" aria-label="Remove">✕</button>`:''}</div>`).join('')}<button class="gAdd" onclick="rmBossAdd()">+ Add</button></div>`;
   h+=gRow('sty','⚔️','Stygian Onslaught','<span class="gNote">150 Primogems ✨</span>',gPill('sty','Before Sunday',sun));
@@ -1386,6 +1406,7 @@ function renderRemind(force){
   rmNotify();
   try{updateBell()}catch(e){}
 }
+function gSubI(k,label,a,b){const c=RM[k].c.slice(a,b);return `<span class="gInl"><span class="gName">${label}</span><span class="gCnt">${c.filter(Boolean).length}/${c.length}</span><span class="gBoxes">${c.map((v,j)=>`<button class="gBox" ${v?'data-on="1"':''} onclick="rmBox('${k}',${a+j})">${v?'✓':''}</button>`).join('')}</span></span>`}
 function gSub(k,label,a,b){const c=RM[k].c.slice(a,b);return `<div class="gSub"><span class="gName">${label}</span><span class="gCnt">${c.filter(Boolean).length}/${c.length}</span><span class="gBoxes">${c.map((v,j)=>`<button class="gBox" ${v?'data-on="1"':''} onclick="rmBox('${k}',${a+j})">${v?'✓':''}</button>`).join('')}</span></div>`}
 function rmBossAdd(){RM.sel.rows.push({c:'',b:''});RM.boss.c.push(false);rmSave();renderRemind(true)}
 function rmBossDel(i){if(i<3)return;RM.sel.rows.splice(i,1);RM.boss.c.pop();rmSave();renderRemind(true)}
