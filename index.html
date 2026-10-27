@@ -465,6 +465,29 @@ html[data-theme="dark"] .gSel option{color:#e9ecff;background:#1a1f38}
 .cmAdd button{height:42px;padding:0 16px;border:none;border-radius:14px;background:var(--blue);color:#fff;font-weight:800;font-size:14px}
 html[data-theme="dark"] .memBox,html[data-theme="dark"] .memCard{background:#1a1f38;box-shadow:0 4px 16px rgba(0,0,0,.35)}
 html[data-theme="dark"] .memTa,html[data-theme="dark"] .cmItem,html[data-theme="dark"] .cmAdd input{background:#242a49}
+
+.gSub{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 0 6px 30px}
+.gSub .gName{font-size:14px}
+.gPanel .two.x{grid-template-columns:1fr 1fr 34px}
+.gX{width:34px;height:42px;border:none;border-radius:12px;background:transparent;color:var(--gray);font-weight:800;font-size:15px}
+.gAdd,.nAdd{height:40px;border:2px dashed #c4cbe6;border-radius:14px;background:transparent;color:var(--blue);font-weight:800;font-size:14px;width:100%}
+.nAdd{margin-top:12px}
+.nCard{position:relative;margin-top:26px;border:2px solid var(--nc,#9e9e9e);background:linear-gradient(var(--nbg),var(--nbg)),#fff;border-radius:26px;padding:18px 14px 14px;color:var(--ink)}
+.nPin{position:absolute;top:-11px;left:50%;margin-left:-11px;width:22px;height:22px;border-radius:50%;background:var(--nc,#9e9e9e);box-shadow:0 3px 6px rgba(0,0,0,.35),inset 0 -3px 5px rgba(0,0,0,.2)}
+.nCol{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--gray);font-weight:600}
+.nCol button{width:26px;height:26px;border-radius:50%;border:2px solid transparent;padding:0}
+.nCol button.on{border-color:var(--ink)}
+.nCust{position:relative;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+.nCust input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.nTitle{display:block;width:100%;text-align:center;background:transparent;border:none;border-bottom:1px solid var(--nc,#9e9e9e);color:var(--ink);font-size:16px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:12px 0;margin:8px 0 10px;outline:none}
+.nRow{display:flex;gap:8px;align-items:center;margin-top:8px}
+.nRow input.nt{flex:1;min-width:0;height:40px;border:none;border-radius:10px;background:rgba(255,255,255,.7);color:var(--ink);font-size:15px;padding:0 10px;outline:none}
+.nRow.on input.nt{text-decoration:line-through;opacity:.55}
+.nE{width:42px;height:40px;border-radius:10px;border:1px solid rgba(0,0,0,.12);background:transparent;font-size:18px;flex:none}
+.nX{width:30px;height:40px;border:none;background:transparent;color:var(--gray);font-weight:800;flex:none}
+html[data-theme="dark"] .nCard{background:linear-gradient(var(--nbg),var(--nbg)),#1a1f38}
+html[data-theme="dark"] .nRow input.nt{background:rgba(0,0,0,.28)}
+html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170}
 </style>
 </head>
 <body>
@@ -538,7 +561,6 @@ html[data-theme="dark"] .memTa,html[data-theme="dark"] .cmItem,html[data-theme="
     <h2 class="sec">Reminders</h2>
     <div class="secSub">Daily, weekly and monthly things to do</div>
     <div id="rmChecklists"></div>
-    <p class="gNote" style="text-align:center;margin-top:14px">Reminder v3 · wit kaarte</p>
     <div class="nBtns"><button class="p" onclick="allowAlerts()">Turn on notifications</button></div>
   </div>
 
@@ -1094,7 +1116,7 @@ function changeMonth(n){
 }
 function planItem(k,p){
   const u=userOf(p.owner),j=p.joined||[];
-  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine">${bubble(p)}${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}${reactBar(p)}</div>`;
+  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine"><div style="flex:1;min-width:0;cursor:pointer" onclick="focusDate('${k}')">${bubble(p)}</div>${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}${reactBar(p)}</div>`;
 }
 function popRow(p){
   const u=userOf(p.owner),j=p.joined||[];
@@ -1150,7 +1172,7 @@ function renderMonth(){
     const n=ks.reduce((a,k)=>a+plans[k].length,0);
     const cols=[...new Set(ks.flatMap(k=>plans[k].map(planColor)))].slice(0,6);
     return `<div class="wkBox"><button class="wkHead ${open?'open':''}" onclick="toggleWeek('${w}')"><span class="wkT">${fmtDM(ws)} – ${fmtDM(we)}${w===keyOf(mondayOf(new Date()))?'<em>This week</em>':''}</span><span class="dotsRow">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="wkN">${n}</span><span class="wkArrow">${open?'▴':'▾'}</span></button>`
-      +(open?ks.map(k=>`<div class="evCard"><div class="evDate">${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
+      +(open?ks.map(k=>`<div class="evCard"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">📍 ${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
       +`</div>`;
   }).join('');
 }
@@ -1162,6 +1184,7 @@ function selectDate(k){
   monthSel=k;renderMonth();
   showDayPop(k,document.querySelector('#calendar .d[data-k="'+k+'"]'));
 }
+function focusDate(k){window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>{try{selectDate(k)}catch(e){}},250)}
 function goWeek(k){weekStart=mondayOf(parseKey(k));nav('planner')}
 
 /* ---------- profile (localStorage pb_profile) ---------- */
@@ -1310,15 +1333,21 @@ function rmLoad(){
   const now=new Date(),d=keyOf(now),w=keyOf(mondayOf(now)),mo=d.slice(0,7),half=mo+(now.getDate()>=16?'-16':'-01');
   const s=store.get(rmKey(),null)||{};
   s.sel=s.sel||{};s.sel.rows=s.sel.rows||[{c:'',b:''},{c:'',b:''},{c:'',b:''}];
-  s.notes=s.notes||{title:'',color:'#9e9e9e',items:Array.from({length:10},()=>({t:'',ck:false}))};
+  s.sel.rows.forEach(r=>{if(r.b==='Wolf of the North')r.b='Andrius'});
+  s.notes=s.notes||{title:'Goal',color:'#4caf50',items:Array.from({length:3},()=>({t:'',ck:false}))};
+  if(s.notes.items.length>=10&&s.notes.items.every(x=>!x.t&&!x.ck))s.notes.items=s.notes.items.slice(0,3);
+  if(s.min&&s.min.c.length!==6)delete s.min;
+  if(s.thr&&s.thr.c.length!==5)delete s.thr;
   const reset=(k,per,n)=>{if(!s[k]||s[k].p!==per)s[k]={p:per,c:Array(n).fill(false)}};
-  reset('daily',d,6);['min','boss','sty'].forEach(k=>reset(k,w,3));reset('thr',mo,3);reset('aby',half,4);
+  reset('daily',d,6);reset('min',w,6);reset('boss',w,Math.max(3,s.sel.rows.length));reset('sty',w,3);reset('thr',mo,5);reset('aby',half,4);
+  while(s.boss.c.length<Math.max(3,s.sel.rows.length))s.boss.c.push(false);
   RM=s;store.set(rmKey(),s);
 }
 const rmSave=()=>store.set(rmKey(),RM);
 const RM_DAILY=[{t:'HoyoLab DAILY CHECK-IN',pre:'🔗 ',link:1},{t:'Battle Pass'},{t:'200 Original Resin',post:' 🌙'},{t:'To Temper Thyself and Journey Far',post:' 🧭',b:1},{t:'Daily Commissions',post:' 🤝'},{t:'Expedition Guide'}];
-const RM_REGIONS=['Mondstadt','Liyue','Inazuma','Sumeru','Fontaine','Natlan'];
-const RM_BOSSES=['Stormterror','Wolf of the North','Childe','Azhdaha','La Signora','Shouki no Kami','Everlasting Lord of Arcane Wisdom','Lord of Eroded Primal Fire','Other'];
+const RM_REGIONS=['Mondstadt','Liyue','Inazuma','Sumeru','Fontaine','Natlan','Snezhnaya'];
+const RM_BOSSES=['Stormterror','Andrius','Childe','Azhdaha','La Signora','Shouki no Kami','Magatsu Mitake Narukami no Mikoto (Raiden Shogun)','Everlasting Lord of Arcane Wisdom','Lord of Eroded Primal Fire',"Guardian of Apep's Oasis",'All-Devouring Narwhal','The Knave (Arlecchino)','Ascended King','Sublimated Queen','Heretic of the False Moon','Exalted Master of the Heretical Path'];
+const RM_NCOLS=['#9e9e9e','#4caf50','#c97b93','#5b9bd5','#d4a017','#9b6bd6','#ef6c3d','#26a69a'];
 const RM_ELEM=['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo'];
 const RM_FLOORS=['Floor 9','Floor 10','Floor 11','Floor 12'];
 const RM_COLS=['#9e9e9e','#4caf50','#c97b93','#5b9bd5','#d4a017'];
@@ -1340,19 +1369,28 @@ function renderRemind(force){
   h+=RM_DAILY.map((it,i)=>{const on=RM.daily.c[i];return `<div class="gItem ${it.link?'hl':''} ${on?'on':''}"><button class="gBox" ${on?'data-on="1"':''} onclick="rmDaily(${i})">${on?'✓':''}</button><div><span class="t" ${it.b?'style="font-weight:800"':''}>${it.pre||''}${esc(it.t)}${it.post||''}</span>${it.link?'<a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481" target="_blank" rel="noopener">HoyoLab Check-in Link 🔗</a>':''}</div></div>`}).join('');
   h+='</div>';
   h+=`<div class="gCard"><div class="gH">📅 Weekly Objectives</div>`;
-  h+=gRow('min','📜','The Ministry of Affairs',gSel(RM_REGIONS,S.region,'Region',"rmSel('region',this.value)",'sm'),gPill('min','Before Sunday',sun));
+  h+=`<div class="gRow"><span>📜</span><span class="gName">The Ministry of Affairs</span>${gSel(RM_REGIONS,S.region,'Region',"rmSel('region',this.value)",'sm')}${gPill('min','Before Sunday',sun)}</div>`+gSub('min','⚔️ Enemy fights',0,3)+gSub('min','📋 Requests',3,6);
   h+=gRow('boss','⚔️','Weekly Boss','',gPill('boss','Before Sunday',sun));
-  h+=`<div class="gPanel">${[0,1,2].map(i=>`<div class="two"><input class="gIn" placeholder="— Choose Character —" value="${esc(S.rows[i].c)}" oninput="rmBoss(${i},'c',this.value)">${gSel(RM_BOSSES,S.rows[i].b,'— Weekly Boss —',`rmBoss(${i},'b',this.value)`)}</div>`).join('')}</div>`;
+  h+=`<div class="gPanel">${S.rows.map((r,i)=>`<div class="two ${i>=3?'x':''}"><input class="gIn" placeholder="— Choose Character —" value="${esc(r.c)}" oninput="rmBoss(${i},'c',this.value)">${gSel(RM_BOSSES,r.b,'— Weekly Boss —',`rmBoss(${i},'b',this.value)`)}${i>=3?`<button class="gX" onclick="rmBossDel(${i})" aria-label="Remove">✕</button>`:''}</div>`).join('')}<button class="gAdd" onclick="rmBossAdd()">+ Add</button></div>`;
   h+=gRow('sty','⚔️','Stygian Onslaught','<span class="gNote">150 Primogems ✨</span>',gPill('sty','Before Sunday',sun));
   h+=gRow('thr','🎭','Imaginarium Theater','<span class="gNote">Earn a lot of Primogems ✨</span>',gPill('thr','Starts 1st',first));
   h+=`<div class="gPanel lab"><span class="gLbl">Element</span>${gSel(RM_ELEM,S.el,'— Required Element —',"rmSel('el',this.value)")}</div>`;
   h+=gRow('aby','🌀','Spiral Abyss','<span class="gNote">800 Primogems ✨</span>',gPill('aby','Starts 16th',sx));
   h+=`<div class="gPanel lab"><span class="gLbl">Floor</span>${gSel(RM_FLOORS,S.fl,'— Target Floor —',"rmSel('fl',this.value)")}</div></div>`;
+  const N=RM.notes;
+  h+=`<div class="rmH">📌 Plans — To-do Notes</div><div class="nCard" style="--nc:${N.color};--nbg:${hexA(N.color,.16)}"><i class="nPin"></i><div class="nCol"><span>Kleur:</span>${RM_NCOLS.map(c=>`<button class="${c===N.color?'on':''}" style="background:${c}" onclick="rmNoteColor('${c}')" aria-label="Colour"></button>`).join('')}<label class="nCust" title="Any colour">🎨<input type="color" value="${N.color}" onchange="rmNoteColor(this.value)"></label></div><input class="nTitle" placeholder="Goal" value="${esc(N.title)}" oninput="RM.notes.title=this.value;rmSave()">`
+    +N.items.map((it,i)=>`<div class="nRow ${it.ck?'on':''}"><button class="gBox" ${it.ck?'data-on="1"':''} onclick="rmNoteCk(${i})">${it.ck?'✓':''}</button><input class="nt" id="in-note${i}" placeholder="To-do…" value="${esc(it.t)}" oninput="rmNoteTxt(${i},this.value)"><button class="nE" onclick="openEmojiPicker('note${i}')" aria-label="Emoji">😊</button><button class="nX" onclick="rmNoteDel(${i})" aria-label="Remove">✕</button></div>`).join('')
+    +`<button class="nAdd" onclick="rmNoteAdd()">+ Add</button></div>`;
   $('rmChecklists').innerHTML=h;
   const dot=$('rmDot');if(dot)dot.classList.toggle('hidden',!rmAlerts());
   rmNotify();
   try{updateBell()}catch(e){}
 }
+function gSub(k,label,a,b){const c=RM[k].c.slice(a,b);return `<div class="gSub"><span class="gName">${label}</span><span class="gCnt">${c.filter(Boolean).length}/${c.length}</span><span class="gBoxes">${c.map((v,j)=>`<button class="gBox" ${v?'data-on="1"':''} onclick="rmBox('${k}',${a+j})">${v?'✓':''}</button>`).join('')}</span></div>`}
+function rmBossAdd(){RM.sel.rows.push({c:'',b:''});RM.boss.c.push(false);rmSave();renderRemind(true)}
+function rmBossDel(i){if(i<3)return;RM.sel.rows.splice(i,1);RM.boss.c.pop();rmSave();renderRemind(true)}
+function rmNoteAdd(){RM.notes.items.push({t:'',ck:false});rmSave();renderRemind(true);setTimeout(()=>{const e=$('in-note'+(RM.notes.items.length-1));if(e)e.focus()},50)}
+function rmNoteDel(i){if(RM.notes.items.length>1)RM.notes.items.splice(i,1);else RM.notes.items[0]={t:'',ck:false};rmSave();renderRemind(true)}
 function rmBox(k,i){RM[k].c[i]=!RM[k].c[i];rmSave();renderRemind(true)}
 function rmDaily(i){RM.daily.c[i]=!RM.daily.c[i];rmSave();renderRemind(true)}
 function rmDailyAll(){const all=RM.daily.c.every(Boolean);RM.daily.c=RM.daily.c.map(()=>!all);rmSave();renderRemind(true)}
