@@ -634,7 +634,7 @@ html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170
 <div id="toast" class="toast hidden" onclick="openNotifs()"></div>
 <div id="rxPop" class="hidden"></div>
 <div id="rxWho" class="hidden"></div>
-<div id="dayPop" class="popLayer hidden" onclick="popLayerClick(event)">
+<div id="dayPop" class="popLayer hidden" onclick="if(event.target===this)closeDayPop()">
   <div class="pop" id="popBox">
     <div class="popArrow" id="popArrow"></div>
     <div class="popHead" id="popHead"></div>
@@ -989,10 +989,10 @@ function renderPlanner(){
     if(!list.length)html+=`<div class="none">No plans yet</div>`;
     list.forEach(p=>{
       if(mode==='my'&&isMine(p)){
-        html+=`<div class="plan"><div class="planLine">${bubble(p)}<button class="editBtn" onclick="openEdit('${key}','${p.id}')" aria-label="Edit">${PENCIL}</button></div>${joinedLine(p)}${reactBar(p)}</div>`;
+        html+=`<div class="plan" data-pid="${p.id}"><div class="planLine">${bubble(p)}<button class="editBtn" onclick="openEdit('${key}','${p.id}')" aria-label="Edit">${PENCIL}</button></div>${joinedLine(p)}${reactBar(p)}</div>`;
       }else{
         const u=userOf(p.owner),joined=iJoined(p);
-        html+=`<div class="plan"><div class="planTop">${avatar(u,24)}${esc(u.name)}${isMine(p)?' (you)':''}</div><div class="planLine">${bubble(p)}<button class="joinBtn ${joined?'joined':''}" onclick="joinPlan('${key}','${p.id}')">${joined?'✓ Joined':'Join'}</button></div>${joinedLine(p)}${reactBar(p)}</div>`;
+        html+=`<div class="plan" data-pid="${p.id}"><div class="planTop">${avatar(u,24)}${esc(u.name)}${isMine(p)?' (you)':''}</div><div class="planLine">${bubble(p)}<button class="joinBtn ${joined?'joined':''}" onclick="joinPlan('${key}','${p.id}')">${joined?'✓ Joined':'Join'}</button></div>${joinedLine(p)}${reactBar(p)}</div>`;
       }
     });
     if(mode==='my'){
@@ -1119,11 +1119,11 @@ function changeMonth(n){
 }
 function planItem(k,p){
   const u=userOf(p.owner),j=p.joined||[];
-  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine"><div style="flex:1;min-width:0;cursor:pointer" onclick="focusDate('${k}')">${bubble(p)}</div>${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}${reactBar(p)}</div>`;
+  return `<div class="evItem"><div class="evWho">${avatar(u,46)}<div class="col"><small>${esc(u.name)}${isMine(p)?' (you)':''}</small><div class="planLine"><div style="flex:1;min-width:0;cursor:pointer" data-goplan="${k}|${p.id}" onclick="focusDate('${k}')">${bubble(p)}</div>${isMine(p)?`<button class="editBtn" onclick="openEdit('${k}','${p.id}')" aria-label="Edit">${PENCIL}</button>`:''}<button class="joinBtn ${iJoined(p)?'joined':''}" onclick="joinPlan('${k}','${p.id}')">${iJoined(p)?'✓ Joined':'Join'}</button></div></div></div>${j.length?`<div class="pmeta has">${j.length} joined • ${esc(j.join(', '))}</div>`:`<div class="pmeta">No one joined yet</div>`}${reactBar(p)}</div>`;
 }
 function popRow(p){
   const u=userOf(p.owner),j=p.joined||[];
-  return `<div class="popRow">${avatar(u,34)}<div style="min-width:0"><div class="t">${p.emoji?esc(p.emoji)+' ':''}${esc(p.text)}</div><small><span class="cdot" style="background:${planColor(p)}"></span>${esc(u.name)}${isMine(p)?' (you)':''}${j.length?' • '+j.length+' joined: '+esc(j.join(', ')):''}</small></div></div>`;
+  return `<div class="popRow" data-goplan="${popKey}|${p.id}" title="Double-click: show in Planner" style="cursor:pointer">${avatar(u,34)}<div style="min-width:0"><div class="t">${p.emoji?esc(p.emoji)+' ':''}${esc(p.text)}</div><small><span class="cdot" style="background:${planColor(p)}"></span>${esc(u.name)}${isMine(p)?' (you)':''}${j.length?' • '+j.length+' joined: '+esc(j.join(', ')):''}</small></div></div>`;
 }
 function fillDayPop(){
   const list=plans[popKey]||[];   // everyone's plans + mine, no limit
@@ -1175,7 +1175,7 @@ function renderMonth(){
     const n=ks.reduce((a,k)=>a+plans[k].length,0);
     const cols=[...new Set(ks.flatMap(k=>plans[k].map(planColor)))].slice(0,6);
     return `<div class="wkBox"><button class="wkHead ${open?'open':''}" onclick="toggleWeek('${w}')"><span class="wkT">${fmtDM(ws)} – ${fmtDM(we)}${w===keyOf(mondayOf(new Date()))?'<em>This week</em>':''}</span><span class="dotsRow">${cols.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="wkN">${n}</span><span class="wkArrow">${open?'▴':'▾'}</span></button>`
-      +(open?ks.map(k=>`<div class="evCard" data-k="${k}"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">📍 ${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
+      +(open?ks.map(k=>`<div class="evCard"><div class="evDate" style="cursor:pointer" onclick="focusDate('${k}')">📍 ${dayLabel(k)}<span class="dotsRow">${plans[k].map(p=>`<i style="background:${planColor(p)}"></i>`).join('')}</span></div>`+plans[k].map(p=>planItem(k,p)).join('')+`</div>`).join(''):'')
       +`</div>`;
   }).join('');
 }
@@ -1184,27 +1184,29 @@ let weekOpenState={};   // which weeks are open in the Month list (this week is 
 const weekOpen=w=>(w in weekOpenState)?weekOpenState[w]:(w===keyOf(mondayOf(new Date())));
 function toggleWeek(w){weekOpenState[w]=!weekOpen(w);renderMonth()}
 function selectDate(k){
-  lastDayTap={k,t:Date.now()};
   monthSel=k;renderMonth();
   showDayPop(k,document.querySelector('#calendar .d[data-k="'+k+'"]'));
 }
-let lastDayTap={k:null,t:0};
-function openDayInList(k){
-  closeDayPop(true);monthSel=k;
-  weekOpenState[keyOf(mondayOf(parseKey(k)))]=true;
-  renderMonth();
-  const el=document.querySelector('#monthEvents .evCard[data-k="'+k+'"]');
-  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.animate([{boxShadow:'0 0 0 4px rgba(59,91,255,.55)'},{boxShadow:'0 0 0 0 rgba(59,91,255,0)'}],{duration:1400})}
+function focusDate(k){window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>{if($('tab-month').classList.contains('hidden'))return;try{selectDate(k)}catch(e){}},250)}
+function goPlan(k,id){
+  closeDayPop(true);monthSel=null;
+  weekStart=mondayOf(parseKey(k));
+  mode='group';friendFilter=null;   // same as tapping a notification: Planner → Group Week
+  nav('planner');
+  const tryScroll=(n)=>{
+    const el=id?document.querySelector('#daysContainer .plan[data-pid="'+id+'"]'):null;
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.animate([{boxShadow:'0 0 0 5px rgba(59,91,255,.6)'},{boxShadow:'0 0 0 0 rgba(59,91,255,0)'}],{duration:1800});return}
+    if(n>0)setTimeout(()=>tryScroll(n-1),120);
+  };
+  setTimeout(()=>tryScroll(8),80);
 }
-// the popup layer covers the page, so a 2nd tap on the same date lands on it: catch it there
-function popLayerClick(e){
-  if(e.target!==$('dayPop'))return;
-  const cell=document.elementsFromPoint(e.clientX,e.clientY).find(n=>n.classList&&n.classList.contains('d')&&n.dataset.k);
-  if(cell&&cell.dataset.k===lastDayTap.k&&Date.now()-lastDayTap.t<450){openDayInList(cell.dataset.k);return}
-  closeDayPop();
-}
-document.addEventListener('dblclick',e=>{const c=e.target.closest&&e.target.closest('#calendar .d[data-k]');if(c)openDayInList(c.dataset.k)});
-function focusDate(k){window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>{try{selectDate(k)}catch(e){}},250)}
+// double-click any plan in the Month popup or Month list -> its spot in the Weekly Planner
+document.addEventListener('dblclick',e=>{
+  const tg=e.target.closest&&e.target.closest('[data-goplan]');
+  if(tg){const [k,id]=tg.dataset.goplan.split('|');goPlan(k,id);return}
+  // double-click anywhere in the date's popup list (even between rows)
+  if(e.target.closest&&e.target.closest('#popBox')&&popKey&&!e.target.closest('#popGo'))goPlan(popKey,null);
+});
 function goWeek(k){weekStart=mondayOf(parseKey(k));nav('planner')}
 
 /* ---------- profile (localStorage pb_profile) ---------- */
