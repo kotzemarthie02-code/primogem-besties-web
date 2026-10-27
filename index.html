@@ -448,6 +448,16 @@ html[data-theme="dark"] .gSel option{color:#e9ecff;background:#1a1f38}
 /* ===== good memories ===== */
 .memBox{background:#fff;border-radius:24px;padding:14px;margin-top:14px;box-shadow:0 4px 16px rgba(30,40,90,.08)}
 .memTa{width:100%;min-height:84px;border:none;border-radius:16px;background:#f3f4fb;color:var(--ink);font-size:15px;padding:12px;outline:none;resize:vertical;font-family:inherit}
+.memPrev{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.memPrev:empty{display:none}
+.memPrev .pv{position:relative;width:76px;height:76px;border-radius:14px;overflow:hidden;background:#f3f4fb}
+.memPrev .pv img,.memPrev .pv video{width:100%;height:100%;object-fit:cover}
+.memPrev .pv button{position:absolute;top:3px;right:3px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(10,14,35,.7);color:#fff;font-size:12px;font-weight:800;line-height:1}
+.memMedia{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px}
+.memMedia img,.memMedia video{width:100%;max-height:340px;object-fit:cover;border-radius:16px;background:#000;display:block;cursor:zoom-in}
+.memMedia video{cursor:auto;object-fit:contain}
+.mediaView{position:fixed;inset:0;z-index:120;background:rgba(5,8,22,.92);display:flex;align-items:center;justify-content:center;padding:16px}
+.mediaView img{max-width:100%;max-height:100%;border-radius:12px}
 .memBar{display:flex;gap:10px;align-items:center;margin-top:10px}
 .memBar .share{flex:1;height:46px;border:none;border-radius:16px;background:var(--blue);color:#fff;font-weight:800;font-size:15px}
 .memBar .emoBtn{width:46px;height:46px}
@@ -553,17 +563,14 @@ html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170
     <div class="secSub">New plans, edits, joins and reactions from the group</div>
     <div class="nList" id="nList"></div>
     <div class="nBtns">
-      <button class="p" id="nAllow" onclick="allowAlerts()">Turn on notifications</button>
       <button onclick="markAllRead()">Mark all read</button>
     </div>
-    <p style="margin-top:10px;font-size:12px;color:var(--gray);font-weight:600" id="nNote"></p>
   </div>
 
   <div id="tab-remind" class="hidden">
     <h2 class="sec">Reminders</h2>
     <div class="secSub">Daily, weekly and monthly things to do</div>
     <div id="rmChecklists"></div>
-    <div class="nBtns"><button class="p" onclick="allowAlerts()">Turn on notifications</button></div>
   </div>
 
   <div id="tab-memories" class="hidden">
@@ -571,7 +578,8 @@ html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170
     <div class="secSub">Share happy moments with the group — everyone can see, react and comment</div>
     <div class="memBox">
       <textarea id="in-memo" class="memTa" maxlength="500" placeholder="Today I got a 5★ on my wish pull! 🎉"></textarea>
-      <div class="memBar"><button class="emoBtn" onclick="openEmojiPicker('memo')" aria-label="Pick emoji">😊</button><button class="share" onclick="addMemory()">Share memory</button></div>
+      <div id="memPrev" class="memPrev"></div>
+      <div class="memBar"><button class="emoBtn" onclick="openEmojiPicker('memo')" aria-label="Pick emoji">😊</button><button class="emoBtn" onclick="$('memFile').click()" aria-label="Add photo or video">📷</button><input id="memFile" type="file" accept="image/*,video/*" multiple hidden onchange="memPick(this)"><button class="share" onclick="addMemory()">Share memory</button></div>
     </div>
     <div id="memList"></div>
   </div>
@@ -1356,10 +1364,18 @@ const RM_COLS=['#9e9e9e','#4caf50','#c97b93','#5b9bd5','#d4a017'];
 function gSel(opts,val,ph,fn,cls){return `<select class="gSel ${cls||''}" onchange="${fn}">${'<option value="">'+ph+'</option>'+opts.map(o=>`<option${o===val?' selected':''}>${esc(o)}</option>`).join('')}</select>`}
 function gPill(k,txt,red){return RM[k].c.every(Boolean)?'<span class="gPill done">✓ Done</span>':`<span class="gPill ${red?'red':''}">⚠ ${txt}</span>`}
 function gRow(k,ic,name,extra,pill){const c=RM[k].c;return `<div class="gRow"><span>${ic}</span><span class="gName">${name}</span><span class="gCnt">${c.filter(Boolean).length}/${c.length}</span><span class="gBoxes">${c.map((v,i)=>`<button class="gBox" ${v?'data-on="1"':''} onclick="rmBox('${k}',${i})">${v?'✓':''}</button>`).join('')}</span>${extra||''}${pill}</div>`}
-function rmAlerts(){
-  if(!RM)return false;const n=new Date(),dd=n.getDate(),open=k=>!RM[k].c.every(Boolean);
-  return (n.getDay()===0&&(open('min')||open('boss')||open('sty')))||(dd===1&&open('thr'))||(dd===16&&open('aby'));
+// how many reminder ticks are still open right now:
+// Daily Routine = every day · Before Sunday items = every Sunday · Theater = the 1st · Spiral Abyss = the 16th
+function rmCount(){
+  if(!RM)return 0;const n=new Date(),dd=n.getDate(),left=k=>RM[k]?RM[k].c.filter(v=>!v).length:0;
+  let c=left('daily');
+  if(n.getDay()===0)c+=left('min')+left('boss')+left('sty');
+  if(dd===1)c+=left('thr');
+  if(dd===16)c+=left('aby');
+  return c;
 }
+function rmAlerts(){return rmCount()>0}
+function updateRmDot(){const d=$('rmDot');if(!d)return;const c=rmCount();d.textContent=c>99?'99+':(c||'!');d.classList.toggle('hidden',!c)}
 function renderRemind(force){
   if(!profile)return;
   const a=document.activeElement;
@@ -1384,7 +1400,7 @@ function renderRemind(force){
     +N.items.map((it,i)=>`<div class="nRow ${it.ck?'on':''}"><button class="gBox" ${it.ck?'data-on="1"':''} onclick="rmNoteCk(${i})">${it.ck?'✓':''}</button><input class="nt" id="in-note${i}" placeholder="To-do…" value="${esc(it.t)}" oninput="rmNoteTxt(${i},this.value)"><button class="nE" onclick="openEmojiPicker('note${i}')" aria-label="Emoji">😊</button><button class="nX" onclick="rmNoteDel(${i})" aria-label="Remove">✕</button></div>`).join('')
     +`<button class="nAdd" onclick="rmNoteAdd()">+ Add</button></div>`;
   $('rmChecklists').innerHTML=h;
-  const dot=$('rmDot');if(dot)dot.classList.toggle('hidden',!rmAlerts());
+  updateRmDot();
   rmNotify();
   try{updateBell()}catch(e){}
 }
@@ -1443,7 +1459,48 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&pro
 
 
 /* ================= GOOD MEMORIES ================= */
-var memEditId=null;
+var memEditId=null,memMedia=[];
+const MEM_MAX_CHARS=850000;          // Firestore: 1 MB per memory — photos/videos must fit inside it together
+const memChars=()=>memMedia.reduce((n,m)=>n+m.d.length,0);
+function memReadFile(f){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=()=>no(r.error);r.readAsDataURL(f)})}
+function memShrink(f,room){return memReadFile(f).then(url=>new Promise((ok,no)=>{
+  const im=new Image();im.onerror=()=>no(new Error('image'));
+  im.onload=()=>{
+    let max=1000,q=.74,out='';
+    for(let t=0;t<8;t++){
+      const sc=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+      const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      out=c.toDataURL('image/jpeg',q);if(out.length<=room)break;max=Math.round(max*.8);q=Math.max(.5,q-.06);
+    }
+    ok(out);
+  };im.src=url}))}
+async function memPick(inp){
+  const files=[...(inp.files||[])];inp.value='';
+  for(const f of files){
+    if(memMedia.length>=4){alert('Up to 4 photos/videos per memory');break}
+    const room=MEM_MAX_CHARS-memChars();
+    try{
+      if(/^image\//.test(f.type)){
+        const d=await memShrink(f,room);
+        if(d.length>room){alert('Too much for one memory — share the rest in a second memory');continue}
+        memMedia.push({t:'i',d});
+      }else if(/^video\//.test(f.type)){
+        if(f.size*1.37>room){alert('This video is too big for a shared memory (about '+Math.max(0,Math.floor(room/1.37/1024))+' KB left). Photos are shrunk automatically, but videos can only be very short clips.');continue}
+        memMedia.push({t:'v',d:await memReadFile(f)});
+      }
+    }catch(e){alert('Could not read '+(f.name||'file'))}
+  }
+  memPreview();
+}
+function memPreview(){
+  const el=$('memPrev');if(!el)return;
+  el.innerHTML=memMedia.map((m,i)=>`<div class="pv">${m.t==='v'?`<video src="${m.d}" muted playsinline></video>`:`<img src="${m.d}" alt="">`}<button onclick="memMedia.splice(${i},1);memPreview()" aria-label="Remove">✕</button></div>`).join('');
+}
+function openMedia(src){
+  const o=document.createElement('div');o.className='mediaView';o.onclick=()=>o.remove();
+  o.innerHTML='<img alt="">';o.firstChild.src=src;document.body.appendChild(o);
+}
 const cmKey=()=>'cm_'+rxKey(me()).slice(3);
 function memTime(ts){
   if(!ts)return '';const d=new Date(ts),k=keyOf(d),t=keyOf(new Date()),y=keyOf(addDays(new Date(),-1));
@@ -1461,13 +1518,14 @@ function renderMemories(force){
   const L=allPlans.filter(p=>p.kind==='memory').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   el.innerHTML=L.length?L.map(p=>{
     const u=userOf(p.owner),mine=isMine(p),pid=esc(p.id);
-    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div><div class="memText">${esc(p.text)}</div>${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>`<div class="cmItem"><b>${esc(c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`).join('')}</div><div class="cmAdd"><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
+    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>`<div class="cmItem"><b>${esc(c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`).join('')}</div><div class="cmAdd"><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
   }).join(''):'<div class="empty">No memories yet — share your first one! 💎</div>';
   Object.keys(keep).forEach(id=>{const e=$(id);if(e)e.value=keep[id]});
 }
 function addMemory(){
-  if(!syncReady())return;const el=$('in-memo'),t=el.value.trim();if(!t)return;el.value='';
-  DB.addPlan({id:uid(),kind:'memory',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date()),joined:[],joinedIds:[],createdAt:Date.now()});
+  if(!syncReady())return;const el=$('in-memo'),t=el.value.trim();if(!t&&!memMedia.length)return;el.value='';
+  const media=memMedia;memMedia=[];memPreview();
+  DB.addPlan(Object.assign({id:uid(),kind:'memory',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date()),joined:[],joinedIds:[],createdAt:Date.now()},media.length?{media}:{}));
   renderMemories(true);
 }
 function addComment(pid){
@@ -1487,8 +1545,8 @@ function openMemEdit(pid){
 }
 function closeMemEdit(){memEditId=null;$('memEditOverlay').classList.add('hidden')}
 function saveMemEdit(){
-  if(!memEditId||!syncReady())return;const t=$('in-memoedit').value.trim();if(!t)return;
-  const p=allPlans.find(x=>x.id===memEditId);
+  if(!memEditId||!syncReady())return;const t=$('in-memoedit').value.trim();
+  const p=allPlans.find(x=>x.id===memEditId);if(!t&&!(p&&p.media&&p.media.length))return;
   if(p&&p.text!==t){p.text=t;p.updatedAt=Date.now();DB.updatePlan(memEditId,{text:t,updatedAt:p.updatedAt})}
   closeMemEdit();renderMemories(true);
 }
@@ -1533,10 +1591,11 @@ function ensurePush(force){
   }catch(e){}
 }
 function updateBell(){
+  try{updateRmDot()}catch(e){}
   const n=unreadCount(),b=$('bellBadge');
   if(b){b.textContent=n>99?'99+':n;b.classList.toggle('hidden',!n)}
   document.title=(n?'('+n+') ':'')+'Primogem Besties';
-  setIconBadge(n+((typeof rmAlerts==='function'&&rmAlerts())?1:0));   // rooi nommer op die app-ikoon (as die toestel dit ondersteun)
+  setIconBadge(n+((typeof rmCount==='function')?rmCount():0));   // rooi nommer op die app-ikoon (as die toestel dit ondersteun)
 }
 var hl;   // kennisgewings wat nuut was toe jy die Updates-blad oopgemaak het (bly uitgelig terwyl jy kyk)
 function hlSet(){return hl||(hl=new Set())}
@@ -1644,9 +1703,6 @@ function renderNotifs(){
     const g=groups[k],fresh=g.some(x=>hlSet().has(x[0].id)),open=(k in nOpen)?nOpen[k]:(k===todayK||fresh);
     nShown[k]=open;const label=k===todayK?'Today':k===yK?'Yesterday':dayLabel(k);
     return `<div class="wkBox"><button class="wkHead ${open?'open':''}" onclick="toggleNDay('${k}')"><span class="wkT">${label}${fresh?'<em style="color:#e11d2e;background:#ffe3e6">New</em>':''}</span><span class="wkN">${g.length}</span><span class="wkArrow">${open?'▴':'▾'}</span></button>${open?g.map(x=>item(x[0],x[1])).join(''):''}</div>`}).join(''):`<div class="nEmpty">Nothing yet. When someone in the group adds a plan or reacts to yours, you'll see it here. 💎</div>`;
-  const ok='Notification' in window&&Notification.permission==='granted';
-  $('nAllow').classList.toggle('hidden',ok||!('Notification' in window)||Notification.permission==='denied');
-  $('nNote').textContent=ok?'Notifications are ON. The red number on the app icon updates while the app is open or in the background.':(('Notification' in window&&Notification.permission==='denied')?'Notifications are blocked in your browser settings.':(!('Notification' in window)?'iPhone: tap Share → Add to Home Screen, open the app from its icon, then turn notifications on.':''));
 }
 function openNotifs(){nav('alerts')}
 function markAllRead(){(feed||[]).forEach(f=>f.read=true);hl=new Set();saveNotifs();updateBell();renderNotifs()}
