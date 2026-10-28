@@ -857,7 +857,7 @@ function beginSync(m){
   if(syncStarted&&!(m==='fb'&&!useFB))return;
   syncStarted=true;useFB=(m==='fb');
   dbg(useFB?'SYNC = LIVE (Firebase connected)':'SYNC = LOCAL ONLY (not shared!)');
-  if(useFB){allPlans=[];plans={};activity=[];FB.listenPlans(onPlans);console.log('[Primogem] Live sync ON')}
+  if(useFB){allPlans=[];plans={};activity=[];FB.listenPlans(onPlans);try{FB.listenUser(profile.email,onUserData)}catch(e){dbg('userData listen error '+e.message)}console.log('[Primogem] Live sync ON')}
   else{
     console.warn('[Primogem] Local mode (no Firebase) – plans are NOT shared between phones.');
     allPlans=loadLocalPlans();const a=store.get('pb_activity',[]);activity=Array.isArray(a)?a:[];
@@ -884,6 +884,52 @@ function syncReady(){
   alert('Still connecting to the group… try again in a few seconds');return false;
 }
 function pushAct(){}   // Activity tab removed: nothing is written any more
+
+/* ---------- per-person sync: profile, plan colour and reminders follow the e-mail to every device ---------- */
+let userReconciled=false,rmPushT=null;
+function isDefaultProfile(){return !profile||(profile.emoji==='🧪'&&profile.name===profile.email.split('@')[0]&&(profile.color||'#A8E6CF')==='#A8E6CF')}
+function rmTouched(s){try{const j=JSON.stringify(s||{});return j.includes('true')||/"(t|b)":"[^"]/.test(j)||/"c":"[^"]/.test(j)}catch(e){return false}}
+function pushUser(part){
+  if(!useFB||!profile||!window.FB||!FB.saveUser)return;
+  const ts=Date.now(),f={};
+  if(part==='profile'){profile.ts=ts;store.set('pb_profile',profile);f.profile={name:profile.name,emoji:profile.emoji,color:profile.color,ts}}
+  if(part==='color'){f.planColor={v:planColorDraft,ts};store.set('pb_colors',{my:planColorDraft,ts})}
+  if(part==='rm'){if(!RM)return;f.rm=JSON.stringify(RM);f.rmTs=RM._ts||ts}
+  FB.saveUser(me(),f);
+}
+function pushRmSoon(){clearTimeout(rmPushT);rmPushT=setTimeout(()=>pushUser('rm'),700)}
+function onUserData(d,meta){
+  if(!profile)return;
+  d=d||{};let redraw=false;
+  const reconcile=!userReconciled&&meta&&!meta.fromCache;
+  if(reconcile)userReconciled=true;
+  // 1) profile (name / emoji / avatar colour)
+  const rp=d.profile,lp=profile.ts||0;
+  if(rp&&rp.ts>lp){
+    profile.name=rp.name||profile.name;profile.emoji=rp.emoji||profile.emoji;profile.color=rp.color||profile.color;profile.ts=rp.ts;
+    saveProf();draft={emoji:profile.emoji,color:profile.color};$('profileName').value=profile.name;redraw=true;
+  }else if(reconcile&&(!rp||lp>rp.ts)&&!isDefaultProfile()){
+    profile.ts=profile.ts||1;store.set('pb_profile',profile);
+    FB.saveUser(me(),{profile:{name:profile.name,emoji:profile.emoji,color:profile.color,ts:profile.ts}});
+  }
+  // 2) colour used for new plans
+  const lc=store.get('pb_colors',{})||{};
+  if(d.planColor&&d.planColor.ts>(lc.ts||0)){
+    const v=normHex(d.planColor.v);if(v){planColorDraft=v;store.set('pb_colors',{my:v,ts:d.planColor.ts});redraw=true}
+  }else if(reconcile&&lc.my&&(!d.planColor||(lc.ts||1)>d.planColor.ts)){
+    FB.saveUser(me(),{planColor:{v:normHex(lc.my)||'#A8E6CF',ts:lc.ts||1}});
+  }
+  // 3) reminders / checklists / notes
+  let loc=store.get(rmKey(),null);
+  const lt=(loc&&loc._ts)||0,rt=d.rmTs||0;
+  if(d.rm&&rt>lt){
+    try{const o=JSON.parse(d.rm);o._ts=rt;store.set(rmKey(),o);RM=null;redraw=true}catch(e){}
+  }else if(reconcile&&loc&&rmTouched(loc)&&(!d.rm||(lt||1)>rt)){
+    loc._ts=lt||1;store.set(rmKey(),loc);
+    FB.saveUser(me(),{rm:JSON.stringify(loc),rmTs:loc._ts});
+  }
+  if(redraw){try{renderAll()}catch(e){dbg('render error '+e.message)}}
+}
 
 /* ---------- login ---------- */
 function setLoginTab(t){$('tabLogin').classList.toggle('active',t==='login');$('tabReg').classList.toggle('active',t==='reg');$('loginBtn').textContent=t==='login'?'Login':'Create account'}
@@ -948,7 +994,7 @@ function closeColorPicker(){$('colorOverlay').classList.add('hidden');colorTarge
 function applyColorChoice(h){
   if(colorTarget==='@profile'){draft.color=h;renderProfile()}
   else if(colorTarget==='edit'){if(editing){editing.color=h;edPreview();saveEditDraft()}}
-  else{planColorDraft=h;store.set('pb_colors',{my:h});renderPlanner()}
+  else{planColorDraft=h;store.set('pb_colors',{my:h});pushUser('color');renderPlanner()}
 }
 function chooseColor(c){applyColorChoice(c);closeColorPicker()}
 function colorHexTyped(v){
@@ -1213,11 +1259,11 @@ function renderProfile(){
   $('profColBtn').style.background=draft.color;
 }
 function setDraftEmoji(e){draft.emoji=e;renderProfile()}
-function saveName(){const v=$('profileName').value.trim();if(!v)return;profile.name=v;saveProf();syncOwnerMeta();renderAll()}
+function saveName(){const v=$('profileName').value.trim();if(!v)return;profile.name=v;saveProf();pushUser('profile');syncOwnerMeta();renderAll()}
 function cancelName(){$('profileName').value=profile.name}
 function saveAvatar(){
   const v=$('profileName').value.trim();if(v)profile.name=v;
-  profile.emoji=draft.emoji;profile.color=draft.color;saveProf();syncOwnerMeta();renderAll();
+  profile.emoji=draft.emoji;profile.color=draft.color;saveProf();pushUser('profile');syncOwnerMeta();renderAll();
   const b=document.querySelector('.saveAv');b.textContent='Saved ✓';setTimeout(()=>b.textContent='Save avatar',1200);
 }
 
@@ -1362,7 +1408,7 @@ function rmLoad(){
   while(s.boss.c.length<Math.max(3,s.sel.rows.length))s.boss.c.push(false);
   RM=s;store.set(rmKey(),s);
 }
-const rmSave=()=>store.set(rmKey(),RM);
+const rmSave=()=>{RM._ts=Date.now();store.set(rmKey(),RM);pushRmSoon()};
 const RM_DAILY=[{t:'HoyoLab DAILY CHECK-IN',pre:'🔗 ',link:1},{t:'Battle Pass'},{t:'200 Original Resin',post:' 🌙'},{t:'To Temper Thyself and Journey Far',post:' 🧭',b:1},{t:'Daily Commissions',post:' 🤝'},{t:'Expedition Guide'}];
 const RM_REGIONS=['Mondstadt','Liyue','Inazuma','Sumeru','Fontaine','Natlan','Snezhnaya'];
 const RM_BOSSES=['Stormterror','Andrius','Childe','Azhdaha','La Signora','Shouki no Kami','Magatsu Mitake Narukami no Mikoto (Raiden Shogun)','Everlasting Lord of Arcane Wisdom','Lord of Eroded Primal Fire',"Guardian of Apep's Oasis",'All-Devouring Narwhal','The Knave (Arlecchino)','Ascended King','Sublimated Queen','Heretic of the False Moon','Exalted Master of the Heretical Path'];

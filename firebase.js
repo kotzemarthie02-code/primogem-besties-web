@@ -82,6 +82,13 @@ if (!configured) {
           snap => cb(snap.docs.map(d => ({ ...d.data(), id: d.id }))), err("activity listener"));
       },
 
+      // ---- per-person data (profile, reminders, colour): follows the e-mail to every device ----
+      listenUser(email, cb) {
+        return onSnapshot(doc(db, "userData", email), { includeMetadataChanges: true },
+          snap => cb(snap.exists() ? snap.data() : null, snap.metadata), err("userData listener"));
+      },
+      saveUser(email, f) { return track("saveUser", setDoc(doc(db, "userData", email), f, { merge: true })); },
+
       // ---- plans ----
       addPlan(p)            { return track("addPlan", setDoc(doc(db, "plans", p.id), p)); },
       updatePlan(id, f)     { return track("updatePlan", updateDoc(doc(db, "plans", id), f)); },
