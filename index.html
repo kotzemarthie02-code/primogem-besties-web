@@ -469,6 +469,10 @@ html[data-theme="dark"] .gSel option{color:#e9ecff;background:#1a1f38}
 .cmList{margin-top:10px}
 .cmItem{position:relative;background:#f3f4fb;border-radius:14px;padding:8px 32px 8px 12px;margin-top:6px;font-size:14px;word-break:break-word}
 .cmItem small{display:block;font-size:11px;color:var(--gray);font-weight:600;margin-top:2px}
+.cmItem{display:flex;gap:10px;align-items:flex-start}
+.cmBody{flex:1;min-width:0}
+.cmEmo{flex:none;width:42px;height:42px;border:none;border-radius:14px;background:#f3f4fb;font-size:20px}
+html[data-theme="dark"] .cmEmo{background:#242a49}
 .cmDel{position:absolute;right:8px;top:6px;border:none;background:none;color:var(--gray);font-size:14px;font-weight:800}
 .cmAdd{display:flex;gap:8px;margin-top:10px}
 .cmAdd input{flex:1;min-width:0;height:42px;border:none;border-radius:14px;background:#f3f4fb;color:var(--ink);padding:0 12px;font-size:14px;outline:none}
@@ -1093,7 +1097,7 @@ function openEmojiPicker(key){
 }
 function closeEmojiPicker(){$('emojiOverlay').classList.add('hidden');emojiTargetKey=null}
 function chooseEmoji(e){const k=emojiTargetKey;closeEmojiPicker();if(k==='@profile')setDraftEmoji(e);else if(k)addEmoji(k,e)}
-function addEmoji(key,e){const el=$('in-'+key);el.value=(el.value+' '+e).trim();if(/^note\d+$/.test(key))rmNoteTxt(+key.slice(4),el.value);else saveDraft(key,el.value);el.focus()}
+function addEmoji(key,e){const isCm=key.indexOf('cm-')===0;const el=$(isCm?key:'in-'+key);if(!el)return;el.value=(el.value+' '+e).trim();if(isCm){}else if(/^note\d+$/.test(key))rmNoteTxt(+key.slice(4),el.value);else saveDraft(key,el.value);el.focus()}
 function addPlan(key){
   if(!syncReady())return;
   const el=$('in-'+key);const raw=el.value.trim();if(!raw)return;
@@ -1567,6 +1571,11 @@ function memTime(ts){
   if(!ts)return '';const d=new Date(ts),k=keyOf(d),t=keyOf(new Date()),y=keyOf(addDays(new Date(),-1));
   return (k===t?'Today':k===y?'Yesterday':dayLabel(k))+' • '+pad(d.getHours())+':'+pad(d.getMinutes());
 }
+function cmUser(c){   // live avatar of the commenter (follows profile changes); falls back to what was saved with the comment
+  const u=userOf(rxOwnerOf('rx_'+String(c.k||'').slice(3)));
+  const known=(profile&&rxKey(profile.email)==='rx_'+String(c.k||'').slice(3))||remoteUsers[rxOwnerOf('rx_'+String(c.k||'').slice(3))];
+  return known?u:{name:c.n||u.name,emoji:c.e||u.emoji,color:c.c||u.color};
+}
 function commentsOf(p){
   const out=[];Object.keys(p).forEach(k=>{if(k.indexOf('cm_')===0&&Array.isArray(p[k]))p[k].forEach(c=>out.push(Object.assign({k:k},c)))});
   return out.sort((a,b)=>(a.ts||0)-(b.ts||0));
@@ -1579,7 +1588,7 @@ function renderMemories(force){
   const L=allPlans.filter(p=>p.kind==='memory').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   el.innerHTML=L.length?L.map(p=>{
     const u=userOf(p.owner),mine=isMine(p),pid=esc(p.id);
-    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${Array.isArray(p.links)&&p.links.length?`<div class="memLinks">${p.links.map(l=>`<a class="memLink" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span>▶</span><div><b>${esc(l.h)}</b><small>Tap to open</small></div></a>`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>`<div class="cmItem"><b>${esc(c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`).join('')}</div><div class="cmAdd"><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
+    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${Array.isArray(p.links)&&p.links.length?`<div class="memLinks">${p.links.map(l=>`<a class="memLink" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span>▶</span><div><b>${esc(l.h)}</b><small>Tap to open</small></div></a>`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>{const cu=cmUser(c);return `<div class="cmItem" style="background:${hexA(normHex(cu.color)||'#A8E6CF',.22)}">${avatar(cu,30)}<div class="cmBody"><b>${esc(cu.name||c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small></div>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`}).join('')}</div><div class="cmAdd"><button class="cmEmo" onclick="openEmojiPicker('cm-${pid}')" aria-label="Pick emoji">😊</button><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
   }).join(''):'<div class="empty">No memories yet — share your first one! 💎</div>';
   Object.keys(keep).forEach(id=>{const e=$(id);if(e)e.value=keep[id]});
 }
@@ -1592,7 +1601,7 @@ function addMemory(){
 function addComment(pid){
   if(!syncReady())return;const el=$('cm-'+pid);if(!el)return;const t=el.value.trim();if(!t)return;
   const p=allPlans.find(x=>x.id===pid);if(!p)return;
-  const k=cmKey(),cur=(Array.isArray(p[k])?p[k]:[]).concat([{id:uid(),n:profile.name,t:t,ts:Date.now()}]);
+  const k=cmKey(),cur=(Array.isArray(p[k])?p[k]:[]).concat([{id:uid(),n:profile.name,e:profile.emoji,c:profile.color,t:t,ts:Date.now()}]);
   p[k]=cur;el.value='';DB.updatePlan(pid,{[k]:cur});renderMemories(true);
 }
 function delComment(pid,cid){
