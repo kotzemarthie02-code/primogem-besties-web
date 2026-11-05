@@ -629,6 +629,35 @@ html[data-theme="dark"] .nwBtn.g{background:#143b2c;color:#4ade80;border-color:#
 .wsWhenRow{display:block;margin-top:10px;font-size:12px;font-weight:800;color:var(--gray)}
 .wsWhenRow input{width:100%;margin-top:6px;color-scheme:light dark}
 html[data-theme="dark"] .wsWhenRow input{color-scheme:dark}
+
+/* ===== NEWS: planner style, 2 columns (1 on phones) ===== */
+#tab-news .nwTitle{font-size:clamp(22px,4vw,30px)}
+#tab-news .nwCard{margin-bottom:0;min-width:0}
+#tab-news .nwTimer{margin-bottom:0;min-width:0}
+#tab-news .nwDig{font-size:clamp(24px,4.4vw,40px);gap:clamp(10px,2.2vw,20px)}
+#tab-news .nwTimer .tt{font-size:clamp(11px,1.6vw,15px)}
+#tab-news .nwTimer .dt{font-size:clamp(11px,1.5vw,15px)}
+.nwG2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
+.nwG2>*{min-width:0}
+@media (min-width:700px){.nwG2{grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}}
+.nwG2 .nwTimer{height:100%}
+.nwG2 .nwImg{height:clamp(160px,22vw,260px)}
+.nwStory{width:100%;min-height:150px}
+/* ===== WISH: picker + edit + Cloudinary thumbnails ===== */
+.wsRec .th{position:relative;overflow:hidden}
+.wsRec .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.wsEdit{background:#fff;border-radius:16px;padding:12px;margin:0 0 4px 18px;box-shadow:0 4px 14px rgba(30,40,90,.1)}
+html[data-theme="dark"] .wsEdit{background:#1a1f38}
+.wsEdit input,.wsEdit select,.wsAdd select{width:100%;background:#f3f4fb;border:none;border-radius:10px;color:var(--ink);padding:11px 12px;font-size:15px;outline:none;margin-top:8px;font-family:inherit}
+html[data-theme="dark"] .wsEdit input,html[data-theme="dark"] .wsEdit select,html[data-theme="dark"] .wsAdd select{background:#272d4c}
+.wsStarRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:2px}
+.wsStarRow button{border:2px solid #d9b45a;border-radius:12px;padding:10px;font-weight:900;font-size:15px;background:transparent;color:#b7860b}
+.wsStarRow button.on{background:#f2b705;color:#fff;border-color:#f2b705}
+.wsEdBtns{display:flex;gap:8px;margin-top:10px}
+.wsEdBtns button{flex:1;border:none;border-radius:12px;padding:11px;font-weight:800;font-size:14px}
+.wsEdBtns .ok{background:#10b866;color:#fff}.wsEdBtns .no{background:#e9ecf9;color:#444}
+.wsPen{background:none;border:none;color:var(--gray);font-size:15px;padding:6px;flex:none}
+.wsPrev{margin-top:8px;font-weight:800;font-size:14px;color:var(--blue);text-align:center}
 </style>
 </head>
 <body>
@@ -1091,8 +1120,8 @@ const WS_TXT={won:'won 50/50',lost:'lost 50/50',guar:'guaranteed',free:'free cha
 const WS_PILL={won:'WON',lost:'LOST',guar:'GUARANTEED',free:'FREE'};
 let wsMode=store.get('pb_ws_mode','my'),wsOpen=new Set(),wsMig=false;
 const wishDocs=o=>allPlans.filter(p=>p.kind==='wish'&&(!o||p.owner===o)).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
-function wishDoc(n,t,ts,id){
-  return {id:id||uid(),kind:'wish',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:n,wt:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date(ts||Date.now())),joined:[],joinedIds:[],createdAt:ts||Date.now(),wsAr:store.get('pb_ws_ar_'+me(),'')};
+function wishDoc(n,t,ts,id,x){
+  return {id:id||uid(),kind:'wish',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:n,wt:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date(ts||Date.now())),joined:[],joinedIds:[],createdAt:ts||Date.now(),wsAr:store.get('pb_ws_ar_'+me(),''),...(x||{})};
 }
 function wishMigrate(list){   // one-time: pulls saved only on this phone -> shared with the group
   if(wsMig)return;wsMig=true;
@@ -1113,32 +1142,97 @@ function wsComments(p){
   const pid=esc(p.id),C=commentsOf(p);
   return `<details class="wsCm" ${wsOpen.has(p.id)?'open':''} ontoggle="wsTog('${pid}',this.open)"><summary>💬 ${C.length?C.length+' comment'+(C.length>1?'s':''):'Comment'}</summary><div class="cmList">${C.map(c=>{const cu=cmUser(c);return `<div class="cmItem" style="background:${hexA(normHex(cu.color)||'#A8E6CF',.22)}">${avatar(cu,30)}<div class="cmBody"><b>${esc(cu.name||c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small></div>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`}).join('')}</div><div class="cmAdd"><button class="cmEmo" onclick="openEmojiPicker('cm-${pid}')" aria-label="Pick emoji">😊</button><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></details>`;
 }
+/* ---- Cloudinary: set your cloud name (and folder if you use one) ---- */
+const WS_CLOUD='cu7atsav';  // jou Cloudinary cloud name
+const WS_FCH=['Characters met Elements','characters','characters-team'];   // gidse vir karakters
+const WS_FWP=['weapons'];                                              // gidse vir wapens
+const WS_C5=['Arataki Itto','Cyno','Emilie','Sangonomiya Kokomi','Varesa','Albedo','Alhaitham','Arlecchino','Baizhu','Chasca','Chiori','Citlali','Clorinde','Columbina','Dehya','Diluc','Escoffier','Eula','Flins','Furina','Ganyu','Hu Tao','Jean','Kaedehara Kazuha','Kamisato Ayaka','Kamisato Ayato','Keqing','Kinich','Klee','Lauma','Linnea','Lyney','Mavuika','Mona','Mualani','Nahida','Navia','Neuvillette','Nilou','Qiqi','Raiden Shogun','Shenhe','Sigewinne','Skirk','Tartaglia','Tighnari','Venti','Wanderer','Wriothesley','Xianyun','Xiao','Xilonen','Yae Miko','Yelan','Yoimiya','Yumemizuki Mizuki','Zhongli'];
+const WS_C4=['Ifa','Illuga','Jahoda','Kujou Sara','Aino','Amber','Barbara','Beidou','Bennett','Candace','Charlotte','Chevreuse','Chongyun','Collei','Dahlia','Diona','Dori','Faruzan','Freminet','Gaming','Gorou','Iansan','Kachina','Kaeya','Kaveh','Kirara','Kuki Shinobu','Lan Yan','Layla','Lisa','Lynette','Mika','Ningguang','Noelle','Ororon','Razor','Rosaria','Sayu','Sethos','Shikanoin Heizou','Sucrose','Thoma','Xiangling','Xingqiu','Xinyan','Yanfei','Yaoyao','Yun Jin'];
+const WS_W5=['Aquila Favonia','Skyward Blade','Skyward Harp','Skyward Atlas','Skyward Pride','Skyward Spine',"Amos' Bow",'Lost Prayer to the Sacred Winds','Primordial Jade Winged-Spear','Staff of Homa','Mistsplitter Reforged','Elegy for the End','Wolf\'s Gravestone','Polar Star','Thundering Pulse','Haran Geppaku Futsu','Engulfing Lightning','Redhorn Stonethresher','Light of Foliar Incision','Key of Khaj-Nisut','Tulaytullah\'s Remembrance','Splendor of Tranquil Waters','Freedom-Sworn','Summit Shaper','Jadefall\'s Splendor','Crimson Moon\'s Semblance','Calamity Queller','Vortex Vanquisher','Song of Broken Pines','A Thousand Floating Dreams','Cashflow Supervision','Absolution','Peak Patrol Song'];
+const WS_W4=['The Flute','The Bell','The Widsith','The Stringless','The Black Sword','The Alley Flash','Favonius Sword','Favonius Greatsword','Favonius Warbow','Favonius Lance','Favonius Codex','Sacrificial Sword','Sacrificial Greatsword','Sacrificial Bow','Sacrificial Fragments','Rust','Dragon\'s Bane','Lion\'s Roar','Rainslasher','Prototype Rancour','Dragonspine Spear','Eye of Perception','Mitternachts Waltz','Wine and Song','Blackcliff Longsword','Royal Longsword','Mappa Mare','Fruit of Fulfillment','Ballad of the Boundless Blue','Flowing Purity','Sacrificial Jade'];
+const wsStarOf=p=>Number(p.wsStar)||((String(p.text||'').match(/^\s*([45])\s*Star/i)||[])[1]|0)||5;
+function wsParse(p){
+  if(p.wsName)return {star:Number(p.wsStar)||5,name:p.wsName,pity:Number(p.wsPity)||0};
+  const m=String(p.text||'').match(/^\s*([45])\s*Star\s*~\s*(.+?)\s*(?:\((\d+)\s*Pity\))?\s*$/i);
+  return m?{star:+m[1],name:m[2],pity:+(m[3]||0)}:{star:5,name:String(p.text||''),pity:0};
+}
+const wsTitle=(star,name,pity)=>star+' Star ~ '+name+(pity?' ('+pity+' Pity)':'');
+const WS_WSET=new Set([...WS_W5,...WS_W4].map(x=>x.toLowerCase()));
+const WS_OK={};
+function wsImgs(name){
+  if(!WS_CLOUD||!name)return [];
+  const n=String(name).trim();if(WS_OK[n.toLowerCase()])return [WS_OK[n.toLowerCase()]];
+  const base='https://res.cloudinary.com/'+WS_CLOUD+'/image/upload/f_auto,q_auto,c_fill,w_200,h_200/';
+  const noAp=n.replace(/['’`]/g,'');
+  const sl=[n.replace(/\s+/g,'_'),n.replace(/['’`]/g,'_').replace(/\s*-\s*/g,'_-_').replace(/\s+/g,'_'),noAp.replace(/\s+/g,'_'),n.replace(/\s+/g,''),n];
+  const slugs=[...new Set(sl)];
+  const isW=WS_WSET.has(n.toLowerCase());
+  const mk=(folders,suf)=>{const o=[];folders.concat(['']).forEach(f=>slugs.forEach(x=>suf.forEach(sf=>o.push(base+(f?encodeURIComponent(f)+'/':'')+encodeURIComponent(x+sf)))));return o};
+  const ch=mk(WS_FCH,['1','']),wp=mk(WS_FWP,['','1']);
+  return [...new Set(isW?wp.concat(ch):ch.concat(wp))];
+}
+function wsThumb(name){
+  const c=wsImgs(name);if(!c.length)return '✦';
+  return `<img alt="" loading="lazy" src="${esc(c[0])}" data-n="${esc(name)}" data-i="0" data-c="${esc(JSON.stringify(c.slice(0,30)))}" onload="WS_OK[this.dataset.n.toLowerCase()]=this.src" onerror="wsImgErr(this)">✦`;
+}
+function wsImgErr(im){
+  try{const c=JSON.parse(im.dataset.c),i=(+im.dataset.i)+1;if(i<c.length){im.dataset.i=i;im.src=c[i]}else im.remove()}catch(e){im.remove()}
+}
+const wsOpts=star=>{const a=star===4?[...WS_C4,...WS_W4]:[...WS_C5,...WS_W5];return a.map(x=>`<option value="${esc(x)}">`).join('')};
+const wsPityOpts=(star,sel)=>{const mx=star===4?10:90;let h='<option value="">Pity — kies</option>';for(let i=1;i<=mx;i++)h+=`<option value="${i}"${+sel===i?' selected':''}>${i} Pity</option>`;return h};
+let wsStar=5,wsEdit=null;
+function setWsStar(s){wsStar=s;renderWish(true)}
+function wsPrev(){const n=($('wsNew')||{}).value||'',pt=($('wsPity')||{}).value||'';const e=$('wsPrev');if(e)e.textContent=n.trim()?wsTitle(wsStar,n.trim(),pt):''}
+function wsEditForm(p){
+  const q=wsParse(p),id=esc(p.id),d=new Date(p.createdAt||Date.now());
+  const loc=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+  return `<div class="wsEdit"><div class="wsStarRow"><button class="${q.star===5?'on':''}" onclick="wsEdSt(5)">5 ★</button><button class="${q.star===4?'on':''}" onclick="wsEdSt(4)">4 ★</button></div>
+  <input id="ed-star" type="hidden" value="${q.star}">
+  <input id="ed-name" list="wsListEd" value="${esc(q.name)}" maxlength="40" placeholder="Character / weapon name"><datalist id="wsListEd">${wsOpts(q.star)}</datalist>
+  <select id="ed-pity">${wsPityOpts(q.star,q.pity)}</select>
+  <select id="ed-type"><option value="won"${p.wt==='won'?' selected':''}>✅ Won 50/50</option><option value="lost"${p.wt==='lost'?' selected':''}>❌ Lost 50/50</option><option value="guar"${p.wt==='guar'?' selected':''}>🎯 Guaranteed</option><option value="free"${p.wt==='free'?' selected':''}>🎁 Free</option></select>
+  <input id="ed-when" type="datetime-local" value="${loc}">
+  <div class="wsEdBtns"><button class="ok" onclick="saveWsEdit('${id}')">✔ Save</button><button class="no" onclick="wsEdit=null;renderWish(true)">Cancel</button></div></div>`;
+}
+function wsEdSt(s){const e=$('ed-star');if(!e)return;e.value=s;document.querySelectorAll('.wsEdit .wsStarRow button').forEach((b,i)=>b.classList.toggle('on',(i===0?5:4)===s));const sel=$('ed-pity'),cur=sel.value;sel.innerHTML=wsPityOpts(s,cur);$('wsListEd').innerHTML=wsOpts(s)}
+function startWsEdit(id){wsEdit=id;renderWish(true)}
+function saveWsEdit(id){
+  const p=allPlans.find(x=>x.id===id);if(!p||!isMine(p)||!syncReady())return;
+  const star=+$('ed-star').value||5,name=$('ed-name').value.trim().replace(/\s*1$/,''),pity=+$('ed-pity').value||0;
+  if(!name){$('ed-name').focus();return}
+  const wv=$('ed-when').value,ts=wv?new Date(wv).getTime():p.createdAt;
+  const f={text:wsTitle(star,name,pity),wt:$('ed-type').value,wsStar:star,wsName:name,wsPity:pity,createdAt:isNaN(ts)?p.createdAt:ts,date:keyOf(new Date(isNaN(ts)?p.createdAt:ts))};
+  Object.assign(p,f);DB.updatePlan(id,f);wsEdit=null;renderWish(true);
+}
 function wishCard(owner){
   const L=wishDocs(owner),mine=owner===me(),u=userOf(owner);
   const won=L.filter(p=>p.wt==='won').length,lost=L.filter(p=>p.wt==='lost').length,rate=won+lost?Math.round(won/(won+lost)*100):0;
   const arDoc=[...L].reverse().find(p=>p.wsAr),ar=mine?store.get('pb_ws_ar_'+me(),''):(arDoc?arDoc.wsAr:'');
   const who=mine?`<input id="wsAr" value="${esc(ar)}" placeholder="Your name + AR (e.g. Unknown AR57)" maxlength="30" onchange="saveWishAr(this.value)">`:`<b style="flex:1;min-width:0;font-size:16px">${esc(ar||u.name)}</b>`;
-  const recs=L.map((p,i)=>`<div class="wsItem"><div class="wsRec ${esc(p.wt)}"><div class="th" style="background-image:url('${encodeURIComponent(p.text||'')}1.jpg')">✦</div><div class="nm"><b>${esc(p.text)}</b><span>${p.wt==='free'?WS_TXT.free:(i+1)+' • '+(WS_TXT[p.wt]||'')}</span><small class="wsWhen">📅 ${wsWhenTxt(p.createdAt)}</small></div><div class="wsPill">${WS_PILL[p.wt]||''}</div>${mine?`<button class="wsDel" onclick="delWish('${esc(p.id)}')" aria-label="Delete">✕</button>`:''}</div>${reactBar(p)}${wsComments(p)}</div>`).join('');
+  const recs=L.map((p,i)=>{
+    const q=wsParse(p);
+    const rec=(mine&&wsEdit===p.id)?wsEditForm(p):`<div class="wsRec ${esc(p.wt)}"><div class="th">${wsThumb(q.name)}</div><div class="nm"><b>${esc(p.text)}</b><span>${p.wt==='free'?WS_TXT.free:(i+1)+' • '+(WS_TXT[p.wt]||'')}</span><small class="wsWhen">📅 ${wsWhenTxt(p.createdAt)}</small></div><div class="wsPill">${WS_PILL[p.wt]||''}</div>${mine?`<button class="wsPen" onclick="startWsEdit('${esc(p.id)}')" aria-label="Edit">✎</button><button class="wsDel" onclick="delWish('${esc(p.id)}')" aria-label="Delete">✕</button>`:''}</div>`;
+    return `<div class="wsItem">${rec}${reactBar(p)}${wsComments(p)}</div>`}).join('');
   return `<div class="wsCard"><div class="wsPlayer">${avatar(u,34)}${who}</div><div class="wsRing${mine?'':' sm'}"><div><small>50/50 LUCK TRACKER</small><b>${won} WON / ${lost} LOST</b><em>${rate}% Win Rate</em></div></div><div class="wsTl">✦ Pull Timeline • ${L.length} Record${L.length===1?'':'s'}</div>${recs||'<div class="wsHint">No pulls yet ✨</div>'}</div>`;
 }
 function renderWish(force){
   const root=$('wsRoot');if(!root||!profile)return;
   const a=document.activeElement;
   if(!force&&a&&root.contains(a)&&/INPUT|TEXTAREA/.test(a.tagName))return;
-  const keep={};root.querySelectorAll('input[id^="cm-"],#wsNew,#wsWhen').forEach(i=>{if(i.value)keep[i.id]=i.value});
+  const keep={};root.querySelectorAll('input[id^="cm-"],#wsNew,#wsWhen,#wsPity').forEach(i=>{if(i.value)keep[i.id]=i.value});
   $('btnWsMy').classList.toggle('active',wsMode==='my');$('btnWsGroup').classList.toggle('active',wsMode==='group');
   const owners=[me()];
   if(wsMode==='group')[...new Set(wishDocs().map(p=>p.owner))].filter(o=>o!==me()).forEach(o=>owners.push(o));
-  const add=`<div class="wsAdd"><input id="wsNew" placeholder="5★ character name (e.g. Columbina)" maxlength="40" onkeydown="if(event.key==='Enter')addWish('won')"><label class="wsWhenRow">📅 Date &amp; time of the pull<input type="datetime-local" id="wsWhen"></label><div class="wsBtns"><button class="w" onclick="addWish('won')">✅ Won 50/50</button><button class="l" onclick="addWish('lost')">❌ Lost 50/50</button><button class="g" onclick="addWish('guar')">🎯 Guaranteed</button><button class="f" onclick="addWish('free')">🎁 Free</button></div><div class="wsHint">Everyone in the group can see, react and comment</div></div>`;
+  const add=`<div class="wsAdd"><div class="wsStarRow"><button class="${wsStar===5?'on':''}" onclick="setWsStar(5)">5 ★</button><button class="${wsStar===4?'on':''}" onclick="setWsStar(4)">4 ★</button></div><input id="wsNew" list="wsList" autocomplete="off" placeholder="${wsStar}★ character / weapon name (e.g. ${wsStar===5?'Linnea':'Bennett'})" maxlength="40" oninput="wsPrev()"><datalist id="wsList">${wsOpts(wsStar)}</datalist><select id="wsPity" onchange="wsPrev()">${wsPityOpts(wsStar,'')}</select><div class="wsPrev" id="wsPrev"></div><label class="wsWhenRow">📅 Date &amp; time of the pull<input type="datetime-local" id="wsWhen"></label><div class="wsBtns"><button class="w" onclick="addWish('won')">✅ Won 50/50</button><button class="l" onclick="addWish('lost')">❌ Lost 50/50</button><button class="g" onclick="addWish('guar')">🎯 Guaranteed</button><button class="f" onclick="addWish('free')">🎁 Free</button></div><div class="wsHint">Everyone in the group can see, react and comment</div></div>`;
   root.innerHTML=owners.map(wishCard).join('')+(wsMode==='my'?add:(owners.length<2?'<div class="wsHint">Nobody else has added pulls yet</div>':''));
   Object.keys(keep).forEach(id=>{const e=$(id);if(e)e.value=keep[id]});
-  const wn=$('wsWhen');if(wn&&!wn.value)wn.value=nowLocal();
+  const wn=$('wsWhen');if(wn&&!wn.value)wn.value=nowLocal();try{wsPrev()}catch(e){}
 }
 function addWish(t){
   if(!syncReady())return;
-  const inp=$('wsNew'),n=inp.value.trim();if(!n){inp.focus();return}
-  const wv=$('wsWhen').value,ts=wv?new Date(wv).getTime():Date.now();
-  DB.addPlan(wishDoc(n,t,isNaN(ts)?Date.now():ts));inp.value='';$('wsWhen').value='';renderWish(true);
+  const inp=$('wsNew'),n=inp.value.trim().replace(/\s*1$/,'');if(!n){inp.focus();return}
+  const pity=+($('wsPity').value)||0,wv=$('wsWhen').value,ts=wv?new Date(wv).getTime():Date.now();
+  DB.addPlan(wishDoc(wsTitle(wsStar,n,pity),t,isNaN(ts)?Date.now():ts,null,{wsStar:wsStar,wsName:n,wsPity:pity}));inp.value='';$('wsPity').value='';$('wsWhen').value='';renderWish(true);
 }
 function delWish(id){
   const p=allPlans.find(x=>x.id===id);if(!p||!isMine(p)||!syncReady())return;
@@ -1180,21 +1274,25 @@ function renderNews(){
   el.innerHTML=`<div class="nwTitle">The Trinity News</div><div class="nwPost">📤 Posted ${esc(S.postedAt?new Date(S.postedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'')}</div>
   <div class="nwPanel"><div class="nwSec">📢 News Update</div>
     <div class="nwVer"><div class="g">GENSHIN IMPACT</div><div class="r"><div class="v">${esc(ver||'—')}</div><div class="t">${esc(n.title||'')}</div></div></div>
+    <div class="nwG2">
     ${nwTimer('⚡ GENSHIN IMPACT '+esc(vb)+' BANNER','#ffe08a',cds.d1,'Expiry Date & Time','bg1',d)}
     ${nwTimer('🔧 GENSHIN IMPACT '+esc(vm)+' MAINTENANCE','#82ccdd',cds.d2,'Release Date & Time','bg2',d,'<div style="font-size:11px;opacity:.6;margin-top:3px">Maintenance Rewards: Primosgems x300</div>')}
-    <div class="nwCard"><span class="nwLbl">📰 News update story</span><div class="nwTxt">${esc(n.story||'—')}</div>
+    </div>
+    <div class="nwG2">
+    <div class="nwCard"><span class="nwLbl">📰 News update story</span><div class="nwTxt nwStory">${esc(n.story||'—')}</div>
       ${evs.length?'<span class="nwLbl" style="margin-top:12px">New events</span>'+evs.map(e=>`<div class="nwEv">${esc(e)}</div>`).join(''):''}</div>
     <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:12px;color:#2b7fa3;margin-bottom:8px">🗺️ NEW MAPS &amp; CONTENT</div><div class="nwTxt">${esc(n.maps||'—')}</div>${maps?`<div class="nwImg" style="background-image:url('${maps}')"></div>`:''}</div>
+    </div>
   </div>
-  <div class="nwPanel"><div class="nwSec">🎴 Banner Tracker</div>${phase('p1','#ffe08a','⚡','PHASE 1')}${phase('p2','#82ccdd','🌙','PHASE 2')}</div>
+  <div class="nwPanel"><div class="nwSec">🎴 Banner Tracker</div><div class="nwG2">${phase('p1','#ffe08a','⚡','PHASE 1')}${phase('p2','#82ccdd','🌙','PHASE 2')}</div></div>
   ${up.length?`<div class="nwPanel"><div class="nwSec">🌟 Upcoming Characters</div><div class="nwUp">${upHtml}</div></div>`:''}
-  <div class="nwPanel"><div class="nwSec">⚔️ Battle &amp; Build Intel</div>
+  <div class="nwPanel"><div class="nwSec">⚔️ Battle &amp; Build Intel</div><div class="nwG2">
     <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:11px;color:#16a35a;margin-bottom:8px">✨ NEW CHARACTER DEBUT</div><div class="nwTxt" style="font-weight:800">${esc(bt.char||'—')}</div>
       ${nwLink(bt.yd,'g','▶ Trailer')}${nwLink(bt.ym,'g','▶ Misc')}${nwLink(bt.bl,'y','📖 Build')}${nwLink(bt.wl,'y','📖 Wiki')}</div>
     <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:11px;color:#e11d2e;margin-bottom:8px">👹 NEW WEEKLY BOSS</div><div class="nwTxt" style="font-weight:800">${esc(bt.wb||'—')}</div>
       ${nwLink(bt.blink,'r','🔗 Guide')}${nwLink(bt.blink2,'r','🔗 Guide 2')}${boss?`<div class="nwImg" style="background-image:url('${boss}');border-color:rgba(255,100,100,.3)"></div>`:''}</div>
-  </div>
-  <div class="nwPanel"><div class="nwSec">⏳ Reminders</div>
+  </div></div>
+  <div class="nwPanel"><div class="nwSec">⏳ Reminders</div><div class="nwG2">
     <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:12px;color:#b7860b;margin-bottom:10px">🎂 UPCOMING BIRTHDAYS</div>
       ${(S.bdays||[]).map(b=>`<div class="nwBd"><span>${b.today?'🎂✨':'🎂'}</span><span style="${b.today?'color:#ffe08a;font-weight:900':''}">${esc(b.name)}</span><span>${esc(b.label)}${b.today?' 🎉':''}</span></div>`).join('')}
       ${bday?`<div class="nwImg" style="background-image:url('${bday}');height:160px;border-color:rgba(0,195,255,.35)"></div>`:''}</div>
@@ -1202,7 +1300,7 @@ function renderNews(){
       ${nwTimer('📺 GENSHIN IMPACT '+esc(lv.ver||'')+' LIVESTREAM','#ffe08a',lv.date,'Release Date & Time','live-bg',d,'<div style="font-size:11px;opacity:.6;margin-top:3px">Codes will be added during the livestream</div>')}
       ${nwLink('https://www.youtube.com/@GenshinImpact','r','▶ Watch on YouTube')}${nwLink('https://genshin.hoyoverse.com/en/gift','y','🎁 Open Redeem')}
       ${codes.map(c=>`<div class="nwCode">${esc(c)}</div>`).join('')}</div>
-  </div>`;
+  </div></div>`;
   tickNews();
 }
 function tickNews(){
