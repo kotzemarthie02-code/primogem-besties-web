@@ -658,6 +658,45 @@ html[data-theme="dark"] .wsEdit input,html[data-theme="dark"] .wsEdit select,htm
 .wsEdBtns .ok{background:#10b866;color:#fff}.wsEdBtns .no{background:#e9ecf9;color:#444}
 .wsPen{background:none;border:none;color:var(--gray);font-size:15px;padding:6px;flex:none}
 .wsPrev{margin-top:8px;font-weight:800;font-size:14px;color:var(--blue);text-align:center}
+
+/* ===== NEWS = exact Trinity News look (dark glass, Cinzel, big timers) – no nested/horizontal scrolling ===== */
+#tab-news{position:relative;margin-top:8px;padding:clamp(10px,2.5vw,26px);border-radius:28px;color:#fff;max-width:100%;overflow:visible;
+  background:radial-gradient(900px 500px at 15% 0%,rgba(80,140,220,.35),transparent 60%),radial-gradient(700px 500px at 100% 20%,rgba(255,224,138,.12),transparent 60%),linear-gradient(165deg,#17305a 0%,#0c1328 55%,#1b1236 100%)}
+#tab-news *{box-sizing:border-box;min-width:0}
+#tab-news .nwWrap{color:#fff}
+#tab-news .nwTitle{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(26px,5.5vw,48px);letter-spacing:2px;text-transform:uppercase;text-align:center;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.65);margin:6px 0 4px;word-break:break-word}
+#tab-news .nwPost{text-align:center;color:rgba(255,255,255,.6);margin-bottom:14px}
+#tab-news .nwPanel{background:rgba(22,24,38,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:26px;box-shadow:0 10px 30px rgba(0,0,0,.4);padding:clamp(12px,2.4vw,26px);margin-bottom:clamp(12px,2vw,22px)}
+#tab-news .nwSec{font-family:'Cinzel',serif;font-size:clamp(12px,1.6vw,15px);font-weight:900;letter-spacing:4px;text-transform:uppercase;color:#ffe08a;border-bottom:1px solid rgba(255,255,255,.14);padding-bottom:12px;margin-bottom:16px}
+#tab-news .nwVer{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;background:linear-gradient(90deg,rgba(165,255,173,.16),rgba(165,255,173,.08));border:1px solid #a5ffad;border-radius:18px;padding:14px 18px;margin-bottom:16px}
+#tab-news .nwVer .g{flex:1 1 150px;font-family:'Cinzel',serif;font-size:clamp(16px,2.4vw,22px);font-weight:900;color:#a5ffad;letter-spacing:1px}
+#tab-news .nwVer .r{flex:3 1 260px;display:flex;align-items:center;gap:12px;margin:0}
+#tab-news .nwVer .v{flex:none;background:rgba(165,255,173,.12);border:1px solid rgba(165,255,173,.45);color:#a5ffad;font-weight:900;font-size:clamp(14px,2vw,18px);border-radius:12px;padding:10px 22px}
+#tab-news .nwVer .t{flex:1;background:rgba(165,255,173,.1);border:1px solid rgba(165,255,173,.45);color:#a5ffad;font-weight:800;font-size:clamp(14px,2vw,18px);border-radius:12px;padding:10px 16px;word-break:break-word}
+#tab-news .nwVer .act{flex:none;color:#a5ffad;font-weight:900;font-size:12px;letter-spacing:.5px}
+#tab-news .nwTimer{background:#000;border:1px solid rgba(255,255,255,.14);border-radius:20px;min-height:190px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+#tab-news .nwTimer .bg{filter:brightness(.55)}
+#tab-news .nwTimer .in{padding:16px 10px;justify-content:center;height:100%}
+#tab-news .nwTimer .tt{font-family:'Cinzel',serif;font-weight:900;letter-spacing:1px;text-transform:uppercase;word-break:break-word}
+#tab-news .nwDig{color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.8);flex-wrap:wrap;justify-content:center}
+#tab-news .nwDig i{font-size:clamp(8px,1.1vw,11px);opacity:.8;letter-spacing:.5px}
+#tab-news .nwTimer .dt{font-weight:800;text-shadow:0 1px 6px rgba(0,0,0,.9);word-break:break-word}
+#tab-news .nwCard{background:rgba(12,14,28,.68);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:clamp(12px,2vw,20px)}
+#tab-news .nwLbl{color:rgba(255,255,255,.6);font-size:11px;letter-spacing:.6px;margin:2px 0 8px}
+#tab-news .nwTxt{color:#fff;word-break:break-word;overflow-wrap:anywhere}
+#tab-news .nwStory{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;min-height:150px;height:auto;max-height:none;overflow:visible}
+#tab-news .nwEv,#tab-news .nwBd,#tab-news .nwCode{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;padding:12px 14px;word-break:break-word}
+#tab-news .nwBd span:last-child{color:rgba(255,255,255,.55)}
+#tab-news .nwCode{color:#a5ffad}
+#tab-news .nwImg{height:clamp(160px,26vw,300px);border-radius:16px;max-width:100%}
+#tab-news .nwBtn{border-radius:12px;padding:10px 16px;font-size:13px;margin:8px 8px 0 0}
+#tab-news .nwBtn.g{background:rgba(165,255,173,.1);color:#a5ffad;border-color:#a5ffad}
+#tab-news .nwBtn.y{background:rgba(255,224,138,.1);color:#ffe08a;border-color:#d9b45a}
+#tab-news .nwBtn.r{background:rgba(255,68,68,.15);color:#ff9090;border-color:#ff4444}
+#tab-news .nwUp{grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr))}
+#tab-news .nwG2{grid-template-columns:1fr}
+@media (min-width:700px){#tab-news .nwG2{grid-template-columns:1fr 1fr}}
+#tab-news .nwEmpty{color:rgba(255,255,255,.7)}
 </style>
 </head>
 <body>
@@ -1273,7 +1312,7 @@ function renderNews(){
   const bday=safeImg(S.bdayImg||d['img_bday-wrap']),boss=safeImg(d['img_boss-wrap']),maps=safeImg(d['img_maps-wrap']);
   el.innerHTML=`<div class="nwTitle">The Trinity News</div><div class="nwPost">📤 Posted ${esc(S.postedAt?new Date(S.postedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'')}</div>
   <div class="nwPanel"><div class="nwSec">📢 News Update</div>
-    <div class="nwVer"><div class="g">GENSHIN IMPACT</div><div class="r"><div class="v">${esc(ver||'—')}</div><div class="t">${esc(n.title||'')}</div></div></div>
+    <div class="nwVer"><div class="g">GENSHIN IMPACT</div><div class="r"><div class="v">${esc(ver||'—')}</div><div class="t">${esc(n.title||'')}</div><div class="act">● ACTIVE</div></div></div>
     <div class="nwG2">
     ${nwTimer('⚡ GENSHIN IMPACT '+esc(vb)+' BANNER','#ffe08a',cds.d1,'Expiry Date & Time','bg1',d)}
     ${nwTimer('🔧 GENSHIN IMPACT '+esc(vm)+' MAINTENANCE','#82ccdd',cds.d2,'Release Date & Time','bg2',d,'<div style="font-size:11px;opacity:.6;margin-top:3px">Maintenance Rewards: Primosgems x300</div>')}
