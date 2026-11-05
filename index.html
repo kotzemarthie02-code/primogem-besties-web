@@ -14,6 +14,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Primogem Besties">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 :root{--bg:#f6f7fd;--ink:#141b34;--gray:#6b7390;--blue:#5078f5;--chip:#eceef7;--green:#05d85b;--mint:#a8e6cf}
@@ -513,6 +514,121 @@ html[data-theme="dark"] .gAdd,html[data-theme="dark"] .nAdd{border-color:#3a4170
 .memLink small{font-size:12px;color:var(--gray);font-weight:600}
 html[data-theme="dark"] .memLink{background:#242a49}
 html[data-theme="dark"] .memPrev .pv.lk{background:#242a49}
+
+/* ===== scrollable 8-button nav ===== */
+.bottomNav{overflow-x:auto;justify-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.bottomNav::-webkit-scrollbar{display:none}
+.bottomNav button{flex:0 0 auto;min-width:74px}
+.bottomNav button:first-child{margin-left:auto}.bottomNav button:last-child{margin-right:auto}
+.fullTab>.groupRow,.fullTab>.lbl,.fullTab>.avRow{display:none}
+/* ===== WISH PULLS (dark gold tracker) ===== */
+.wsPanel{background:#0f1322;border:1px solid rgba(255,224,138,.25);border-radius:28px;padding:16px 14px 18px;margin-top:10px;color:#fff;font-family:'Nunito',sans-serif}
+.wsHead{display:flex;align-items:center;gap:8px;color:#ffe08a;font-weight:900;font-size:19px;letter-spacing:.5px;padding:2px 4px 12px;border-bottom:1px solid rgba(255,224,138,.35)}
+.wsPlayer{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,224,138,.15);border-radius:12px;padding:8px 10px;margin-top:12px}
+.wsPlayer .wsAv{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.wsPlayer input{flex:1;min-width:0;background:none;border:none;color:#fff;font-weight:800;font-size:16px;outline:none}
+.wsPlayer span{color:rgba(255,255,255,.5);font-size:13px;font-weight:700;white-space:nowrap}
+.wsRing{width:min(260px,76%);aspect-ratio:1;margin:18px auto 8px;border-radius:50%;border:3px solid #d9b45a;box-shadow:0 0 0 6px rgba(217,180,90,.12),0 0 40px rgba(255,224,138,.18),inset 0 0 40px rgba(255,224,138,.08);display:flex;align-items:center;justify-content:center;text-align:center}
+.wsRing small{display:block;color:#ffe08a;font-size:11px;font-weight:800;letter-spacing:.6px}
+.wsRing b{display:block;font-size:24px;font-weight:900;margin:10px 0 8px}
+.wsRing em{font-style:normal;color:#ffe08a;font-weight:800;font-size:14px}
+.wsTl{color:#ffe08a;font-weight:800;font-size:14px;letter-spacing:.3px;margin:16px 4px 10px;text-transform:uppercase}
+.wsRec{position:relative;display:flex;align-items:center;gap:12px;border-radius:14px;padding:0 12px 0 0;margin:0 0 9px 18px;min-height:76px;overflow:hidden;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.wsRec::before{content:"";position:absolute;left:-14px;top:50%;width:11px;height:11px;border-radius:50%;background:var(--c)}
+.wsRec::after{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.wsRec.won{--c:#4cd964;background:#17382b}.wsRec.lost{--c:#e5484d;background:#341b20}.wsRec.free{--c:#f2c94c;background:#6d5a1f}.wsRec.guar{--c:#5aa9ff;background:#192d4d}
+.wsRec .th{width:74px;align-self:stretch;margin-left:5px;background:#222a44 center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.wsRec .nm{flex:1;min-width:0}.wsRec .nm b{display:block;font-size:18px;font-weight:800;word-break:break-word}
+.wsRec .nm span{font-size:13px;font-weight:700;color:var(--c)}.wsRec.free .nm span{color:#fff3c4}
+.wsPill{border-radius:999px;padding:6px 16px;font-size:13px;font-weight:900;color:#fff;background:var(--c);flex:none}
+.wsRec.lost .wsPill{background:#c4545a}.wsRec.won .wsPill{background:#43b05c}.wsRec.free .wsPill{background:#f7d658}
+.wsAdd{margin-top:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,224,138,.2);border-radius:16px;padding:12px}
+.wsAdd input{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;padding:11px 12px;font-size:15px;outline:none}
+.wsBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.wsBtns button{border:1px solid;border-radius:12px;padding:11px 6px;font-weight:800;font-size:13px;background:transparent}
+.wsBtns .w{color:#4cd964;border-color:#4cd964}.wsBtns .l{color:#ff7b80;border-color:#e5484d}.wsBtns .g{color:#7db8ff;border-color:#5aa9ff}.wsBtns .f{color:#f7d658;border-color:#f2c94c}
+.wsHint{color:rgba(255,255,255,.4);font-size:12px;font-weight:600;text-align:center;margin-top:8px}
+/* ===== TRINITY NEWS (read-only copy) ===== */
+.nwWrap{border-radius:26px;padding:12px;margin-top:8px;color:rgba(255,255,255,.88);font-family:'Nunito',sans-serif;background:linear-gradient(rgba(8,10,25,.55),rgba(8,10,25,.7)),url('News.jpg') center top/cover,#10142a}
+.nwTitle{text-align:center;font-family:'Cinzel',serif;font-size:26px;letter-spacing:3px;color:#fff;margin:8px 0 6px;text-shadow:0 2px 10px #000}
+.nwPost{text-align:center;font-size:11px;color:rgba(255,255,255,.55);margin:0 0 12px;font-weight:700}
+.nwPanel{background:rgba(10,10,20,.62);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px;margin-bottom:14px}
+.nwSec{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#ffe08a;border-bottom:1px solid rgba(255,224,138,.2);padding-bottom:9px;margin-bottom:12px}
+.nwVer{background:rgba(165,255,173,.14);border:1px solid #a5ffad;border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.nwVer .g{font-family:'Cinzel',serif;font-weight:900;color:#a5ffad;letter-spacing:1px}
+.nwVer .r{display:flex;gap:8px;margin-top:8px;align-items:center}
+.nwVer .v{background:rgba(165,255,173,.12);border:1px solid rgba(165,255,173,.4);color:#a5ffad;font-weight:900;border-radius:10px;padding:8px 14px}
+.nwVer .t{flex:1;color:#a5ffad;font-weight:800;font-size:14px}
+.nwTimer{position:relative;border-radius:14px;border:1px solid rgba(255,255,255,.12);overflow:hidden;background:#000;margin-bottom:10px;min-height:140px}
+.nwTimer .bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.4)}
+.nwTimer .in{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 10px}
+.nwTimer .tt{font-size:12px;font-weight:800;letter-spacing:1px}
+.nwDig{font-family:'Cinzel',serif;font-size:26px;font-weight:900;color:#fff;display:flex;gap:14px;margin:8px 0}
+.nwDig div{display:flex;flex-direction:column;align-items:center;line-height:1.1}.nwDig i{font-style:normal;font-family:'Nunito',sans-serif;font-size:8px;text-transform:uppercase;opacity:.55;font-weight:700}
+.nwTimer .dt{font-size:13px;font-weight:700}
+.nwCard{background:rgba(15,15,30,.55);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:13px;margin-bottom:10px}
+.nwLbl{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.45);margin:2px 0 6px;display:block;letter-spacing:.5px}
+.nwTxt{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.nwEv{background:rgba(0,0,0,.35);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:14px;font-weight:600}
+.nwImg{border-radius:12px;background:#111 center/cover no-repeat;height:200px;margin-top:10px;border:1px solid rgba(130,204,221,.5)}
+.nwBtn{display:inline-flex;align-items:center;gap:5px;padding:8px 13px;border-radius:9px;font-size:12px;font-weight:800;border:1px solid;text-decoration:none;margin:5px 6px 0 0}
+.nwBtn.g{color:#a5ffad;border-color:#a5ffad;background:rgba(165,255,173,.1)}.nwBtn.y{color:#ffe08a;border-color:#ffe08a;background:rgba(255,224,138,.1)}.nwBtn.r{color:#ff9090;border-color:#ff4444;background:rgba(255,68,68,.15)}
+.nwEmpty{text-align:center;padding:40px 14px;font-weight:700}
+.nwUp{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.nwBd{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:600;font-size:14px}
+.nwBd span:nth-child(2){flex:1}.nwBd span:last-child{color:rgba(255,255,255,.5);font-size:12px}
+.nwCode{background:rgba(0,0,0,.5);padding:7px 10px;margin-top:6px;border-radius:8px;color:#a5ffad;font-family:monospace;letter-spacing:1px}
+
+/* ===== Wish Pulls + News: same look as Planner / Month (follows Light/Dark theme) ===== */
+.wsPanel{background:transparent;border:none;padding:0;margin-top:0;color:var(--ink)}
+.wsHead{color:var(--ink);font-size:24px;font-weight:800;letter-spacing:0;border-bottom:none;padding:14px 0 0}
+.wsPlayer,.wsAdd{background:#fff;border:none;box-shadow:0 4px 14px rgba(30,40,90,.07);border-radius:20px}
+.wsPlayer input{color:var(--ink)}.wsPlayer span{color:var(--gray)}
+.wsRing{background:#fff;border:3px solid var(--blue);box-shadow:0 0 0 6px rgba(80,120,245,.10),0 4px 16px rgba(30,40,90,.08)}
+.wsRing small,.wsRing em{color:var(--blue)}.wsRing b{color:var(--ink)}
+.wsTl{color:var(--ink);font-size:16px;font-weight:800}
+.wsRec{border:none;box-shadow:0 4px 14px rgba(30,40,90,.07)}
+.wsRec .nm b{color:var(--ink)}
+.wsRec.won{background:#d8f5e3;--c:#16a35a}.wsRec.lost{background:#ffe1e4;--c:#e11d2e}.wsRec.free{background:#fff3c4;--c:#b7860b}.wsRec.guar{background:#dfe8ff;--c:#5078f5}
+.wsRec.free .nm span{color:#b7860b}
+.wsRec .th{background-color:#e9ecf9;color:var(--gray)}
+.wsRec.won .wsPill{background:#10b866}.wsRec.lost .wsPill{background:#ff3347}.wsRec.free .wsPill{background:#f2b705}.wsRec.guar .wsPill{background:#5078f5}
+.wsAdd input{background:#f3f4fb;border:none;color:var(--ink)}
+.wsBtns .w{color:#16a35a;border-color:#16a35a}.wsBtns .l{color:#e11d2e;border-color:#e11d2e}.wsBtns .g{color:#5078f5;border-color:#5078f5}.wsBtns .f{color:#b7860b;border-color:#b7860b}
+.wsHint{color:var(--gray)}
+.nwWrap{background:none;padding:0;margin-top:0;color:var(--ink)}
+.nwTitle{font-family:inherit;font-size:24px;font-weight:800;letter-spacing:0;color:var(--ink);text-align:left;text-shadow:none;margin:14px 0 2px}
+.nwPost{text-align:left;color:var(--gray);margin-bottom:6px}
+.nwPanel{background:#fff;border:none;border-radius:24px;box-shadow:0 4px 16px rgba(30,40,90,.08)}
+.nwSec{font-family:inherit;font-size:18px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--ink);border-bottom:1px solid #eceef7}
+.nwVer{background:#d8f5e3;border-color:#bdebd0}.nwVer .g,.nwVer .t{color:#16a35a;font-family:inherit}.nwVer .v{background:#fff;color:#16a35a;border-color:#bdebd0}
+.nwCard{background:#f3f4fb;border:none}
+.nwLbl{color:var(--gray)}.nwTxt{color:var(--ink)}
+.nwEv,.nwBd,.nwCode{background:#fff;border:none;color:var(--ink)}
+.nwBd span:last-child{color:var(--gray)}.nwCode{color:#16a35a}
+.nwTimer{background:linear-gradient(135deg,#5078f5,#7c5cff);border:none}
+.nwBtn.g{color:#16a35a;border-color:#16a35a;background:#e6f8ee}.nwBtn.y{color:#b7860b;border-color:#d9b45a;background:#fff6d6}.nwBtn.r{color:#e11d2e;border-color:#e11d2e;background:#ffe9eb}
+.nwEmpty{color:var(--gray)}
+html[data-theme="dark"] .wsPlayer,html[data-theme="dark"] .wsAdd,html[data-theme="dark"] .wsRing,html[data-theme="dark"] .nwPanel{background:#1a1f38;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+html[data-theme="dark"] .wsAdd input{background:#272d4c}
+html[data-theme="dark"] .wsRec.won{background:#143b2c}html[data-theme="dark"] .wsRec.lost{background:#3a1d28}html[data-theme="dark"] .wsRec.free{background:#4a3f1a}html[data-theme="dark"] .wsRec.guar{background:#1f2a52}
+html[data-theme="dark"] .wsRec .th{background-color:#272d4c}
+html[data-theme="dark"] .nwSec{border-color:#2c3560}
+html[data-theme="dark"] .nwCard{background:#242a49}html[data-theme="dark"] .nwEv,html[data-theme="dark"] .nwBd,html[data-theme="dark"] .nwCode{background:#1a1f38}
+html[data-theme="dark"] .nwVer{background:#143b2c;border-color:#1f7a52}html[data-theme="dark"] .nwVer .v{background:#1a1f38;border-color:#1f7a52}
+html[data-theme="dark"] .nwVer .g,html[data-theme="dark"] .nwVer .t,html[data-theme="dark"] .nwVer .v,html[data-theme="dark"] .nwCode{color:#4ade80}
+html[data-theme="dark"] .nwBtn.g{background:#143b2c;color:#4ade80;border-color:#4ade80}html[data-theme="dark"] .nwBtn.y{background:#3a331a;color:#ffe08a;border-color:#b7860b}html[data-theme="dark"] .nwBtn.r{background:#3a1d28;color:#ff8a93;border-color:#ff8a93}
+.wsCard{margin-bottom:28px}
+.wsItem{margin:0 0 12px}.wsItem .wsRec{margin-bottom:4px}.wsItem .rxRow,.wsItem .wsCm{margin-left:18px}
+.wsDel{background:none;border:none;color:var(--gray);font-size:16px;padding:6px;flex:none}
+.wsCm summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--gray);padding:6px 0;list-style:none}
+.wsCm summary::-webkit-details-marker{display:none}
+.wsRing.sm{width:min(170px,60%);margin:12px auto 4px}.wsRing.sm b{font-size:18px;margin:6px 0}
+.wsPlayer b{color:var(--ink)}.wsPlayer .av{flex:none}
+.wsRec .nm small.wsWhen{display:block;font-size:11px;font-weight:700;color:var(--gray);margin-top:2px}
+.wsWhenRow{display:block;margin-top:10px;font-size:12px;font-weight:800;color:var(--gray)}
+.wsWhenRow input{width:100%;margin-top:6px;color-scheme:light dark}
+html[data-theme="dark"] .wsWhenRow input{color-scheme:dark}
 </style>
 </head>
 <body>
@@ -597,6 +713,16 @@ html[data-theme="dark"] .memPrev .pv.lk{background:#242a49}
     <div id="memList"></div>
   </div>
 
+  <div id="tab-news" class="hidden"><div class="nwWrap" id="newsBody"></div></div>
+
+  <div id="tab-wish" class="hidden">
+    <div class="wsPanel">
+      <div class="wsHead">✦ LUCKIEST ACCOUNT</div>
+      <div class="seg"><button id="btnWsMy" class="active" onclick="setWsMode('my')">My Pulls</button><button id="btnWsGroup" onclick="setWsMode('group')">Group Pulls</button></div>
+      <div id="wsRoot"></div>
+    </div>
+  </div>
+
   <div id="tab-profile" class="hidden">
     <div class="pCard">
       <div id="bigAvatar" class="bigAv">🧪</div>
@@ -628,7 +754,9 @@ html[data-theme="dark"] .memPrev .pv.lk{background:#242a49}
     <button id="nav-planner" class="active" onclick="nav('planner')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><line class="w" x1="12" y1="3.5" x2="12" y2="20.5"/></svg>Planner</button>
     <button id="nav-month" onclick="nav('month')"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><line class="w" x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>Month</button>
     <button id="nav-remind" onclick="nav('remind')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/><path d="M3 9a9 9 0 0 1 3-6M21 9a9 9 0 0 0-3-6" style="fill:none"/></svg><i class="navBadge hidden" id="rmDot">!</i></span>Reminder</button>
+    <button id="nav-news" onclick="nav('news')"><span class="navIcon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="14" height="15" rx="2"/><path d="M17.5 8.5h3v8a3 3 0 0 1-3 3"/><line x1="7" y1="9" x2="13.5" y2="9"/><line x1="7" y1="12.5" x2="13.5" y2="12.5"/><line x1="7" y1="16" x2="11" y2="16"/></svg><i class="navBadge hidden" id="newsDot">!</i></span>News</button>
     <button id="nav-alerts" onclick="nav('alerts')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><i class="navBadge hidden" id="bellBadge">0</i></span>Notifications</button>
+    <button id="nav-wish" onclick="nav('wish')"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 6.1 6.1 2.4-6.1 2.4L12 20l-2.4-6.1L3.5 11.5l6.1-2.4z"/></svg>Wish Pulls</button>
     <button id="nav-memories" onclick="nav('memories')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"/></svg>Memories</button>
     <button id="nav-profile" onclick="nav('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Profile</button>
   </div>
@@ -822,13 +950,13 @@ function onPlans(list,meta){
   allPlans=list;plans={};remoteUsers={};
   list.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(p=>{
     p.joined=p.joined||[];p.joinedIds=p.joinedIds||[];
-    if(p.kind!=='memory')(plans[p.date]=plans[p.date]||[]).push(p);
+    if(p.kind!=='memory'&&p.kind!=='wish')(plans[p.date]=plans[p.date]||[]).push(p);
     if(p.owner)remoteUsers[p.owner]={name:p.ownerName||String(p.owner).split('@')[0],emoji:p.ownerEmoji||'🙂',color:p.ownerColor||'#A8E6CF'};
   });
-  if(profile&&!$('appScreen').classList.contains('hidden')){renderGroup();renderPlanner();renderMonth();try{renderMemories()}catch(e){}}
+  if(profile&&!$('appScreen').classList.contains('hidden')){renderGroup();renderPlanner();renderMonth();try{renderMemories()}catch(e){}try{renderWish()}catch(e){}}
   if(profile&&!$('appScreen').classList.contains('hidden'))restoreEditDraft(meta);
-  if(useFB&&profile&&meta&&!meta.fromCache)migrateStep(list,meta);
-  try{processNotifs(list.filter(p=>p.kind!=='memory'),meta)}catch(e){dbg('notif error '+e.message)}
+  if(useFB&&profile&&meta&&!meta.fromCache){migrateStep(list,meta);try{wishMigrate(list)}catch(e){}}
+  try{processNotifs(list.filter(p=>p.kind!=='memory'&&p.kind!=='wish'),meta)}catch(e){dbg('notif error '+e.message)}
 }
 /* one-time: copy plans that were saved only on THIS phone (old local mode) into Firestore */
 function buildMigration(){
@@ -956,16 +1084,160 @@ function checkLogin(){
   }
 }
 
+
+/* ================= WISH PULLS (shared with the group: everyone sees, reacts and comments) ================= */
+function safeImg(u){u=String(u||'');return /^(data:image\/|https?:\/\/)/.test(u)?u.replace(/['"()\\]/g,''):''}
+const WS_TXT={won:'won 50/50',lost:'lost 50/50',guar:'guaranteed',free:'free character • choose by quest'};
+const WS_PILL={won:'WON',lost:'LOST',guar:'GUARANTEED',free:'FREE'};
+let wsMode=store.get('pb_ws_mode','my'),wsOpen=new Set(),wsMig=false;
+const wishDocs=o=>allPlans.filter(p=>p.kind==='wish'&&(!o||p.owner===o)).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+function wishDoc(n,t,ts,id){
+  return {id:id||uid(),kind:'wish',owner:me(),ownerName:profile.name,ownerEmoji:profile.emoji,ownerColor:profile.color,text:n,wt:t,emoji:'',color:'#A8E6CF',day:'',date:keyOf(new Date(ts||Date.now())),joined:[],joinedIds:[],createdAt:ts||Date.now(),wsAr:store.get('pb_ws_ar_'+me(),'')};
+}
+function wishMigrate(list){   // one-time: pulls saved only on this phone -> shared with the group
+  if(wsMig)return;wsMig=true;
+  if(store.get('pb_wish_migd_'+me(),false))return;
+  const old=store.get('pb_wish_'+me(),null);
+  if(old&&old.n&&!store.get('pb_ws_ar_'+me(),''))store.set('pb_ws_ar_'+me(),old.n);
+  if(old&&Array.isArray(old.list)&&old.list.length){
+    const tag=me().replace(/[^A-Za-z0-9]/g,''),have=new Set(list.map(p=>p.id));
+    old.list.forEach((r,i)=>{const id='wsh_'+tag+'_'+(r.ts||i);if(!have.has(id))DB.addPlan(wishDoc(r.n,r.t,r.ts||Date.now()+i,id))});
+  }
+  store.set('pb_wish_migd_'+me(),true);
+}
+const nowLocal=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())};
+const wsWhenTxt=ts=>{const d=new Date(ts);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' • '+pad(d.getHours())+':'+pad(d.getMinutes())};
+function setWsMode(m){wsMode=m;store.set('pb_ws_mode',m);renderWish(true)}
+function wsTog(pid,o){o?wsOpen.add(pid):wsOpen.delete(pid)}
+function wsComments(p){
+  const pid=esc(p.id),C=commentsOf(p);
+  return `<details class="wsCm" ${wsOpen.has(p.id)?'open':''} ontoggle="wsTog('${pid}',this.open)"><summary>💬 ${C.length?C.length+' comment'+(C.length>1?'s':''):'Comment'}</summary><div class="cmList">${C.map(c=>{const cu=cmUser(c);return `<div class="cmItem" style="background:${hexA(normHex(cu.color)||'#A8E6CF',.22)}">${avatar(cu,30)}<div class="cmBody"><b>${esc(cu.name||c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small></div>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`}).join('')}</div><div class="cmAdd"><button class="cmEmo" onclick="openEmojiPicker('cm-${pid}')" aria-label="Pick emoji">😊</button><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></details>`;
+}
+function wishCard(owner){
+  const L=wishDocs(owner),mine=owner===me(),u=userOf(owner);
+  const won=L.filter(p=>p.wt==='won').length,lost=L.filter(p=>p.wt==='lost').length,rate=won+lost?Math.round(won/(won+lost)*100):0;
+  const arDoc=[...L].reverse().find(p=>p.wsAr),ar=mine?store.get('pb_ws_ar_'+me(),''):(arDoc?arDoc.wsAr:'');
+  const who=mine?`<input id="wsAr" value="${esc(ar)}" placeholder="Your name + AR (e.g. Unknown AR57)" maxlength="30" onchange="saveWishAr(this.value)">`:`<b style="flex:1;min-width:0;font-size:16px">${esc(ar||u.name)}</b>`;
+  const recs=L.map((p,i)=>`<div class="wsItem"><div class="wsRec ${esc(p.wt)}"><div class="th" style="background-image:url('${encodeURIComponent(p.text||'')}1.jpg')">✦</div><div class="nm"><b>${esc(p.text)}</b><span>${p.wt==='free'?WS_TXT.free:(i+1)+' • '+(WS_TXT[p.wt]||'')}</span><small class="wsWhen">📅 ${wsWhenTxt(p.createdAt)}</small></div><div class="wsPill">${WS_PILL[p.wt]||''}</div>${mine?`<button class="wsDel" onclick="delWish('${esc(p.id)}')" aria-label="Delete">✕</button>`:''}</div>${reactBar(p)}${wsComments(p)}</div>`).join('');
+  return `<div class="wsCard"><div class="wsPlayer">${avatar(u,34)}${who}<span>${L.length} 5★</span></div><div class="wsRing${mine?'':' sm'}"><div><small>5-STAR PULL TRACKER</small><b>${won} WON / ${lost} LOST</b><em>${rate}% Win Rate</em></div></div><div class="wsTl">✦ Pull Timeline • ${L.length} Record${L.length===1?'':'s'}</div>${recs||'<div class="wsHint">No pulls yet ✨</div>'}</div>`;
+}
+function renderWish(force){
+  const root=$('wsRoot');if(!root||!profile)return;
+  const a=document.activeElement;
+  if(!force&&a&&root.contains(a)&&/INPUT|TEXTAREA/.test(a.tagName))return;
+  const keep={};root.querySelectorAll('input[id^="cm-"],#wsNew,#wsWhen').forEach(i=>{if(i.value)keep[i.id]=i.value});
+  $('btnWsMy').classList.toggle('active',wsMode==='my');$('btnWsGroup').classList.toggle('active',wsMode==='group');
+  const owners=[me()];
+  if(wsMode==='group')[...new Set(wishDocs().map(p=>p.owner))].filter(o=>o!==me()).forEach(o=>owners.push(o));
+  const add=`<div class="wsAdd"><input id="wsNew" placeholder="5★ character name (e.g. Columbina)" maxlength="40" onkeydown="if(event.key==='Enter')addWish('won')"><label class="wsWhenRow">📅 Date &amp; time of the pull<input type="datetime-local" id="wsWhen"></label><div class="wsBtns"><button class="w" onclick="addWish('won')">✅ Won 50/50</button><button class="l" onclick="addWish('lost')">❌ Lost 50/50</button><button class="g" onclick="addWish('guar')">🎯 Guaranteed</button><button class="f" onclick="addWish('free')">🎁 Free</button></div><div class="wsHint">Everyone in the group can see, react and comment</div></div>`;
+  root.innerHTML=owners.map(wishCard).join('')+(wsMode==='my'?add:(owners.length<2?'<div class="wsHint">Nobody else has added pulls yet</div>':''));
+  Object.keys(keep).forEach(id=>{const e=$(id);if(e)e.value=keep[id]});
+  const wn=$('wsWhen');if(wn&&!wn.value)wn.value=nowLocal();
+}
+function addWish(t){
+  if(!syncReady())return;
+  const inp=$('wsNew'),n=inp.value.trim();if(!n){inp.focus();return}
+  const wv=$('wsWhen').value,ts=wv?new Date(wv).getTime():Date.now();
+  DB.addPlan(wishDoc(n,t,isNaN(ts)?Date.now():ts));inp.value='';$('wsWhen').value='';renderWish(true);
+}
+function delWish(id){
+  const p=allPlans.find(x=>x.id===id);if(!p||!isMine(p)||!syncReady())return;
+  if(confirm('Delete "'+p.text+'" from your timeline?')){DB.deletePlan(id);allPlans=allPlans.filter(x=>x.id!==id);renderWish(true)}
+}
+function saveWishAr(v){
+  v=String(v||'').trim();store.set('pb_ws_ar_'+me(),v);
+  const ids=wishDocs(me()).map(p=>p.id);if(ids.length&&syncReady())DB.meta(ids,{wsAr:v});
+}
+
+/* ================= TRINITY NEWS (read-only, posted from Trinity News editor) ================= */
+window.NEWS_SNAP=store.get('pb_news_cache',null);
+const nwFmt=v=>v?new Date(v).toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'}):'—';
+const nwLink=(u,cls,lbl)=>{u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u;return `<a class="nwBtn ${cls}" href="${esc(u)}" target="_blank" rel="noopener">${lbl}</a>`};
+function nwTimer(title,color,dt,label,bgk,d,extra){
+  const b=safeImg(d['img_'+bgk]);
+  return `<div class="nwTimer"><div class="bg" style="${b?`background-image:url('${b}')`:''}"></div><div class="in">
+  <div class="tt" style="color:${color}">${title}</div>
+  <div class="nwDig" data-dt="${esc(dt||'')}"><div><span class="d">--</span><i>days</i></div><div><span class="h">--</span><i>hours</i></div><div><span class="m">--</span><i>min</i></div><div><span class="s">--</span><i>sec</i></div></div>
+  <div class="dt" style="color:${color}">${label}: ${esc(nwFmt(dt))}</div>${extra||''}</div></div>`;
+}
+function renderNews(){
+  const el=$('newsBody');if(!el)return;
+  const S=window.NEWS_SNAP;
+  if(!S||!S.data){el.innerHTML='<div class="nwEmpty">📰 No news posted yet.<br><small style="opacity:.6">It appears here when Trinity News is posted.</small></div>';return}
+  const d=S.data,n=d.news||{},cds=d.cds||{},pd=d.pd||{},lv=d.live||{},bt=d.battle||{},up=Array.isArray(d.upcoming)?d.upcoming:[],codes=Array.isArray(d.codes)?d.codes:[];
+  const evs=(n.events||[]).filter(Boolean),ver=n.ver||'',vb=d.vb||ver,vm=d.vm||'';
+  const phase=(k,col,emo,sym)=>{
+    const c1=n[k+'c1'],c2=n[k+'c2'];
+    const row=(c,y,b)=>c?`<div class="nwEv" style="font-weight:800">${esc(c)}</div>${nwLink(n[y],col==='#ffe08a'?'g':'g','▶ Watch')}${nwLink(n[b],'y','📖 Build')}`:'';
+    return `<div class="nwCard" style="border-top:3px solid ${col}"><div style="font-weight:800;font-size:15px;color:${col==='#ffe08a'?'#b7860b':'#2b7fa3'};margin-bottom:8px">${emo} ${sym}</div>
+      ${row(c1,k+'c1yt',k+'c1b')}
+      ${nwTimer('',col,pd[k==='p1'?'p1':'p2'],'Expected Release Date & Time',k==='p1'?'bgp1':'bgp2',d)}
+      ${row(c2,k+'c2yt',k+'c2b')}</div>`;
+  };
+  const upHtml=up.map(u=>{const b=safeImg(u.img);return `<div class="nwCard" style="padding:10px"><div style="display:flex;gap:6px;font-family:Cinzel,serif;font-weight:900"><span style="flex:1">${esc(u.name||'')}</span><span style="font-size:12px;opacity:.8">${esc(u.elem||'')}</span></div>
+    <div class="nwTimer" style="margin:8px 0 0;min-height:120px"><div class="bg" style="${b?`background-image:url('${b}')`:''}"></div><div class="in"><div class="nwDig" style="font-size:20px;gap:10px" data-dt="${esc(u.dt||'')}"><div><span class="d">--</span><i>days</i></div><div><span class="h">--</span><i>hrs</i></div><div><span class="m">--</span><i>min</i></div><div><span class="s">--</span><i>sec</i></div></div><div class="dt" style="font-size:11px;color:#ffe08a">Expected: ${esc(nwFmt(u.dt))}</div></div></div></div>`}).join('');
+  const bday=safeImg(S.bdayImg||d['img_bday-wrap']),boss=safeImg(d['img_boss-wrap']),maps=safeImg(d['img_maps-wrap']);
+  el.innerHTML=`<div class="nwTitle">The Trinity News</div><div class="nwPost">📤 Posted ${esc(S.postedAt?new Date(S.postedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'')}</div>
+  <div class="nwPanel"><div class="nwSec">📢 News Update</div>
+    <div class="nwVer"><div class="g">GENSHIN IMPACT</div><div class="r"><div class="v">${esc(ver||'—')}</div><div class="t">${esc(n.title||'')}</div></div></div>
+    ${nwTimer('⚡ GENSHIN IMPACT '+esc(vb)+' BANNER','#ffe08a',cds.d1,'Expiry Date & Time','bg1',d)}
+    ${nwTimer('🔧 GENSHIN IMPACT '+esc(vm)+' MAINTENANCE','#82ccdd',cds.d2,'Release Date & Time','bg2',d,'<div style="font-size:11px;opacity:.6;margin-top:3px">Maintenance Rewards: Primosgems x300</div>')}
+    <div class="nwCard"><span class="nwLbl">📰 News update story</span><div class="nwTxt">${esc(n.story||'—')}</div>
+      ${evs.length?'<span class="nwLbl" style="margin-top:12px">New events</span>'+evs.map(e=>`<div class="nwEv">${esc(e)}</div>`).join(''):''}</div>
+    <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:12px;color:#2b7fa3;margin-bottom:8px">🗺️ NEW MAPS &amp; CONTENT</div><div class="nwTxt">${esc(n.maps||'—')}</div>${maps?`<div class="nwImg" style="background-image:url('${maps}')"></div>`:''}</div>
+  </div>
+  <div class="nwPanel"><div class="nwSec">🎴 Banner Tracker</div>${phase('p1','#ffe08a','⚡','PHASE 1')}${phase('p2','#82ccdd','🌙','PHASE 2')}</div>
+  ${up.length?`<div class="nwPanel"><div class="nwSec">🌟 Upcoming Characters</div><div class="nwUp">${upHtml}</div></div>`:''}
+  <div class="nwPanel"><div class="nwSec">⚔️ Battle &amp; Build Intel</div>
+    <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:11px;color:#16a35a;margin-bottom:8px">✨ NEW CHARACTER DEBUT</div><div class="nwTxt" style="font-weight:800">${esc(bt.char||'—')}</div>
+      ${nwLink(bt.yd,'g','▶ Trailer')}${nwLink(bt.ym,'g','▶ Misc')}${nwLink(bt.bl,'y','📖 Build')}${nwLink(bt.wl,'y','📖 Wiki')}</div>
+    <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:11px;color:#e11d2e;margin-bottom:8px">👹 NEW WEEKLY BOSS</div><div class="nwTxt" style="font-weight:800">${esc(bt.wb||'—')}</div>
+      ${nwLink(bt.blink,'r','🔗 Guide')}${nwLink(bt.blink2,'r','🔗 Guide 2')}${boss?`<div class="nwImg" style="background-image:url('${boss}');border-color:rgba(255,100,100,.3)"></div>`:''}</div>
+  </div>
+  <div class="nwPanel"><div class="nwSec">⏳ Reminders</div>
+    <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:12px;color:#b7860b;margin-bottom:10px">🎂 UPCOMING BIRTHDAYS</div>
+      ${(S.bdays||[]).map(b=>`<div class="nwBd"><span>${b.today?'🎂✨':'🎂'}</span><span style="${b.today?'color:#ffe08a;font-weight:900':''}">${esc(b.name)}</span><span>${esc(b.label)}${b.today?' 🎉':''}</span></div>`).join('')}
+      ${bday?`<div class="nwImg" style="background-image:url('${bday}');height:160px;border-color:rgba(0,195,255,.35)"></div>`:''}</div>
+    <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:12px;color:#b7860b;margin-bottom:10px">🔑 REDEEM CODES / 📺 LIVESTREAM</div>
+      ${nwTimer('📺 GENSHIN IMPACT '+esc(lv.ver||'')+' LIVESTREAM','#ffe08a',lv.date,'Release Date & Time','live-bg',d,'<div style="font-size:11px;opacity:.6;margin-top:3px">Codes will be added during the livestream</div>')}
+      ${nwLink('https://www.youtube.com/@GenshinImpact','r','▶ Watch on YouTube')}${nwLink('https://genshin.hoyoverse.com/en/gift','y','🎁 Open Redeem')}
+      ${codes.map(c=>`<div class="nwCode">${esc(c)}</div>`).join('')}</div>
+  </div>`;
+  tickNews();
+}
+function tickNews(){
+  const now=Date.now();
+  document.querySelectorAll('.nwDig').forEach(b=>{
+    const dt=b.dataset.dt,diff=dt?new Date(dt).getTime()-now:0;
+    let v=['--','--','--','--'];
+    if(dt&&diff>0)v=[Math.floor(diff/864e5),pad(Math.floor(diff%864e5/36e5)),pad(Math.floor(diff%36e5/6e4)),pad(Math.floor(diff%6e4/1e3))];
+    ['d','h','m','s'].forEach((c,i)=>{const e=b.querySelector('.'+c);if(e)e.textContent=v[i]});
+  });
+}
+setInterval(()=>{if(!$('tab-news').classList.contains('hidden'))tickNews()},1000);
+function newsUnread(){const S=window.NEWS_SNAP;return !!(S&&S.postedAt&&S.postedAt>store.get('pb_news_seen',0))}
+function updNewsDot(){const e=$('newsDot');if(e)e.classList.toggle('hidden',!newsUnread())}
+function markNewsSeen(){const S=window.NEWS_SNAP;if(S&&S.postedAt)store.set('pb_news_seen',S.postedAt);updNewsDot()}
+window.onNewsSnap=function(v){
+  const first=!window.NEWS_SNAP,wasNew=v&&v.postedAt&&(!window.NEWS_SNAP||v.postedAt>(window.NEWS_SNAP.postedAt||0));
+  window.NEWS_SNAP=v||null;try{store.set('pb_news_cache',v)}catch(e){}
+  try{renderNews();if(!$('tab-news').classList.contains('hidden'))markNewsSeen();else updNewsDot()}catch(e){dbg('news error '+e.message)}
+  if(wasNew&&!first&&newsUnread()&&profile)try{showToast('📰 New Trinity News posted',(v.data&&v.data.news&&v.data.news.title)||'Tap News to read')}catch(e){}
+};
+
 /* ---------- navigation ---------- */
-const TITLES={planner:'Group Weekly Planner',month:'Calendar',remind:'Reminders',memories:'Good Memories',alerts:'Notifications',profile:'Profile'};
+const TITLES={news:'The Trinity News',wish:'Wish Pulls',planner:'Group Weekly Planner',month:'Calendar',remind:'Reminders',memories:'Good Memories',alerts:'Notifications',profile:'Profile'};
 function nav(t){
-  ['planner','month','remind','alerts','memories','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
+  ['planner','month','remind','news','alerts','wish','memories','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
   $('pageTitle').textContent=TITLES[t];
+  $('appScreen').classList.toggle('fullTab',t==='news'||t==='wish');
   renderAll();window.scrollTo(0,0);
   if(t==='remind'){try{renderRemind(true)}catch(e){$('rmChecklists').innerHTML='<div class="empty">Reminder error: '+esc(e.message)+'</div>'}}
   if(t==='alerts')enterAlerts();else leaveAlerts();
+  if(t==='news'){try{renderNews();markNewsSeen()}catch(e){}}else{try{updNewsDot()}catch(e){}}
+  try{$('nav-'+t).scrollIntoView({inline:'center',block:'nearest'})}catch(e){}
 }
-function renderAll(){[renderGroup,renderPlanner,renderMonth,renderProfile,()=>renderRemind(),()=>renderMemories()].forEach(f=>{try{f()}catch(e){dbg('render error '+e.message)}})}
+function renderAll(){[renderGroup,renderPlanner,renderMonth,renderProfile,()=>renderRemind(),()=>renderMemories(),renderWish].forEach(f=>{try{f()}catch(e){dbg('render error '+e.message)}})}
 function renderGroup(){
   const ids=Object.keys(remoteUsers);if(profile&&!ids.includes(profile.email))ids.unshift(profile.email);
   $('memberCount').textContent=`Team Trinity • ${ids.length} members`;
@@ -1602,12 +1874,12 @@ function addComment(pid){
   if(!syncReady())return;const el=$('cm-'+pid);if(!el)return;const t=el.value.trim();if(!t)return;
   const p=allPlans.find(x=>x.id===pid);if(!p)return;
   const k=cmKey(),cur=(Array.isArray(p[k])?p[k]:[]).concat([{id:uid(),n:profile.name,e:profile.emoji,c:profile.color,t:t,ts:Date.now()}]);
-  p[k]=cur;el.value='';DB.updatePlan(pid,{[k]:cur});renderMemories(true);
+  p[k]=cur;el.value='';DB.updatePlan(pid,{[k]:cur});renderMemories(true);renderWish(true);
 }
 function delComment(pid,cid){
   if(!syncReady())return;const p=allPlans.find(x=>x.id===pid);if(!p)return;
   const k=cmKey(),cur=(Array.isArray(p[k])?p[k]:[]).filter(c=>c.id!==cid);
-  p[k]=cur;DB.updatePlan(pid,{[k]:cur});renderMemories(true);
+  p[k]=cur;DB.updatePlan(pid,{[k]:cur});renderMemories(true);renderWish(true);
 }
 function openMemEdit(pid){
   const p=allPlans.find(x=>x.id===pid);if(!p||!isMine(p))return;
@@ -1799,6 +2071,15 @@ function applyTheme(){
 function setTheme(t){store.set('pb_theme',t);applyTheme()}
 try{var _mq=window.matchMedia('(prefers-color-scheme: dark)');(_mq.addEventListener?_mq.addEventListener('change',applyTheme):_mq.addListener&&_mq.addListener(applyTheme))}catch(e){}
 applyTheme();
+</script>
+<script type="module">
+/* Trinity News (read-only): listens to the node Trinity News posts to */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+try{
+  const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
+  onValue(ref(getDatabase(app),"sharedData/primogemNews"),snap=>window.onNewsSnap(snap.val()),err=>console.warn("Trinity News:",err.message));
+}catch(e){console.warn("Trinity News init failed",e)}
 </script>
 </body>
 </html>
