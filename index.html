@@ -1119,7 +1119,7 @@ function wishCard(owner){
   const arDoc=[...L].reverse().find(p=>p.wsAr),ar=mine?store.get('pb_ws_ar_'+me(),''):(arDoc?arDoc.wsAr:'');
   const who=mine?`<input id="wsAr" value="${esc(ar)}" placeholder="Your name + AR (e.g. Unknown AR57)" maxlength="30" onchange="saveWishAr(this.value)">`:`<b style="flex:1;min-width:0;font-size:16px">${esc(ar||u.name)}</b>`;
   const recs=L.map((p,i)=>`<div class="wsItem"><div class="wsRec ${esc(p.wt)}"><div class="th" style="background-image:url('${encodeURIComponent(p.text||'')}1.jpg')">✦</div><div class="nm"><b>${esc(p.text)}</b><span>${p.wt==='free'?WS_TXT.free:(i+1)+' • '+(WS_TXT[p.wt]||'')}</span><small class="wsWhen">📅 ${wsWhenTxt(p.createdAt)}</small></div><div class="wsPill">${WS_PILL[p.wt]||''}</div>${mine?`<button class="wsDel" onclick="delWish('${esc(p.id)}')" aria-label="Delete">✕</button>`:''}</div>${reactBar(p)}${wsComments(p)}</div>`).join('');
-  return `<div class="wsCard"><div class="wsPlayer">${avatar(u,34)}${who}<span>${L.length} 5★</span></div><div class="wsRing${mine?'':' sm'}"><div><small>5-STAR PULL TRACKER</small><b>${won} WON / ${lost} LOST</b><em>${rate}% Win Rate</em></div></div><div class="wsTl">✦ Pull Timeline • ${L.length} Record${L.length===1?'':'s'}</div>${recs||'<div class="wsHint">No pulls yet ✨</div>'}</div>`;
+  return `<div class="wsCard"><div class="wsPlayer">${avatar(u,34)}${who}</div><div class="wsRing${mine?'':' sm'}"><div><small>50/50 LUCK TRACKER</small><b>${won} WON / ${lost} LOST</b><em>${rate}% Win Rate</em></div></div><div class="wsTl">✦ Pull Timeline • ${L.length} Record${L.length===1?'':'s'}</div>${recs||'<div class="wsHint">No pulls yet ✨</div>'}</div>`;
 }
 function renderWish(force){
   const root=$('wsRoot');if(!root||!profile)return;
