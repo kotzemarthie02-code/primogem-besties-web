@@ -697,6 +697,17 @@ html[data-theme="dark"] .wsEdit input,html[data-theme="dark"] .wsEdit select,htm
 #tab-news .nwG2{grid-template-columns:1fr}
 @media (min-width:700px){#tab-news .nwG2{grid-template-columns:1fr 1fr}}
 #tab-news .nwEmpty{color:rgba(255,255,255,.7)}
+
+/* ===== FIT FIX: no overflow on phone / tablet / laptop / PC ===== */
+#tab-news .nwG2 .nwTimer{height:auto}
+#tab-news .nwG2>.nwTimer{height:100%}
+#tab-news .nwCard .nwTimer{min-height:clamp(170px,32vw,240px);width:100%}
+#tab-news .nwTimer .bg{background-size:cover;background-position:center}
+#tab-news .nwPanel,#tab-news .nwCard{overflow:hidden;max-width:100%}
+#tab-news .nwG2{align-items:start}
+#tab-news .nwDig{gap:clamp(8px,2vw,20px)}
+#tab-news .nwBtn{max-width:100%}
+.nwMedia{position:relative;width:100%;aspect-ratio:16/9;margin-top:12px;border-radius:16px;background:#111 center/cover no-repeat;border:1px solid rgba(165,255,173,.35);overflow:hidden}
 </style>
 </head>
 <body>
@@ -1293,6 +1304,11 @@ function nwTimer(title,color,dt,label,bgk,d,extra){
   <div class="nwDig" data-dt="${esc(dt||'')}"><div><span class="d">--</span><i>days</i></div><div><span class="h">--</span><i>hours</i></div><div><span class="m">--</span><i>min</i></div><div><span class="s">--</span><i>sec</i></div></div>
   <div class="dt" style="color:${color}">${label}: ${esc(nwFmt(dt))}</div>${extra||''}</div></div>`;
 }
+
+function nwMedia(img){
+  if(!img)return '';
+  return `<div class="nwMedia" style="background-image:url('${img}')"></div>`;
+}
 function renderNews(){
   const el=$('newsBody');if(!el)return;
   const S=window.NEWS_SNAP;
@@ -1309,7 +1325,7 @@ function renderNews(){
   };
   const upHtml=up.map(u=>{const b=safeImg(u.img);return `<div class="nwCard" style="padding:10px"><div style="display:flex;gap:6px;font-family:Cinzel,serif;font-weight:900"><span style="flex:1">${esc(u.name||'')}</span><span style="font-size:12px;opacity:.8">${esc(u.elem||'')}</span></div>
     <div class="nwTimer" style="margin:8px 0 0;min-height:120px"><div class="bg" style="${b?`background-image:url('${b}')`:''}"></div><div class="in"><div class="nwDig" style="font-size:20px;gap:10px" data-dt="${esc(u.dt||'')}"><div><span class="d">--</span><i>days</i></div><div><span class="h">--</span><i>hrs</i></div><div><span class="m">--</span><i>min</i></div><div><span class="s">--</span><i>sec</i></div></div><div class="dt" style="font-size:11px;color:#ffe08a">Expected: ${esc(nwFmt(u.dt))}</div></div></div></div>`}).join('');
-  const bday=safeImg(S.bdayImg||d['img_bday-wrap']),boss=safeImg(d['img_boss-wrap']),maps=safeImg(d['img_maps-wrap']);
+  const bday=safeImg(S.bdayImg||d['img_bday-wrap']),boss=safeImg(d['img_boss-wrap']),chr=safeImg(d['img_char-wrap']),maps=safeImg(d['img_maps-wrap']);
   el.innerHTML=`<div class="nwTitle">The Trinity News</div><div class="nwPost">📤 Posted ${esc(S.postedAt?new Date(S.postedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'')}</div>
   <div class="nwPanel"><div class="nwSec">📢 News Update</div>
     <div class="nwVer"><div class="g">GENSHIN IMPACT</div><div class="r"><div class="v">${esc(ver||'—')}</div><div class="t">${esc(n.title||'')}</div><div class="act">● ACTIVE</div></div></div>
@@ -1327,7 +1343,7 @@ function renderNews(){
   ${up.length?`<div class="nwPanel"><div class="nwSec">🌟 Upcoming Characters</div><div class="nwUp">${upHtml}</div></div>`:''}
   <div class="nwPanel"><div class="nwSec">⚔️ Battle &amp; Build Intel</div><div class="nwG2">
     <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:11px;color:#16a35a;margin-bottom:8px">✨ NEW CHARACTER DEBUT</div><div class="nwTxt" style="font-weight:800">${esc(bt.char||'—')}</div>
-      ${nwLink(bt.yd,'g','▶ Trailer')}${nwLink(bt.ym,'g','▶ Misc')}${nwLink(bt.bl,'y','📖 Build')}${nwLink(bt.wl,'y','📖 Wiki')}</div>
+      ${nwLink(bt.yd,'g','▶ Trailer')}${nwLink(bt.ym,'g','▶ Misc')}${nwLink(bt.bl,'y','📖 Build')}${nwLink(bt.wl,'y','📖 Wiki')}${nwMedia(chr)}</div>
     <div class="nwCard"><div style="font-family:Cinzel,serif;font-size:11px;color:#e11d2e;margin-bottom:8px">👹 NEW WEEKLY BOSS</div><div class="nwTxt" style="font-weight:800">${esc(bt.wb||'—')}</div>
       ${nwLink(bt.blink,'r','🔗 Guide')}${nwLink(bt.blink2,'r','🔗 Guide 2')}${boss?`<div class="nwImg" style="background-image:url('${boss}');border-color:rgba(255,100,100,.3)"></div>`:''}</div>
   </div></div>
