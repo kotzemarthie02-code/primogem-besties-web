@@ -1438,7 +1438,9 @@ const FM_BOSS=[
 ];
 const FM_GROUPS=[['mon','Mon / Thu',[1,4]],['tue','Tue / Fri',[2,5]],['wed','Wed / Sat',[3,6]],['all','All days',[]]];
 const FM_DAYMAP={'Mon/Thu':'mon','Ma/Do':'mon','Tue/Fri':'tue','Di/Vr':'tue','Wed/Sat':'wed','Wo/Sa':'wed'};
-let FM={owned:store.get('ownedCharacters',[]),details:store.get('characterDetails',{})};
+const fmUid=()=>localStorage.getItem('trinity_uid')||'';
+let FM={owned:[],details:{}};
+if(fmUid()&&store.get('pb_fm_uid','')===fmUid()){FM.owned=store.get('ownedCharacters',[]);FM.details=store.get('characterDetails',{})}   // net eie cache van DIESELFDE rekening
 if(!Array.isArray(FM.owned))FM.owned=Object.values(FM.owned||{});
 let fmTab=store.get('pb_fm_tab','weapon'),fmDay=null;
 function fmTodayGroup(){const d=new Date().getDay();return d===0?'all':(FM_GROUPS.find(g=>g[2].includes(d))||FM_GROUPS[3])[0]}
@@ -1475,9 +1477,11 @@ function fmBlock(title,sub,list,empty){
 function fmSetTab(t){fmTab=t;store.set('pb_fm_tab',t);renderFarm()}
 function fmSetDay(g){fmDay=g;renderFarm()}
 function onFarmData(kind,val){
+  if(!fmUid())return;
   let changed=false;
-  if(kind==='owned'){if(!val)return;const a=Array.isArray(val)?val:Object.values(val);changed=JSON.stringify(a)!==JSON.stringify(FM.owned);FM.owned=a;store.set('ownedCharacters',a)}
-  else{if(!val)return;changed=JSON.stringify(val)!==JSON.stringify(FM.details);FM.details=val;store.set('characterDetails',val)}
+  store.set('pb_fm_uid',fmUid());
+  if(kind==='owned'){const a=val?(Array.isArray(val)?val:Object.values(val)):[];changed=JSON.stringify(a)!==JSON.stringify(FM.owned);FM.owned=a;store.set('ownedCharacters',a)}
+  else{const d=val||{};changed=JSON.stringify(d)!==JSON.stringify(FM.details);FM.details=d;store.set('characterDetails',d)}
   if(!changed)return;   // niks nuut nie: moenie die prente weer van voor af laai nie
   try{renderFarm()}catch(e){dbg('farm error '+e.message)}
 }
@@ -1492,7 +1496,8 @@ function renderFarm(){
     days.innerHTML=FM_GROUPS.map(g=>`<button class="fmChip ${g[0]===fmDay?'on':''}" onclick="fmSetDay('${g[0]}')">${g[1]}${g[0]===tg&&new Date().getDay()!==0?'<em>Today</em>':''}</button>`).join('');
   }
   let h='';
-  if(!FM.owned.length)h+='<div class="fmNote fmWide">No owned characters loaded yet — mark them as Owned in the Training Guide and they will show up here automatically.</div>';
+  if(!fmUid())h+='<div class="fmNote fmWide">Open the Dashboard and log in once, so your own characters can load here.</div>';
+  else if(!FM.owned.length)h+='<div class="fmNote fmWide">No owned characters yet — mark them as Owned in the Training Guide and they will show up here automatically.</div>';
   if(fmTab==='weapon'){
     const pick=g=>FM.owned.filter(n=>fmWeaponDay(n)===g);
     const shown=fmDay==='all'?FM_GROUPS.slice(0,3):FM_GROUPS.filter(g=>g[0]===fmDay);
@@ -2370,9 +2375,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 try{
   const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
-  const _fdb=getDatabase(app),_fuid=localStorage.getItem("trinity_uid")||"Admin";
+  const _fdb=getDatabase(app),_fuid=localStorage.getItem("trinity_uid")||"";
+  if(_fuid){
   onValue(ref(_fdb,"users/"+_fuid+"/ownedCharacters"),snap=>{if(window.onFarmData)window.onFarmData("owned",snap.val())},err=>console.warn("Farm owned:",err.message));
   onValue(ref(_fdb,"users/"+_fuid+"/characterDetails"),snap=>{if(window.onFarmData)window.onFarmData("details",snap.val())},err=>console.warn("Farm details:",err.message));
+  }
   onValue(ref(getDatabase(app),"sharedData/primogemNews"),snap=>window.onNewsSnap(snap.val()),err=>console.warn("Trinity News:",err.message));
 }catch(e){console.warn("Trinity News init failed",e)}
 </script>
