@@ -708,6 +708,33 @@ html[data-theme="dark"] .wsEdit input,html[data-theme="dark"] .wsEdit select,htm
 #tab-news .nwDig{gap:clamp(8px,2vw,20px)}
 #tab-news .nwBtn{max-width:100%}
 .nwMedia{position:relative;width:100%;aspect-ratio:16/9;margin-top:12px;border-radius:16px;background:#111 center/cover no-repeat;border:1px solid rgba(165,255,173,.35);overflow:hidden}
+
+/* ===== WEEKLY FARM (Weapons / Talents / Bosses) ===== */
+.fmSub{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.fmChip{flex:1 1 auto;min-width:96px;border:none;background:var(--chip);color:var(--ink);border-radius:16px;padding:12px 10px;font-weight:800;font-size:14px;position:relative}
+.fmChip.on{background:var(--blue);color:#fff}
+.fmChip em{display:block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-top:1px}
+.fmCard{background:#fff;border-radius:24px;padding:16px;margin-top:14px;box-shadow:0 4px 16px rgba(30,40,90,.08)}
+.fmHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.fmHead b{font-size:18px;font-weight:800}
+.fmHead small{font-size:12px;font-weight:700;color:var(--gray)}
+.fmCnt{margin-left:auto;font-size:13px;font-weight:800;color:var(--gray);background:var(--chip);border-radius:12px;padding:3px 10px}
+.fmGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px}
+.fmChar{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-width:0}
+.fmPic{width:100%;max-width:84px;aspect-ratio:1;border-radius:16px;border:2px solid #e3e7f5;background:#e9ecf9 center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:var(--gray);position:relative;overflow:hidden}
+.fmPic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fmChar span{font-size:11px;font-weight:700;color:var(--gray);line-height:1.2;word-break:break-word}
+.fmNone{font-size:14px;font-weight:600;color:var(--gray);padding:6px 2px}
+.fmNote{font-size:13px;font-weight:700;color:var(--gray);text-align:center;background:var(--chip);border-radius:16px;padding:12px;margin-top:14px}
+.fmReg{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:20px 4px 0}
+.fmBoss .fmHead b{font-size:16px}
+.fmBoss .who{font-size:12px;font-weight:700;color:var(--gray);width:100%}
+#farmBody{display:grid;grid-template-columns:1fr;gap:0 16px;align-items:start}
+@media (min-width:700px){#farmBody.two{grid-template-columns:1fr 1fr}}
+#farmBody .fmReg,#farmBody .fmNote,#farmBody .fmWide{grid-column:1/-1}
+html[data-theme="dark"] .fmCard{background:#1a1f38;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+html[data-theme="dark"] .fmPic{background-color:#272d4c;border-color:#343c66}
+html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
 </style>
 </head>
 <body>
@@ -781,6 +808,14 @@ html[data-theme="dark"] .wsEdit input,html[data-theme="dark"] .wsEdit select,htm
     <div id="rmChecklists"></div>
   </div>
 
+  <div id="tab-farm" class="hidden">
+    <h2 class="sec">Weekly Farm</h2>
+    <div class="secSub">Weapons, talents &amp; weekly bosses — characters show automatically</div>
+    <div class="seg" id="fmSeg"><button data-t="weapon" onclick="fmSetTab('weapon')">⚔️ Weapons</button><button data-t="talent" onclick="fmSetTab('talent')">📘 Talents</button><button data-t="boss" onclick="fmSetTab('boss')">👹 Bosses</button></div>
+    <div class="fmSub" id="fmDays"></div>
+    <div id="farmBody"></div>
+  </div>
+
   <div id="tab-memories" class="hidden">
     <h2 class="sec">Good Memories 💎</h2>
     <div class="secSub">Share happy moments with the group — everyone can see, react and comment</div>
@@ -833,6 +868,7 @@ html[data-theme="dark"] .wsEdit input,html[data-theme="dark"] .wsEdit select,htm
     <button id="nav-planner" class="active" onclick="nav('planner')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><line class="w" x1="12" y1="3.5" x2="12" y2="20.5"/></svg>Planner</button>
     <button id="nav-month" onclick="nav('month')"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><line class="w" x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>Month</button>
     <button id="nav-remind" onclick="nav('remind')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/><path d="M3 9a9 9 0 0 1 3-6M21 9a9 9 0 0 0-3-6" style="fill:none"/></svg><i class="navBadge hidden" id="rmDot">!</i></span>Reminder</button>
+    <button id="nav-farm" onclick="nav('farm')"><svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13c0-4 2.6-6.5 7-6.5 0 4.2-2.6 6.5-7 6.5z"/><path d="M12 15.5C12 12 9.8 10 5 10c0 3.6 2.4 5.5 7 5.5z"/></svg>Farm</button>
     <button id="nav-news" onclick="nav('news')"><span class="navIcon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="14" height="15" rx="2"/><path d="M17.5 8.5h3v8a3 3 0 0 1-3 3"/><line x1="7" y1="9" x2="13.5" y2="9"/><line x1="7" y1="12.5" x2="13.5" y2="12.5"/><line x1="7" y1="16" x2="11" y2="16"/></svg><i class="navBadge hidden" id="newsDot">!</i></span>News</button>
     <button id="nav-alerts" onclick="nav('alerts')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><i class="navBadge hidden" id="bellBadge">0</i></span>Notifications</button>
     <button id="nav-wish" onclick="nav('wish')"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 6.1 6.1 2.4-6.1 2.4L12 20l-2.4-6.1L3.5 11.5l6.1-2.4z"/></svg>Wish Pulls</button>
@@ -1378,10 +1414,95 @@ window.onNewsSnap=function(v){
   if(wasNew&&!first&&newsUnread()&&profile)try{showToast('📰 New Trinity News posted',(v.data&&v.data.news&&v.data.news.title)||'Tap News to read')}catch(e){}
 };
 
+/* ================= WEEKLY FARM: Weapons (Character View) / Talents (Owned) / Bosses ================= */
+const FM_TALENT={
+            mon: ["Amber", "Barbara", "Klee", "Sucrose", "Tartaglia", "Diona", "Varka", "Aloy", "Xiao", "Ningguang", "Qiqi", "Keqing", "Shenhe", "Yelan", "Gaming", "Yoimiya", "Thoma", "Sangonomiya Kokomi", "Shikanoin Heizou", "Kirara", "Yumemizuki Mizuki", "Cyno", "Tighnari", "Candace", "Faruzan", "Lyney", "Navia", "Sigewinne", "Neuvillette", "Skirk", "Iansan", "Mualani", "Mavuika", "Columbina", "Lauma", "Odette", "Mitya"],
+            tue: ["Jean", "Diluc", "Razor", "Bennett", "Noelle", "Mona", "Eula", "Xiangling", "Chongyun", "Ganyu", "Hu Tao", "Kaedehara Kazuha", "Yun Jin", "Yaoyao", "Lan Yan", "Kamisato Ayaka", "Kujou Sara", "Arataki Itto", "Kamisato Ayato", "Kuki Shinobu", "Dori", "Alhaitham", "Nahida", "Kaveh", "Layla", "Charlotte", "Freminet", "Furina", "Clorinde", "Escoffier", "Kinich", "Citlali", "Xilonen", "Ororon", "Aino", "Nefer", "Illuga", "Alyosha", "Prune", "Nicole", "Lohen", "Vodyanitsa"],
+            wed: ["Lisa", "Kaeya", "Venti", "Fischl", "Albedo", "Rosaria", "Mika", "Dahlia", "Durin", "Beidou", "Xingqiu", "Zhongli", "Xinyan", "Yanfei", "Baizhu", "Xianyun", "Zibai", "Yae Miko", "Sayu", "Gorou", "Raiden Shogun", "Chiori", "Wanderer", "Collei", "Dehya", "Nilou", "Sethos", "Lynette", "Arlecchino", "Wriothesley", "Emilie", "Chevreuse", "Kachina", "Chasca", "Ifa", "Varesa", "Ineffa", "Jahoda", "Flins", "Linnea", "Vesna", "Valeriy"]
+        };
+const FM_BOSS=[
+ ['Mondstadt','Andrius','Barbatos (Venti)',['Qiqi','Venti','Xingqiu','Barbara','Keqing','Klee','Mona','Fischl','Kaeya','Ningguang','Sucrose']],
+ ['Mondstadt','Stormterror Dvalin','Barbatos (Venti)',['Traveler Anemo','Traveler Geo','Bennett','Diluc','Diona','Jean','Lisa','Noelle','Razor','Xiangling','Amber','Beidou','Chongyun']],
+ ['Mondstadt','The Game Before the Gate','Barbatos (Venti)',['Jahoda','Lohen','Skirk','Ifa','Nefer','Varka','Flins','Traveler Cryo','Zibai']],
+ ['Liyue','Childe','Morax (Zhongli)',['Albedo','Xinyan','Zhongli','Diona','Hu Tao','Tartaglia','Ganyu','Rosaria','Xiao']],
+ ['Liyue','Azhdaha','Morax (Zhongli)',['Eula','Traveler Electro','Yoimiya','Dori','Kamisato Ayaka','Yanfei','Kaedehara Kazuha','Sayu','Yelan']],
+ ['Inazuma','La Signora','Beelzebul (Raiden Shogun)',['Aloy','Gorou','Raiden Shogun','Sangonomiya Kokomi','Shenhe','Thoma','Arataki Itto','Kujou Sara','Yun Jin']],
+ ['Inazuma','Magatsu Mitake Narukami no Mikoto','Beelzebul (Raiden Shogun)',['Cyno','Kamisato Ayato','Traveler Dendro','Candace','Collei','Kuki Shinobu','Nilou','Shikanoin Heizou','Tighnari','Yae Miko']],
+ ['Sumeru','Everlasting Lord of Arcane Wisdom','Buer / Lesser Lord Kusanali (Nahida)',['Dehya','Faruzan','Nahida','Alhaitham','Layla','Mika','Xilonen','Sethos','Wanderer','Yaoyao']],
+ ['Sumeru','Guardian of Apep\'s Oasis','Buer / Lesser Lord Kusanali (Nahida)',['Baizhu','Freminet','Traveler Hydro','Kaveh','Lyney','Wriothesley','Clorinde','Kirara','Lynette','Neuvillette']],
+ ['Sumeru','Exalted Master of the Heretical Path','Buer / Lesser Lord Kusanali (Nahida)',['Nicole','Valeriy','Odette','Vesna']],
+ ['Fontaine','All-Devouring Narwhal','Focalors / Furina',['Charlotte','Chiori','Navia','Ororon','Chevreuse','Sigewinne','Xianyun','Furina','Gaming','Mualani']],
+ ['Fontaine','The Knave','Focalors / Furina',['Arlecchino','Kachina','Yumemizuki Mizuki','Aino','Chasca','Emilie','Citlali','Iansan','Kinich']],
+ ['Natlan','Lord of Eroded Primal Fire','Mavuika',['Escoffier','Illuga','Mavuika','Durin','Ineffa','Lan Yan','Dahlia','Lauma','Varesa']],
+ ['Nod-Krai','Heretic of the False Moon','Columbina',['Columbina','Mitya','Prune','Sandrone','Vodyanitsa','Alyosha','Linnea']]
+];
+const FM_GROUPS=[['mon','Mon / Thu',[1,4]],['tue','Tue / Fri',[2,5]],['wed','Wed / Sat',[3,6]],['all','All days',[]]];
+const FM_DAYMAP={'Mon/Thu':'mon','Ma/Do':'mon','Tue/Fri':'tue','Di/Vr':'tue','Wed/Sat':'wed','Wo/Sa':'wed'};
+let FM={owned:store.get('ownedCharacters',[]),details:store.get('characterDetails',{})};
+if(!Array.isArray(FM.owned))FM.owned=Object.values(FM.owned||{});
+let fmTab=store.get('pb_fm_tab','weapon'),fmDay=null;
+function fmTodayGroup(){const d=new Date().getDay();return d===0?'all':(FM_GROUPS.find(g=>g[2].includes(d))||FM_GROUPS[3])[0]}
+function fmOwns(n){return FM.owned.includes(n)||(/^Traveler\b/.test(n)&&FM.owned.includes('Traveler'))}
+function fmWeaponDay(n){
+  const d=FM.details&&FM.details[n];if(!d)return '';
+  let v=d.weaponDay||'';
+  if(!v)for(const k in d){if(FM_DAYMAP[d[k]]){v=d[k];break}}
+  return FM_DAYMAP[v]||'';
+}
+function fmPic(n){
+  const ini=esc(n.replace(/^Traveler\s*/,'T ').trim().charAt(0).toUpperCase());
+  return `<div class="fmChar"><div class="fmPic" title="${esc(n)}">${ini}<img alt="" loading="lazy" src="${esc(n)}1.jpg" onerror="this.remove()"></div><span>${esc(n)}</span></div>`;
+}
+function fmBlock(title,sub,list,empty){
+  return `<div class="fmCard"><div class="fmHead"><b>${esc(title)}</b>${sub?`<small>${esc(sub)}</small>`:''}<span class="fmCnt">${list.length}</span></div>${list.length?`<div class="fmGrid">${list.map(fmPic).join('')}</div>`:`<div class="fmNone">${esc(empty)}</div>`}</div>`;
+}
+function fmSetTab(t){fmTab=t;store.set('pb_fm_tab',t);renderFarm()}
+function fmSetDay(g){fmDay=g;renderFarm()}
+function onFarmData(kind,val){
+  if(kind==='owned'){if(!val)return;const a=Array.isArray(val)?val:Object.values(val);FM.owned=a;store.set('ownedCharacters',a)}
+  else{if(!val)return;FM.details=val;store.set('characterDetails',val)}
+  try{renderFarm()}catch(e){dbg('farm error '+e.message)}
+}
+function renderFarm(){
+  const body=$('farmBody');if(!body)return;
+  $('fmSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.t===fmTab));
+  const days=$('fmDays'),isBoss=fmTab==='boss';
+  days.classList.toggle('hidden',isBoss);body.classList.toggle('two',false);
+  if(!fmDay)fmDay=fmTodayGroup();
+  if(!isBoss){
+    const tg=fmTodayGroup();
+    days.innerHTML=FM_GROUPS.map(g=>`<button class="fmChip ${g[0]===fmDay?'on':''}" onclick="fmSetDay('${g[0]}')">${g[1]}${g[0]===tg&&new Date().getDay()!==0?'<em>Today</em>':''}</button>`).join('');
+  }
+  let h='';
+  if(!FM.owned.length)h+='<div class="fmNote fmWide">No owned characters loaded yet — mark them as Owned in the Training Guide and they will show up here automatically.</div>';
+  if(fmTab==='weapon'){
+    const pick=g=>FM.owned.filter(n=>fmWeaponDay(n)===g);
+    const shown=fmDay==='all'?FM_GROUPS.slice(0,3):FM_GROUPS.filter(g=>g[0]===fmDay);
+    body.classList.toggle('two',shown.length>1);
+    h+=shown.map(g=>fmBlock(g[1],'Weapon ascension',pick(g[0]),'No owned characters on this day yet — set a Weapon Day in Character View.')).join('');
+    h+='<div class="fmNote">Sunday: all Weapon Ascension Materials can be obtained.</div>';
+  }else if(fmTab==='talent'){
+    const shown=fmDay==='all'?FM_GROUPS.slice(0,3):FM_GROUPS.filter(g=>g[0]===fmDay);
+    body.classList.toggle('two',shown.length>1);
+    h+=shown.map(g=>fmBlock(g[1],'Talent books',FM_TALENT[g[0]].filter(fmOwns),'No owned characters on this day.')).join('');
+    h+='<div class="fmNote">Sunday: all Talent Book materials can be obtained.</div>';
+  }else{
+    let reg='',any=false;
+    FM_BOSS.forEach(b=>{
+      const L=b[3].filter(fmOwns);if(!L.length)return;any=true;
+      if(b[0]!==reg){reg=b[0];h+=`<div class="fmReg">${esc(reg)}</div>`}
+      h+=`<div class="fmCard fmBoss"><div class="fmHead"><b>${esc(b[1])}</b><span class="fmCnt">${L.length}</span><div class="who">${esc(b[2])}</div></div><div class="fmGrid">${L.map(fmPic).join('')}</div></div>`;
+    });
+    if(!any)h+='<div class="fmNote fmWide">None of your owned characters match a weekly boss yet.</div>';
+    body.classList.add('two');
+  }
+  body.innerHTML=h;
+}
+
 /* ---------- navigation ---------- */
-const TITLES={news:'The Trinity News',wish:'Wish Pulls',planner:'Group Weekly Planner',month:'Calendar',remind:'Reminders',memories:'Good Memories',alerts:'Notifications',profile:'Profile'};
+const TITLES={news:'The Trinity News',wish:'Wish Pulls',planner:'Group Weekly Planner',month:'Calendar',remind:'Reminders',farm:'Weekly Farm',memories:'Good Memories',alerts:'Notifications',profile:'Profile'};
 function nav(t){
-  ['planner','month','remind','news','alerts','wish','memories','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
+  ['planner','month','remind','farm','news','alerts','wish','memories','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
   $('pageTitle').textContent=TITLES[t];
   $('appScreen').classList.toggle('fullTab',t==='news'||t==='wish');
   renderAll();window.scrollTo(0,0);
@@ -1390,7 +1511,7 @@ function nav(t){
   if(t==='news'){try{renderNews();markNewsSeen()}catch(e){}}else{try{updNewsDot()}catch(e){}}
   try{$('nav-'+t).scrollIntoView({inline:'center',block:'nearest'})}catch(e){}
 }
-function renderAll(){[renderGroup,renderPlanner,renderMonth,renderProfile,()=>renderRemind(),()=>renderMemories(),renderWish].forEach(f=>{try{f()}catch(e){dbg('render error '+e.message)}})}
+function renderAll(){[renderGroup,renderPlanner,renderMonth,renderProfile,()=>renderRemind(),()=>renderMemories(),renderWish,renderFarm].forEach(f=>{try{f()}catch(e){dbg('render error '+e.message)}})}
 function renderGroup(){
   const ids=Object.keys(remoteUsers);if(profile&&!ids.includes(profile.email))ids.unshift(profile.email);
   $('memberCount').textContent=`Team Trinity • ${ids.length} members`;
@@ -2231,6 +2352,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 try{
   const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
+  const _fdb=getDatabase(app),_fuid=localStorage.getItem("trinity_uid")||"Admin";
+  onValue(ref(_fdb,"users/"+_fuid+"/ownedCharacters"),snap=>{if(window.onFarmData)window.onFarmData("owned",snap.val())},err=>console.warn("Farm owned:",err.message));
+  onValue(ref(_fdb,"users/"+_fuid+"/characterDetails"),snap=>{if(window.onFarmData)window.onFarmData("details",snap.val())},err=>console.warn("Farm details:",err.message));
   onValue(ref(getDatabase(app),"sharedData/primogemNews"),snap=>window.onNewsSnap(snap.val()),err=>console.warn("Trinity News:",err.message));
 }catch(e){console.warn("Trinity News init failed",e)}
 </script>
