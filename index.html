@@ -1449,9 +1449,18 @@ function fmWeaponDay(n){
   if(!v)for(const k in d){if(FM_DAYMAP[d[k]]){v=d[k];break}}
   return FM_DAYMAP[v]||'';
 }
+function fmImg(n){
+  // 1) jou eie Naam1.jpg op GitHub  2) dieselfde Cloudinary-prente as Wish Pulls  3) anders net die letter
+  const pn=n.replace(/^Traveler\s+/,'');   // Traveler Hydro -> Hydro1 (Cloudinary / GitHub)
+  let c=[encodeURIComponent(n)+'1.jpg'];
+  if(pn!==n)c.push(encodeURIComponent(pn)+'1.jpg');
+  try{c=c.concat(wsImgs(n));if(pn!==n)c=c.concat(wsImgs(pn))}catch(e){}
+  c=[...new Set(c)].slice(0,30);
+  return `<img alt="" loading="lazy" src="${esc(c[0])}" data-n="${esc(n)}" data-i="0" data-c="${esc(JSON.stringify(c))}" onload="try{WS_OK[this.dataset.n.toLowerCase()]=this.src}catch(e){}" onerror="wsImgErr(this)">`;
+}
 function fmPic(n){
   const ini=esc(n.replace(/^Traveler\s*/,'T ').trim().charAt(0).toUpperCase());
-  return `<div class="fmChar"><div class="fmPic" title="${esc(n)}">${ini}<img alt="" loading="lazy" src="${esc(n)}1.jpg" onerror="this.remove()"></div><span>${esc(n)}</span></div>`;
+  return `<div class="fmChar"><div class="fmPic" title="${esc(n)}">${ini}${fmImg(n)}</div><span>${esc(n)}</span></div>`;
 }
 function fmBlock(title,sub,list,empty){
   return `<div class="fmCard"><div class="fmHead"><b>${esc(title)}</b>${sub?`<small>${esc(sub)}</small>`:''}<span class="fmCnt">${list.length}</span></div>${list.length?`<div class="fmGrid">${list.map(fmPic).join('')}</div>`:`<div class="fmNone">${esc(empty)}</div>`}</div>`;
