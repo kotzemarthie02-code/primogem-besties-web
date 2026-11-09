@@ -1494,9 +1494,12 @@ function ensureFarmUid(){
       const k='pb_'+profile.email.toLowerCase().replace(/[.#$\[\]\/]/g,'_');
       if(k!==cur){localStorage.setItem('trinity_uid',k);FM.owned=[];FM.details={};store.set('ownedCharacters',[]);store.set('characterDetails',{})}
     }
+    window.__pbEmail=profile.email;
     if(window.farmAttach)window.farmAttach();
+    if(window.farmLookup)window.farmLookup();
   }catch(e){dbg('uid error '+e.message)}
 }
+window.onFarmUidChanged=function(){FM.owned=[];FM.details={};store.set('ownedCharacters',[]);store.set('characterDetails',{});try{renderFarm()}catch(e){}};
 function renderFarm(){
   const body=$('farmBody');if(!body)return;
   $('fmSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.t===fmTab));
@@ -1531,6 +1534,7 @@ function renderFarm(){
     if(!any)h+='<div class="fmNote fmWide">None of your owned characters match a weekly boss yet.</div>';
     body.classList.add('two');
   }
+  if(DEBUG)h+='<div class="fmNote fmWide" style="text-align:left;font-family:monospace">DEBUG<br>ID: '+esc(fmUid()||'(none)')+'<br>owned: '+FM.owned.length+' · details: '+Object.keys(FM.details||{}).length+'<br>browser storage ID saved for: '+esc(store.get('pb_fm_uid','(none)'))+'</div>';
   body.innerHTML=h;
 }
 
@@ -2384,7 +2388,7 @@ applyTheme();
 <script type="module">
 /* Trinity News (read-only): listens to the node Trinity News posts to */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 try{
   const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
   const _fdb=getDatabase(app);let _fAt="",_fUn=[];
@@ -2395,6 +2399,18 @@ try{
           onValue(ref(_fdb,"users/"+u+"/characterDetails"),snap=>{if(window.onFarmData)window.onFarmData("details",snap.val())},err=>console.warn("Farm details:",err.message))];
   };
   window.farmAttach();
+  /* Geen Trinity-ID in hierdie toestel/app nie? Soek dit op by die e-pos waarmee jy by Primogem ingeteken het */
+  window.farmLookup=function(){
+    try{
+      const cur=localStorage.getItem("trinity_uid")||"",em=(window.__pbEmail||"").toLowerCase();
+      if(!em||(cur&&cur.indexOf("pb_")!==0))return;
+      get(ref(_fdb,"emailLinks/"+em.replace(/[.#$\[\]\/]/g,"_"))).then(snap=>{
+        const u=snap.val();
+        if(u&&typeof u==="string"){localStorage.setItem("trinity_uid",u);if(window.onFarmUidChanged)window.onFarmUidChanged();window.farmAttach()}
+      }).catch(e=>console.warn("Farm lookup:",e.message));
+    }catch(e){console.warn("Farm lookup:",e.message)}
+  };
+  window.farmLookup();
   onValue(ref(getDatabase(app),"sharedData/primogemNews"),snap=>window.onNewsSnap(snap.val()),err=>console.warn("Trinity News:",err.message));
 }catch(e){console.warn("Trinity News init failed",e)}
 </script>
