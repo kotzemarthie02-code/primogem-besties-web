@@ -811,6 +811,7 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
   <div id="tab-farm" class="hidden">
     <h2 class="sec">Weekly Farm</h2>
     <div class="secSub">Weapons, talents &amp; weekly bosses — characters show automatically</div>
+    <div class="fmSub" style="margin-top:10px"><a class="fmChip" style="text-decoration:none;text-align:center" href="training_guide.html">✅ Mark owned<em>Training Guide</em></a><a class="fmChip" style="text-decoration:none;text-align:center" href="CharacterView.html">🗓️ Weapon day<em>Character View</em></a></div>
     <div class="seg" id="fmSeg"><button data-t="weapon" onclick="fmSetTab('weapon')">⚔️ Weapons</button><button data-t="talent" onclick="fmSetTab('talent')">📘 Talents</button><button data-t="boss" onclick="fmSetTab('boss')">👹 Bosses</button></div>
     <div class="fmSub" id="fmDays"></div>
     <div id="farmBody"></div>
@@ -1188,7 +1189,7 @@ function doLogin(){
   saveProf();showApp();
 }
 function doLogout(){try{localStorage.removeItem('pb_logged')}catch(e){}location.reload()}
-function showApp(){dbg('logged in as: '+profile.email);$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');draft={emoji:profile.emoji,color:profile.color};$('profileName').value=profile.name;nav('planner');startSync();}
+function showApp(){dbg('logged in as: '+profile.email);ensureFarmUid();$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');draft={emoji:profile.emoji,color:profile.color};$('profileName').value=profile.name;nav('planner');startSync();}
 function checkLogin(){
   const logged=store.get('pb_logged',null);
   if(logged){
@@ -1484,6 +1485,18 @@ function onFarmData(kind,val){
   else{const d=val||{};changed=JSON.stringify(d)!==JSON.stringify(FM.details);FM.details=d;store.set('characterDetails',d)}
   if(!changed)return;   // niks nuut nie: moenie die prente weer van voor af laai nie
   try{renderFarm()}catch(e){dbg('farm error '+e.message)}
+}
+/* Elkeen kry sy EIE sleutel: Dashboard-login (echte uid) bly soos dit is; sonder een word dit van die Primogem-e-pos gemaak */
+function ensureFarmUid(){
+  try{
+    if(!profile||!profile.email)return;
+    const cur=localStorage.getItem('trinity_uid')||'';
+    if(!cur||cur.indexOf('pb_')===0){
+      const k='pb_'+profile.email.toLowerCase().replace(/[.#$\[\]\/]/g,'_');
+      if(k!==cur){localStorage.setItem('trinity_uid',k);FM.owned=[];FM.details={};store.set('ownedCharacters',[]);store.set('characterDetails',{})}
+    }
+    if(window.farmAttach)window.farmAttach();
+  }catch(e){dbg('uid error '+e.message)}
 }
 function renderFarm(){
   const body=$('farmBody');if(!body)return;
@@ -2375,11 +2388,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 try{
   const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
-  const _fdb=getDatabase(app),_fuid=localStorage.getItem("trinity_uid")||"";
-  if(_fuid){
-  onValue(ref(_fdb,"users/"+_fuid+"/ownedCharacters"),snap=>{if(window.onFarmData)window.onFarmData("owned",snap.val())},err=>console.warn("Farm owned:",err.message));
-  onValue(ref(_fdb,"users/"+_fuid+"/characterDetails"),snap=>{if(window.onFarmData)window.onFarmData("details",snap.val())},err=>console.warn("Farm details:",err.message));
-  }
+  const _fdb=getDatabase(app);let _fAt="",_fUn=[];
+  window.farmAttach=function(){
+    const u=localStorage.getItem("trinity_uid")||"";if(!u||u===_fAt)return;
+    _fUn.forEach(f=>{try{f()}catch(e){}});_fAt=u;
+    _fUn=[onValue(ref(_fdb,"users/"+u+"/ownedCharacters"),snap=>{if(window.onFarmData)window.onFarmData("owned",snap.val())},err=>console.warn("Farm owned:",err.message)),
+          onValue(ref(_fdb,"users/"+u+"/characterDetails"),snap=>{if(window.onFarmData)window.onFarmData("details",snap.val())},err=>console.warn("Farm details:",err.message))];
+  };
+  window.farmAttach();
   onValue(ref(getDatabase(app),"sharedData/primogemNews"),snap=>window.onNewsSnap(snap.val()),err=>console.warn("Trinity News:",err.message));
 }catch(e){console.warn("Trinity News init failed",e)}
 </script>
