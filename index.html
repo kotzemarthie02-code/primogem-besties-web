@@ -1449,14 +1449,21 @@ function fmWeaponDay(n){
   if(!v)for(const k in d){if(FM_DAYMAP[d[k]]){v=d[k];break}}
   return FM_DAYMAP[v]||'';
 }
+function fmOk(im){   // onthou die URL wat gewerk het, sodat die volgende keer die prent dadelik laai
+  try{const m=store.get('pb_fm_img',{});if(m[im.dataset.n]!==im.src){m[im.dataset.n]=im.src;store.set('pb_fm_img',m)}}catch(e){}
+}
 function fmImg(n){
-  // 1) jou eie Naam1.jpg op GitHub  2) dieselfde Cloudinary-prente as Wish Pulls  3) anders net die letter
-  const pn=n.replace(/^Traveler\s+/,'');   // Traveler Hydro -> Hydro1 (Cloudinary / GitHub)
-  let c=[encodeURIComponent(n)+'1.jpg'];
-  if(pn!==n)c.push(encodeURIComponent(pn)+'1.jpg');
-  try{c=c.concat(wsImgs(n));if(pn!==n)c=c.concat(wsImgs(pn))}catch(e){}
-  c=[...new Set(c)].slice(0,30);
-  return `<img alt="" loading="lazy" src="${esc(c[0])}" data-n="${esc(n)}" data-i="0" data-c="${esc(JSON.stringify(c))}" onload="try{WS_OK[this.dataset.n.toLowerCase()]=this.src}catch(e){}" onerror="wsImgErr(this)">`;
+  // 0) laaste URL wat gewerk het  1) jou eie Naam1.jpg  2) Cloudinary (soos Wish Pulls)  3) Traveler sonder eie prent: Hydro1  4) letter
+  const pn=n.replace(/^Traveler\s+/,''),trav=pn!==n;
+  let c=[];
+  const known=(store.get('pb_fm_img',{})||{})[n];if(known)c.push(known);
+  c.push(encodeURIComponent(trav?pn:n)+'1.jpg');
+  try{
+    if(trav){c=c.concat(wsImgs(pn),wsImgs('Hydro'))}   // Traveler Geo -> Geo1, anders Hydro1
+    else c=c.concat(wsImgs(n));
+  }catch(e){}
+  c=[...new Set(c)].slice(0,60);
+  return `<img alt="" src="${esc(c[0])}" data-n="${esc(n)}" data-i="0" data-c="${esc(JSON.stringify(c))}" onload="fmOk(this)" onerror="wsImgErr(this)">`;
 }
 function fmPic(n){
   const ini=esc(n.replace(/^Traveler\s*/,'T ').trim().charAt(0).toUpperCase());
@@ -1468,8 +1475,10 @@ function fmBlock(title,sub,list,empty){
 function fmSetTab(t){fmTab=t;store.set('pb_fm_tab',t);renderFarm()}
 function fmSetDay(g){fmDay=g;renderFarm()}
 function onFarmData(kind,val){
-  if(kind==='owned'){if(!val)return;const a=Array.isArray(val)?val:Object.values(val);FM.owned=a;store.set('ownedCharacters',a)}
-  else{if(!val)return;FM.details=val;store.set('characterDetails',val)}
+  let changed=false;
+  if(kind==='owned'){if(!val)return;const a=Array.isArray(val)?val:Object.values(val);changed=JSON.stringify(a)!==JSON.stringify(FM.owned);FM.owned=a;store.set('ownedCharacters',a)}
+  else{if(!val)return;changed=JSON.stringify(val)!==JSON.stringify(FM.details);FM.details=val;store.set('characterDetails',val)}
+  if(!changed)return;   // niks nuut nie: moenie die prente weer van voor af laai nie
   try{renderFarm()}catch(e){dbg('farm error '+e.message)}
 }
 function renderFarm(){
