@@ -811,7 +811,6 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
   <div id="tab-farm" class="hidden">
     <h2 class="sec">Weekly Farm</h2>
     <div class="secSub">Weapons, talents &amp; weekly bosses — characters show automatically</div>
-    <div class="fmSub" style="margin-top:10px"><a class="fmChip" style="text-decoration:none;text-align:center" href="training_guide.html">✅ Mark owned<em>Training Guide</em></a><a class="fmChip" style="text-decoration:none;text-align:center" href="CharacterView.html">🗓️ Weapon day<em>Character View</em></a></div>
     <div class="seg" id="fmSeg"><button data-t="weapon" onclick="fmSetTab('weapon')">⚔️ Weapons</button><button data-t="talent" onclick="fmSetTab('talent')">📘 Talents</button><button data-t="boss" onclick="fmSetTab('boss')">👹 Bosses</button></div>
     <div class="fmSub" id="fmDays"></div>
     <div id="farmBody"></div>
@@ -1498,6 +1497,8 @@ function ensureFarmUid(){
     if(window.farmAttach)window.farmAttach();
   }catch(e){dbg('uid error '+e.message)}
 }
+function fmConnect(){if(window.farmConnect)window.farmConnect();else alert('Still loading — try again in a few seconds')}
+window.onFarmUidChanged=function(){FM.owned=[];FM.details={};store.set('ownedCharacters',[]);store.set('characterDetails',{});try{renderFarm()}catch(e){}};
 function renderFarm(){
   const body=$('farmBody');if(!body)return;
   $('fmSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.t===fmTab));
@@ -1509,8 +1510,9 @@ function renderFarm(){
     days.innerHTML=FM_GROUPS.map(g=>`<button class="fmChip ${g[0]===fmDay?'on':''}" onclick="fmSetDay('${g[0]}')">${g[1]}${g[0]===tg&&new Date().getDay()!==0?'<em>Today</em>':''}</button>`).join('');
   }
   let h='';
-  if(!fmUid())h+='<div class="fmNote fmWide">Open the Dashboard and log in once, so your own characters can load here.</div>';
-  else if(!FM.owned.length)h+='<div class="fmNote fmWide">No owned characters yet — mark them as Owned in the Training Guide and they will show up here automatically.</div>';
+  const realId=fmUid()&&fmUid().indexOf('pb_')!==0;
+  if(!realId)h+='<div class="fmCard fmWide"><div class="fmHead"><b>Connect Trinity</b></div><div class="fmNone">Sign in with the same Google account you use in Trinity, so your own characters load here.</div><button class="fmChip on" style="margin-top:10px;width:100%" onclick="fmConnect()">Connect with Google</button></div>';
+  if(fmUid()&&!FM.owned.length)h+='<div class="fmNote fmWide">No owned characters yet — mark them as Owned in the Training Guide and they will show up here automatically.</div>';
   if(fmTab==='weapon'){
     const pick=g=>FM.owned.filter(n=>fmWeaponDay(n)===g);
     const shown=fmDay==='all'?FM_GROUPS.slice(0,3):FM_GROUPS.filter(g=>g[0]===fmDay);
@@ -2386,6 +2388,7 @@ applyTheme();
 /* Trinity News (read-only): listens to the node Trinity News posts to */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 try{
   const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
   const _fdb=getDatabase(app);let _fAt="",_fUn=[];
@@ -2396,6 +2399,20 @@ try{
           onValue(ref(_fdb,"users/"+u+"/characterDetails"),snap=>{if(window.onFarmData)window.onFarmData("details",snap.val())},err=>console.warn("Farm details:",err.message))];
   };
   window.farmAttach();
+  /* Verbind met die Trinity-rekening (Google): so kry Primogem jou ware ID, in watter ikoon/blaaier jy dit ook oopmaak */
+  const _auth=getAuth(app);
+  const _real=()=>{const c=localStorage.getItem("trinity_uid")||"";return c&&c.indexOf("pb_")!==0};
+  const _setUid=u=>{if(!u)return;localStorage.setItem("trinity_uid",u.uid);if(window.onFarmUidChanged)window.onFarmUidChanged();window.farmAttach()};
+  onAuthStateChanged(_auth,u=>{if(u&&!_real())_setUid(u)});
+  getRedirectResult(_auth).then(r=>{if(r&&r.user)_setUid(r.user)}).catch(e=>console.warn("Redirect:",e.code));
+  window.farmConnect=async function(){
+    const p=new GoogleAuthProvider();
+    try{const r=await signInWithPopup(_auth,p);_setUid(r.user)}
+    catch(e){
+      if(e&&(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment"||e.code==="auth/web-storage-unsupported")){try{await signInWithRedirect(_auth,p);return}catch(e2){e=e2}}
+      if(!e||e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request")alert("Could not connect: "+((e&&e.code)||e));
+    }
+  };
   onValue(ref(getDatabase(app),"sharedData/primogemNews"),snap=>window.onNewsSnap(snap.val()),err=>console.warn("Trinity News:",err.message));
 }catch(e){console.warn("Trinity News init failed",e)}
 </script>
