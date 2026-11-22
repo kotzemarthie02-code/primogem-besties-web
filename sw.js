@@ -51,10 +51,15 @@ self.addEventListener('push', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
+  const tag = e.notification.tag || '';
   e.waitUntil((async () => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const w of wins) { if ('focus' in w) { await w.focus(); return; } }
-    await self.clients.openWindow((e.notification.data && e.notification.data.url) || './');
+    for (const w of wins) {
+      if ('focus' in w) { await w.focus(); try { w.postMessage({ type: 'notif-click', tag }); } catch (_) {} return; }
+    }
+    // app was closed: open it and tell it which item to jump to (read from the #n= part of the address)
+    const base = ((e.notification.data && e.notification.data.url) || './').split('#')[0];
+    await self.clients.openWindow(tag ? base + '#n=' + encodeURIComponent(tag) : base);
   })());
 });
 

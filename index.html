@@ -740,6 +740,19 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
 #trSeg button{padding:12px 4px;font-size:14px}
 .trFrame{display:block;border:0;width:100vw;margin:10px 0 0 calc(50% - 50vw);height:calc(100vh - 255px);height:calc(100dvh - 255px);min-height:380px;background:#0a0b0e}
 #trMsg{margin-top:10px;text-align:center}
+
+/* ===== kleiner onderste balk + More-kieslys + kloppie bo ===== */
+.bottomNav button.navHid{display:none!important}
+.hbell{position:absolute;left:14px;top:8px;width:44px;height:44px;border-radius:50%;background:#a5a8b1;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.hbell svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hbell .navBadge{top:-4px;right:-4px}
+.moreGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.moreGrid button{position:relative;border:none;background:#fff;border-radius:22px;padding:20px 6px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--ink);box-shadow:0 4px 16px rgba(30,40,90,.08)}
+.moreGrid button span{font-size:30px;line-height:1}
+.moreGrid .navBadge{top:10px;right:12px}
+html[data-theme="dark"] .moreGrid button{background:#1a1f38;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.memFlash{animation:memFlash 3s ease-out}
+@keyframes memFlash{0%,55%{box-shadow:0 0 0 4px var(--blue),0 6px 22px rgba(80,120,245,.45)}100%{box-shadow:0 0 0 0 transparent}}
 </style>
 </head>
 <body>
@@ -762,6 +775,7 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
 <div id="appScreen" class="wrap hidden">
   <div class="top">
     <h1 id="pageTitle">Group Weekly Planner</h1>
+    <button class="hbell" onclick="nav('alerts')" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><i class="navBadge hidden" id="hbBadge">0</i></button>
     <button class="gear" onclick="nav('profile')" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
   </div>
 
@@ -821,6 +835,16 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
     <div id="farmBody"></div>
   </div>
 
+  <div id="tab-more" class="hidden">
+    <h2 class="sec">More</h2>
+    <div class="secSub">Everything else in one place</div>
+    <div class="moreGrid">
+      <button onclick="nav('news')"><span>📰</span>News<i class="navBadge hidden" id="mb-news">!</i></button>
+      <button onclick="nav('alerts')"><span>🔔</span>Notifications<i class="navBadge hidden" id="mb-alerts">0</i></button>
+      <button onclick="nav('profile')"><span>👤</span>Profile</button>
+    </div>
+  </div>
+
   <div id="tab-trinity" class="hidden">
     <div class="seg" id="trSeg"><button data-t="bg" onclick="trOpen('bg')">📋 Build Guide</button><button data-t="cv" onclick="trOpen('cv')">👤 Characters</button><button data-t="tk" onclick="trOpen('tk')">🎯 Tracker</button></div>
     <div id="trMsg" class="secSub"></div>
@@ -828,6 +852,7 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
   </div>
 
   <div id="tab-memories" class="hidden">
+    <div class="seg"><button class="active" onclick="nav('memories')">💎 Memories</button><button onclick="nav('wish')">✨ Wish Pulls</button></div>
     <h2 class="sec">Good Memories 💎</h2>
     <div class="secSub">Share happy moments with the group — everyone can see, react and comment</div>
     <div class="memBox">
@@ -841,6 +866,7 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
   <div id="tab-news" class="hidden"><div class="nwWrap" id="newsBody"></div></div>
 
   <div id="tab-wish" class="hidden">
+    <div class="seg"><button onclick="nav('memories')">💎 Memories</button><button class="active" onclick="nav('wish')">✨ Wish Pulls</button></div>
     <div class="wsPanel">
       <div class="wsHead">✦ LUCKIEST ACCOUNT</div>
       <div class="seg"><button id="btnWsMy" class="active" onclick="setWsMode('my')">My Pulls</button><button id="btnWsGroup" onclick="setWsMode('group')">Group Pulls</button></div>
@@ -879,13 +905,14 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
     <button id="nav-planner" class="active" onclick="nav('planner')"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><line class="w" x1="12" y1="3.5" x2="12" y2="20.5"/></svg>Planner</button>
     <button id="nav-month" onclick="nav('month')"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><line class="w" x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/></svg>Month</button>
     <button id="nav-remind" onclick="nav('remind')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/><path d="M3 9a9 9 0 0 1 3-6M21 9a9 9 0 0 0-3-6" style="fill:none"/></svg><i class="navBadge hidden" id="rmDot">!</i></span>Reminder</button>
-    <button id="nav-farm" onclick="nav('farm')"><svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13c0-4 2.6-6.5 7-6.5 0 4.2-2.6 6.5-7 6.5z"/><path d="M12 15.5C12 12 9.8 10 5 10c0 3.6 2.4 5.5 7 5.5z"/></svg>Farm</button>
     <button id="nav-trinity" onclick="nav('trinity')"><svg viewBox="0 0 24 24"><path d="M12 3l8 5v8l-8 5-8-5V8z"/><path class="w" d="M12 8l3 2v4l-3 2-3-2v-4z"/></svg>Trinity</button>
-    <button id="nav-news" onclick="nav('news')"><span class="navIcon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="14" height="15" rx="2"/><path d="M17.5 8.5h3v8a3 3 0 0 1-3 3"/><line x1="7" y1="9" x2="13.5" y2="9"/><line x1="7" y1="12.5" x2="13.5" y2="12.5"/><line x1="7" y1="16" x2="11" y2="16"/></svg><i class="navBadge hidden" id="newsDot">!</i></span>News</button>
-    <button id="nav-alerts" onclick="nav('alerts')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><i class="navBadge hidden" id="bellBadge">0</i></span>Notifications</button>
-    <button id="nav-wish" onclick="nav('wish')"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 6.1 6.1 2.4-6.1 2.4L12 20l-2.4-6.1L3.5 11.5l6.1-2.4z"/></svg>Wish Pulls</button>
+    <button id="nav-farm" onclick="nav('farm')"><svg viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13c0-4 2.6-6.5 7-6.5 0 4.2-2.6 6.5-7 6.5z"/><path d="M12 15.5C12 12 9.8 10 5 10c0 3.6 2.4 5.5 7 5.5z"/></svg>Farm</button>
+    <button class="navHid" id="nav-news" onclick="nav('news')"><span class="navIcon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="14" height="15" rx="2"/><path d="M17.5 8.5h3v8a3 3 0 0 1-3 3"/><line x1="7" y1="9" x2="13.5" y2="9"/><line x1="7" y1="12.5" x2="13.5" y2="12.5"/><line x1="7" y1="16" x2="11" y2="16"/></svg><i class="navBadge hidden" id="newsDot">!</i></span>News</button>
+    <button class="navHid" id="nav-alerts" onclick="nav('alerts')"><span class="navIcon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.6 2.2H4.4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><i class="navBadge hidden" id="bellBadge">0</i></span>Notifications</button>
+    <button class="navHid" id="nav-wish" onclick="nav('wish')"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 6.1 6.1 2.4-6.1 2.4L12 20l-2.4-6.1L3.5 11.5l6.1-2.4z"/></svg>Wish Pulls</button>
     <button id="nav-memories" onclick="nav('memories')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.8a4.3 4.3 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z"/></svg>Memories</button>
-    <button id="nav-profile" onclick="nav('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Profile</button>
+    <button class="navHid" id="nav-profile" onclick="nav('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>Profile</button>
+    <button id="nav-more" onclick="nav('more')"><span class="navIcon"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><i class="navBadge hidden" id="moreDot">!</i></span>More</button>
   </div>
 </div>
 
@@ -906,7 +933,7 @@ html[data-theme="dark"] .fmChip.on{background:var(--blue);color:#fff}
 </div>
 
 <!-- DAY POPUP (Month: tap a date) -->
-<div id="toast" class="toast hidden" onclick="openNotifs()"></div>
+<div id="toast" class="toast hidden" onclick="toastTap()"></div>
 <div id="rxPop" class="hidden"></div>
 <div id="rxWho" class="hidden"></div>
 <div id="dayPop" class="popLayer hidden" onclick="if(event.target===this)closeDayPop()">
@@ -1551,9 +1578,9 @@ function renderFarm(){
 }
 
 /* ---------- navigation ---------- */
-const TITLES={news:'The Trinity News',wish:'Wish Pulls',planner:'Group Weekly Planner',month:'Calendar',remind:'Reminders',farm:'Weekly Farm',trinity:'Trinity',memories:'Good Memories',alerts:'Notifications',profile:'Profile'};
+const TITLES={news:'The Trinity News',wish:'Wish Pulls',planner:'Group Weekly Planner',month:'Calendar',remind:'Reminders',farm:'Weekly Farm',trinity:'Trinity',more:'More',memories:'Good Memories',alerts:'Notifications',profile:'Profile'};
 function nav(t){
-  ['planner','month','remind','farm','trinity','news','alerts','wish','memories','profile'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
+  ['planner','month','remind','farm','trinity','news','alerts','wish','memories','profile','more'].forEach(x=>{$('tab-'+x).classList.toggle('hidden',x!==t);$('nav-'+x).classList.toggle('active',x===t)});
   $('pageTitle').textContent=TITLES[t];
   $('appScreen').classList.toggle('fullTab',t==='news'||t==='wish'||t==='trinity');
   renderAll();window.scrollTo(0,0);
@@ -2186,7 +2213,7 @@ function renderMemories(force){
   const L=allPlans.filter(p=>p.kind==='memory').sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   el.innerHTML=L.length?L.map(p=>{
     const u=userOf(p.owner),mine=isMine(p),pid=esc(p.id);
-    return `<div class="memCard"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${Array.isArray(p.links)&&p.links.length?`<div class="memLinks">${p.links.map(l=>`<a class="memLink" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span>▶</span><div><b>${esc(l.h)}</b><small>Tap to open</small></div></a>`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>{const cu=cmUser(c);return `<div class="cmItem" style="background:${hexA(normHex(cu.color)||'#A8E6CF',.22)}">${avatar(cu,30)}<div class="cmBody"><b>${esc(cu.name||c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small></div>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`}).join('')}</div><div class="cmAdd"><button class="cmEmo" onclick="openEmojiPicker('cm-${pid}')" aria-label="Pick emoji">😊</button><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
+    return `<div class="memCard" id="mem-${pid}"><div class="memHead">${avatar(u,38)}<div style="flex:1;min-width:0"><b>${esc(u.name)}${mine?' (you)':''}</b><div class="memTime">${memTime(p.createdAt)}${p.updatedAt?' • edited':''}</div></div>${mine?`<button class="editBtn" onclick="openMemEdit('${pid}')" aria-label="Edit memory">${PENCIL}</button>`:''}</div>${p.text?`<div class="memText">${esc(p.text)}</div>`:''}${Array.isArray(p.media)&&p.media.length?`<div class="memMedia">${p.media.map(m=>m.t==='v'?`<video src="${m.d}" controls playsinline preload="metadata"></video>`:`<img src="${m.d}" alt="" onclick="openMedia(this.src)">`).join('')}</div>`:''}${Array.isArray(p.links)&&p.links.length?`<div class="memLinks">${p.links.map(l=>`<a class="memLink" href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span>▶</span><div><b>${esc(l.h)}</b><small>Tap to open</small></div></a>`).join('')}</div>`:''}${reactBar(p)}<div class="cmList">${commentsOf(p).map(c=>{const cu=cmUser(c);return `<div class="cmItem" style="background:${hexA(normHex(cu.color)||'#A8E6CF',.22)}">${avatar(cu,30)}<div class="cmBody"><b>${esc(cu.name||c.n||'?')}</b> ${esc(c.t)}<small>${memTime(c.ts)}</small></div>${c.k===cmKey()?`<button class="cmDel" onclick="delComment('${pid}','${esc(c.id)}')" aria-label="Delete comment">✕</button>`:''}</div>`}).join('')}</div><div class="cmAdd"><button class="cmEmo" onclick="openEmojiPicker('cm-${pid}')" aria-label="Pick emoji">😊</button><input id="cm-${pid}" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter')addComment('${pid}')"><button onclick="addComment('${pid}')">Send</button></div></div>`;
   }).join(''):'<div class="empty">No memories yet — share your first one! 💎</div>';
   Object.keys(keep).forEach(id=>{const e=$(id);if(e)e.value=keep[id]});
 }
@@ -2284,7 +2311,7 @@ function processNotifs(list,meta){
       const id='add_'+p.id;
       if(!seenN.has(id)){
         seenN.add(id);
-        added.push({id,type:'add',pid:p.id,date:p.date,who:p.ownerName||String(p.owner).split('@')[0],emoji:p.emoji||'',text:p.text||'',ts:p.createdAt||Date.now(),read:false,fresh:(Date.now()-(p.createdAt||0))<180000});
+        added.push({id,type:'add',mem:p.kind==='memory',pid:p.id,date:p.date,who:p.ownerName||String(p.owner).split('@')[0],emoji:p.emoji||'',text:p.text||'',ts:p.createdAt||Date.now(),read:false,fresh:(Date.now()-(p.createdAt||0))<180000});
       }
     }
     // 3) iemand het 'n plan verander (teks / emoji / kleur)
@@ -2292,7 +2319,7 @@ function processNotifs(list,meta){
       const id='edit_'+p.id+'_'+p.updatedAt;
       if(!seenN.has(id)){
         seenN.add(id);
-        added.push({id,type:'edit',pid:p.id,date:p.date,who:p.updatedByName||String(p.updatedBy).split('@')[0],emoji:p.emoji||'',text:p.text||'',ts:p.updatedAt,read:false,fresh:(Date.now()-p.updatedAt)<180000});
+        added.push({id,type:'edit',mem:p.kind==='memory',pid:p.id,date:p.date,who:p.updatedByName||String(p.updatedBy).split('@')[0],emoji:p.emoji||'',text:p.text||'',ts:p.updatedAt,read:false,fresh:(Date.now()-p.updatedAt)<180000});
       }
     }
     // 4) iemand wil by 'n plan join
@@ -2313,7 +2340,7 @@ function processNotifs(list,meta){
           const id='rx_'+p.id+'_'+k+'_'+e;
           if(seenN.has(id))return;seenN.add(id);
           if(silentReact)return;
-          added.push({id,type:'react',pid:p.id,date:p.date,who:userOf(rxOwnerOf(k)).name,reaction:e,emoji:p.emoji||'',text:p.text||'',ts:Date.now(),read:false,fresh:true});
+          added.push({id,type:'react',mem:p.kind==='memory',pid:p.id,date:p.date,who:userOf(rxOwnerOf(k)).name,reaction:e,emoji:p.emoji||'',text:p.text||'',ts:Date.now(),read:false,fresh:true});
         });
       });
     }
@@ -2327,7 +2354,7 @@ function processNotifs(list,meta){
   const fresh=added.filter(a=>a.fresh);
   if(fresh.length){
     const f=fresh[0];
-    showToast(notifTitle(f)+(fresh.length>1?`  (+${fresh.length-1} more)`:''),notifSub(f));
+    showToast(notifTitle(f)+(fresh.length>1?`  (+${fresh.length-1} more)`:''),notifSub(f),f.mem?function(){goMemory(f.pid)}:null);
     if(document.hidden)systemNotify(notifTitle(f),notifSub(f),f.id);
   }else if(!meta||!meta.fromCache){
     showToast(`🔔 ${added.length} new update${added.length>1?'s':''} while you were away`,'Tap to see');
@@ -2335,15 +2362,18 @@ function processNotifs(list,meta){
 }
 function planLbl(f){return `${f.emoji?f.emoji+' ':''}${f.text}`.trim()}
 function notifTitle(f){
+  if(f.mem){if(f.type==='react')return `${f.who} reacted ${f.reaction} to your memory`;if(f.type==='edit')return `${f.who} edited a memory`;return `${f.who} shared a memory 💎`}
   if(f.type==='react')return `${f.who} reacted ${f.reaction} to your plan`;
   if(f.type==='edit')return `${f.who} updated ${planLbl(f)}`;
   if(f.type==='join')return `${f.who} joined ${planLbl(f)}`;
   return `${f.who} added ${planLbl(f)}`;
 }
-function notifSub(f){return f.type==='react'?planLbl(f):(f.date?dayLabel(f.date):'')}
+function notifSub(f){if(f.mem)return ((f.text||'').trim().slice(0,70))||'📷 Tap to see';return f.type==='react'?planLbl(f):(f.date?dayLabel(f.date):'')}
 var toastT;
-function showToast(t,sub){
-  const el=$('toast');el.innerHTML=esc(t)+(sub?`<small>${esc(sub)}</small>`:'');
+var toastGo=null;
+function toastTap(){var g=toastGo;$('toast').classList.add('hidden');if(g)g();else openNotifs()}
+function showToast(t,sub,go){
+  toastGo=go||null;const el=$('toast');el.innerHTML=esc(t)+(sub?`<small>${esc(sub)}</small>`:'');
   el.classList.remove('hidden');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.add('hidden'),5500);
 }
 function systemNotify(title,body,tag){
@@ -2374,8 +2404,14 @@ function renderNotifs(){
 }
 function openNotifs(){nav('alerts')}
 function markAllRead(){(feed||[]).forEach(f=>f.read=true);hl=new Set();saveNotifs();updateBell();renderNotifs()}
+function goMemory(pid){
+  nav('memories');
+  setTimeout(function(){var el=$('mem-'+pid);if(!el){showToast('That memory is no longer there');return}el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('memFlash');setTimeout(function(){el.classList.remove('memFlash')},3200)},150);
+}
 function goNotif(i){
   const f=(feed||[])[i];if(!f)return;f.read=true;saveNotifs();updateBell();
+  const pl=(allPlans||[]).find(x=>x.id===f.pid);
+  if(f.mem||(pl&&pl.kind==='memory')){goMemory(f.pid);return}
   if(f.date){mode='group';friendFilter=null;weekStart=mondayOf(parseKey(f.date))}
   nav('planner');
 }
@@ -2441,6 +2477,33 @@ async function trOpen(k){
   }catch(e){TR.loaded=false;$('trMsg').textContent='Kon nie laai nie. '+e.message+'. Die lêer moet in dieselfde gids as index.html wees; sê vir my sy regte naam.'}
 }
 function trShow(){if(!TR.loaded)trOpen(TR.k);else document.querySelectorAll('#trSeg button').forEach(function(b){b.classList.toggle('active',b.dataset.t===TR.k)})}
+</script>
+<script>
+/* ===== More-tab: kennisgewing-kolletjies + 'More' lig op ===== */
+var MORE_SET=['news','alerts','profile','more'];
+function updMore(){
+  function cp(s,d){s=$(s);d=$(d);if(!s||!d)return 0;var hid=s.classList.contains('hidden');d.textContent=s.textContent;d.classList.toggle('hidden',hid);return hid?0:1}
+  var a=cp('newsDot','mb-news')+cp('bellBadge','mb-alerts');
+  cp('bellBadge','hbBadge');
+  var m=$('moreDot');if(m)m.classList.toggle('hidden',!a);
+}
+(function(){
+  var n0=nav;nav=function(t){n0(t);try{var b=$('nav-more');if(b)b.classList.toggle('active',MORE_SET.indexOf(t)>=0);var mb=$('nav-memories');if(mb&&t==='wish')mb.classList.add('active');updMore()}catch(e){}};
+  var r0=renderAll;renderAll=function(){r0();try{updMore()}catch(e){}};
+  setInterval(function(){try{updMore()}catch(e){}},1500);
+})();
+</script>
+<script>
+/* ===== klik op foon-kennisgewing (sw.js) -> spesifieke memory/plan ===== */
+function openByTag(tag){
+  tag=String(tag||'');
+  var i=(feed||[]).findIndex(function(f){return f.id===tag});if(i>=0){goNotif(i);return true}
+  var pl=(allPlans||[]).find(function(p){return p.kind==='memory'&&tag.indexOf(p.id)>=0});if(pl){goMemory(pl.id);return true}
+  var q=(allPlans||[]).find(function(p){return tag.indexOf(p.id)>=0});if(q){if(q.date){mode='group';friendFilter=null;weekStart=mondayOf(parseKey(q.date))}nav('planner');return true}
+  return false}
+var _pendTag=null;try{var _hm=/^#n=(.+)/.exec(location.hash);if(_hm){_pendTag=decodeURIComponent(_hm[1]);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
+try{if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',function(e){var m=e.data||{};if(m.type==='notif-click'&&!openByTag(m.tag))openNotifs()})}catch(e){}
+(function(){var r1=renderAll;renderAll=function(){r1();try{if(_pendTag&&profile&&allPlans&&allPlans.length){var t=_pendTag;_pendTag=null;if(!openByTag(t))openNotifs()}}catch(e){}}})();
 </script>
 <script type="module">
 /* Trinity News (read-only): listens to the node Trinity News posts to */
