@@ -2605,7 +2605,7 @@ function trViewCV(){
     var all=cs.length&&g===cs.length,rc=all?'#6fdc7a':'#ffb64a';
     var html='<div id="vPic" style="background-image:'+esc(bg)+'"></div><div><div class="vhn">'+esc(tx('charName'))+'<span style="color:'+(four?'#a29bfe':'#ffe14b')+'">'+esc(tx('charStars'))+'</span></div>'
       +(sub.length?'<div class="vhs">'+esc(sub.join(' \u00B7 '))+'</div>':'')+(bits.length?'<div class="vhb">'+esc(bits.join(' \u00B7 '))+'</div>':'')+'</div>'
-      +(cs.length?'<div class="vhr" style="color:'+rc+'">'+g+' of '+cs.length+' ready</div>':'');
+      ;
     if(html!==hsig){hsig=html;hd.innerHTML=html}
     hd.style.display='flex';
   }
