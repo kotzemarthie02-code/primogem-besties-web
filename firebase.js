@@ -35,17 +35,18 @@ if (!configured) {
   try {
     const { initializeApp } = await import(SDK + "firebase-app.js");
     const fs = await import(SDK + "firebase-firestore.js");
-    const { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager,
+    const { initializeFirestore, getFirestore, memoryLocalCache,
             collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot,
             arrayUnion, arrayRemove, query, where, writeBatch } = fs;
 
     const app = initializeApp(firebaseConfig);
-    // persistent cache = edits survive a reload and are re-sent automatically if the phone was offline
-    // long-polling auto-detect = works on slow / filtered mobile networks too
+    // memory cache = always starts fresh from the server (a stuck/old copy stored in the browser can no longer
+    // show only 1 member or block the connection). Your data lives in Firebase, not in the browser.
+    // long-polling = works on slow / filtered networks too
     let db;
     try {
       db = initializeFirestore(app, {
-        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+        localCache: memoryLocalCache(),
         experimentalForceLongPolling: true
       });
     } catch (e) {
