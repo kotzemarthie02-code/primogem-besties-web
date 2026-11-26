@@ -2437,7 +2437,7 @@ applyTheme();
 </script>
 <script>
 /* ===== Trinity tab: wys die regte Trinity-bladsye in KYK-modus (lêers self onveranderd) ===== */
-var TR_BASES=['https://kotzemarthie02-code.github.io/Trinity-App/',''];   /* eers Trinity-App se webwerf, dan dieselfde gids as index.html */
+var TR_BASES=['','https://kotzemarthie02-code.github.io/Trinity-App/'];   /* eers Trinity-App se webwerf, dan dieselfde gids as index.html */
 var TR_PAGES={   /* moontlike lêername op jou gasheer: eerste wat bestaan word gebruik */
   bg:['Build-Guide.html','build-guide.html','BuildGuide.html','Build_Guide.html','buildguide.html'],
   cv:['CharacterView.html','characterview.html','Character-View.html','character-view.html','Characterview.html'],
@@ -2627,6 +2627,33 @@ function trViewCV(){
   }
   setInterval(function(){try{if(document.getElementById('charSelect')){setup();view()}}catch(e){}},500);
 }
+/* Haal die Firebase-data hier (met index se eie werkende verbinding) en sit dit in localStorage voor die bladsy in die raam laai */
+async function trPrefetch(k){
+  var R=window.__pbRT;
+  for(var w=0;w<30&&!R;w++){await new Promise(function(r){setTimeout(r,200)});R=window.__pbRT}
+  if(!R)return 'Firebase-databasis het nie gelaai nie (internet?)';
+  var uid=localStorage.getItem('trinity_uid')||'Admin',errs=[];
+  function rd(p){
+    return Promise.race([R.get(R.ref(R.db,p)).then(function(s){return s.exists()?s.val():null}),
+      new Promise(function(_,rej){setTimeout(function(){rej(new Error('geen antwoord na 10s'))},10000)})])
+      .catch(function(e){errs.push(p+' -> '+(e&&e.message||e));return undefined});
+  }
+  function ls(key,v){try{localStorage.setItem(key,typeof v==='string'?v:JSON.stringify(v))}catch(e){}}
+  function arr(v){return v?(Array.isArray(v)?v:Object.values(v)):[]}
+  var jobs=[];
+  if(k==='bg'){
+    jobs.push(rd('buildguide/characters').then(function(v){try{if(v&&v.chars&&JSON.parse(v.chars).length)ls('bg_chars_v3',v.chars)}catch(e){}}));
+    jobs.push(rd('buildguide/deleted').then(function(v){if(v&&v.names)ls('bg_deleted_v1',v.names)}));
+    jobs.push(rd('buildguide_owned/'+uid).then(function(v){if(v&&v.owned)ls('bg_owned_'+uid,v.owned)}));
+    jobs.push(rd('users/'+uid+'/ownedCharacters').then(function(v){if(v)ls('bg_tgowned_'+uid,arr(v))}));
+  }else{
+    jobs.push(rd('users/'+uid+'/ownedCharacters').then(function(v){if(v)ls('ownedCharacters',arr(v))}));
+    if(k==='tk')jobs.push(rd('users/'+uid+'/genshinTracker').then(function(v){
+      try{if(Array.isArray(v)&&v.length&&localStorage.getItem('genshinTrackerUnsynced')!=='1')ls('genshinTrackerCharacterData',v)}catch(e){}}));
+  }
+  await Promise.all(jobs);
+  return errs.join('; ');
+}
 async function trOpen(k){
   TR.k=k;store.set('pb_tr_k',k);TR.loaded=true;
   document.querySelectorAll('#trSeg button').forEach(function(b){b.classList.toggle('active',b.dataset.t===k)});
@@ -2637,12 +2664,16 @@ async function trOpen(k){
       var names=TR_PAGES[k],bad=[],base='';
       for(var b=0;b<TR_BASES.length&&!s;b++)for(var i=0;i<names.length&&!s;i++){
         var u=TR_BASES[b]+names[i];
-        try{var r=await fetch(u,{cache:'no-cache'});if(r.ok){var t=await r.text();if(/<html|<!doctype/i.test(t.slice(0,300))&&t.length>5000){s=t;base=TR_BASES[b]}else bad.push(u)}else if(r.status!==404||i<2)bad.push(u+' ('+r.status+')')}catch(e2){bad.push(u+' (fout)');if(TR_BASES[b])break}
+        try{var r=await fetch(u,{cache:'no-cache'});if(r.ok){var t=await r.text();if(/<html|<!doctype/i.test(t.slice(0,300))&&t.length>5000&&t.indexOf('id="tab-trinity"')<0){s=t;base=TR_BASES[b]}else bad.push(u)}else if(r.status!==404||i<2)bad.push(u+' ('+r.status+')')}catch(e2){bad.push(u+' (fout)');if(TR_BASES[b])break}
       }
       if(!s)throw new Error('Geen van hierdie lêers gevind nie: '+bad.join(', '));
       TR.c[k]={s:s,base:base}}
     var o=TR.c[k],bs=o.base;s=o.s.replace(/<head[^>]*>/i,function(m){return m+(bs?'<base href="'+bs+'">':'')+'<style>'+TR_CSS+'</style><script>('+trGuard.toString()+')()<\/script>'+(k==='cv'?'<script>('+trViewCV.toString()+')()<\/script>':'')});
-    $('trFrame').srcdoc=s;$('trMsg').textContent='';
+    $('trMsg').textContent='Laai data…';
+    var pe='';try{pe=await trPrefetch(k)}catch(e3){pe=String(e3&&e3.message||e3)}
+    if(TR.k!==k)return;   /* intussen na 'n ander oortjie gewissel */
+    $('trFrame').srcdoc=s;
+    $('trMsg').textContent=pe?'Let op: Firebase het nie data gegee nie ('+pe+'). Kyk of die Realtime Database-reëls lees toelaat.':'';
   }catch(e){TR.loaded=false;$('trMsg').textContent='Kon nie laai nie. '+e.message+'. Die lêer moet in dieselfde gids as index.html wees; sê vir my sy regte naam.'}
 }
 function trShow(){if(!TR.loaded)trOpen(TR.k);else document.querySelectorAll('#trSeg button').forEach(function(b){b.classList.toggle('active',b.dataset.t===TR.k)})}
@@ -2680,7 +2711,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 try{
   const app=initializeApp({apiKey:"AIzaSyBoCKHkd1FhfNeFMnJInkqqgiX0GCjAJAQ",authDomain:"trinityapp-28019.firebaseapp.com",databaseURL:"https://trinityapp-28019-default-rtdb.firebaseio.com",projectId:"trinityapp-28019",storageBucket:"trinityapp-28019.firebasestorage.app",messagingSenderId:"72035223407",appId:"1:72035223407:web:b1a40d9ce96ae479be4a9a"},"trinityNews");
-  const _fdb=getDatabase(app);let _fAt="",_fUn=[];
+  const _fdb=getDatabase(app);window.__pbRT={db:_fdb,ref:ref,get:get};let _fAt="",_fUn=[];
   window.farmAttach=function(){
     const u=localStorage.getItem("trinity_uid")||"";if(!u||u===_fAt)return;
     _fUn.forEach(f=>{try{f()}catch(e){}});_fAt=u;
